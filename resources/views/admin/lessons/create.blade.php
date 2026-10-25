@@ -85,6 +85,9 @@
                     <button type="button" onclick="addCalloutBlock()" class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl transition">
                         <i class="fa-solid fa-lightbulb me-1 text-[10px]"></i> Tip / Note
                     </button>
+                    <button type="button" onclick="addPracticeBlock()" class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 rounded-xl transition">
+                        <i class="fa-solid fa-terminal me-1 text-[10px]"></i> Practice Lab
+                    </button>
                 </div>
             </div>
 
@@ -242,6 +245,34 @@
                         </div>
                     </div>
                 `;
+            } else if (block.type === 'practice') {
+                headerBadge = `<span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-violet-50 text-violet-700 border border-violet-200"><i class="fa-solid fa-terminal me-1"></i> Interactive Coding Challenge</span>`;
+                contentHtml = `
+                    <div class="space-y-2">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="md:col-span-2">
+                                <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Challenge Title</label>
+                                <input type="text" value="${escapeHtml(block.title || '')}" oninput="updateBlock(${index}, 'title', this.value)" placeholder="e.g. Practice: Calculate Fibonacci Sequence" class="bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Language</label>
+                                <select onchange="updateBlock(${index}, 'language', this.value)" class="bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full font-semibold">
+                                    ${['php', 'python', 'javascript', 'html'].map(lang => 
+                                        `<option value="${lang}" ${block.language === lang ? 'selected' : ''}>${lang.toUpperCase()}</option>`
+                                    ).join('')}
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Task Instructions / Problem Statement</label>
+                            <textarea rows="2" oninput="updateBlock(${index}, 'instructions', this.value)" placeholder="Describe what students need to compute or output..." class="bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full">${escapeHtml(block.instructions || '')}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Starter Code Template</label>
+                            <textarea rows="5" oninput="updateBlock(${index}, 'code', this.value)" class="bg-slate-900 border border-slate-800 text-emerald-400 text-xs font-mono rounded-xl p-3 w-full">${escapeHtml(block.code || '')}</textarea>
+                        </div>
+                    </div>
+                `;
             }
 
             card.innerHTML = `
@@ -296,6 +327,17 @@
 
     function addCalloutBlock() {
         blocks.push({ type: 'callout', title: '', style: 'tip', content: '' });
+        renderBlocks();
+    }
+
+    function addPracticeBlock() {
+        blocks.push({
+            type: 'practice',
+            title: 'Hands-on Practice Challenge',
+            instructions: 'Write a program to solve the task below and test the output:',
+            language: 'php',
+            code: '<?php\n// Write your solution below:\n\n?>'
+        });
         renderBlocks();
     }
 

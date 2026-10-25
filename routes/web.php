@@ -8,11 +8,15 @@ use App\Http\Controllers\Admin\ChapterController;
 use App\Http\Controllers\Admin\LessonController;
 use App\Http\Controllers\Admin\QuizController;
 use App\Http\Controllers\Admin\AssignmentController;
+use App\Http\Controllers\CodeRunnerController;
 
 // Redirect root to Admin Dashboard (or login)
 Route::get('/', function () {
     return redirect()->route('admin.dashboard');
 });
+
+// Interactive Code Runner API (Safe execution sandbox for lesson practice)
+Route::post('/code/execute', [CodeRunnerController::class, 'execute'])->name('code.execute');
 
 // Admin Auth Routes
 Route::prefix('admin')->name('admin.')->group(function () {

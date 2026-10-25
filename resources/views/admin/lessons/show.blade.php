@@ -27,8 +27,11 @@
         </div>
 
         <div class="flex items-center gap-2">
+            <a href="#practice-sandbox-section" class="inline-flex items-center px-3.5 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition">
+                <i class="fa-solid fa-terminal me-1.5"></i> Open Practice Lab
+            </a>
             <a href="{{ route('admin.lessons.edit', $lesson->id) }}" class="inline-flex items-center px-4 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition">
-                <i class="fa-solid fa-pen me-1.5 text-gray-500"></i> Edit Lesson / Blocks
+                <i class="fa-solid fa-pen me-1.5 text-gray-500"></i> Edit Lesson
             </a>
             <a href="{{ route('admin.courses.show', $lesson->chapter->course_id) }}" class="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition">
                 <i class="fa-solid fa-arrow-left me-1.5"></i> Back to Course
@@ -101,9 +104,14 @@
                                 {{ $lang }}
                             </span>
                         </div>
-                        <button onclick="navigator.clipboard.writeText(document.getElementById('{{ $codeId }}').innerText); alert('Code snippet copied to clipboard!');" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition">
-                            <i class="fa-solid fa-copy"></i> Copy
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="loadIntoSandbox(@js($block['code']), @js($lang))" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-950/60 border border-emerald-800/60 px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-play text-[10px]"></i> Test in Sandbox
+                            </button>
+                            <button onclick="navigator.clipboard.writeText(document.getElementById('{{ $codeId }}').innerText); alert('Code snippet copied to clipboard!');" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition px-2 py-1">
+                                <i class="fa-solid fa-copy"></i> Copy
+                            </button>
+                        </div>
                     </div>
                     <pre class="p-5 overflow-x-auto text-xs font-mono"><code id="{{ $codeId }}" class="language-{{ $lang }}">{{ $block['code'] }}</code></pre>
                 </div>
@@ -140,11 +148,27 @@
                     </div>
                 </div>
 
+                <!-- 6. Embedded Practice Lab Block -->
+                @elseif($blockType === 'practice')
+                <div class="p-6 bg-gradient-to-br from-indigo-950 to-slate-900 rounded-3xl border border-indigo-800 text-white shadow-xl space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            <i class="fa-solid fa-laptop-code"></i> Embedded Coding Challenge
+                        </span>
+                        <span class="text-xs font-mono text-indigo-300 uppercase font-bold">{{ $block['language'] ?? 'php' }}</span>
+                    </div>
+                    <h3 class="text-lg font-bold">{{ $block['title'] ?? 'Hands-on Practice Task' }}</h3>
+                    <p class="text-xs text-indigo-200/90 leading-relaxed">{{ $block['instructions'] ?? 'Try writing and executing the code below:' }}</p>
+                    <button type="button" onclick="loadIntoSandbox(@js($block['code'] ?? ''), @js($block['language'] ?? 'php'))" class="inline-flex items-center px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition shadow-md">
+                        <i class="fa-solid fa-play me-2"></i> Launch in Practice Lab Below
+                    </button>
+                </div>
+
                 @endif
             @endforeach
         </div>
     @else
-        <!-- Classic Fallback View (if no modular blocks created yet) -->
+        <!-- Classic Fallback View -->
         <div class="space-y-6">
             @if($lesson->video_url)
             <div class="bg-black rounded-3xl overflow-hidden shadow-lg border border-gray-800">
@@ -183,15 +207,132 @@
                         </div>
                         <span class="text-xs font-mono text-slate-300 ms-2 font-bold uppercase">{{ $lesson->code_language ?? 'php' }} snippet</span>
                     </div>
-                    <button onclick="navigator.clipboard.writeText(document.getElementById('code-block-classic').innerText); alert('Code copied to clipboard!');" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition">
-                        <i class="fa-solid fa-copy"></i> Copy
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="loadIntoSandbox(@js($lesson->code_snippet), @js($lesson->code_language ?? 'php'))" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-950/60 border border-emerald-800/60 px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-play text-[10px]"></i> Test in Sandbox
+                        </button>
+                        <button onclick="navigator.clipboard.writeText(document.getElementById('code-block-classic').innerText); alert('Code copied to clipboard!');" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition px-2 py-1">
+                            <i class="fa-solid fa-copy"></i> Copy
+                        </button>
+                    </div>
                 </div>
                 <pre class="p-5 overflow-x-auto text-xs font-mono"><code id="code-block-classic" class="language-{{ $lesson->code_language ?? 'php' }}">{{ $lesson->code_snippet }}</code></pre>
             </div>
             @endif
         </div>
     @endif
+
+    <!-- ============================================================== -->
+    <!-- INTERACTIVE CODE PRACTICE LAB & TERMINAL CONSOLE SANDBOX -->
+    <!-- ============================================================== -->
+    <div id="practice-sandbox-section" class="bg-slate-950 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden text-white scroll-mt-24">
+        
+        <!-- Sandbox Header -->
+        <div class="p-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border-b border-slate-800/80 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                    <i class="fa-solid fa-terminal text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
+                        Interactive Code Lab & Practice Console
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Live Runner</span>
+                    </h2>
+                    <p class="text-xs text-slate-400">Write, edit, and execute code in real-time. Instant terminal output.</p>
+                </div>
+            </div>
+
+            <!-- Controls: Language selector & Actions -->
+            <div class="flex flex-wrap items-center gap-2">
+                <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-700/80 rounded-xl px-2.5 py-1">
+                    <span class="text-[11px] text-slate-400 uppercase font-semibold">Env:</span>
+                    <select id="sandbox-language" onchange="switchSandboxLanguage(this.value)" class="bg-transparent border-none text-xs font-bold text-indigo-300 focus:ring-0 cursor-pointer p-0">
+                        <option value="php" selected class="bg-slate-900 text-white">PHP 8.5 (CLI)</option>
+                        <option value="python" class="bg-slate-900 text-white">Python 3</option>
+                        <option value="javascript" class="bg-slate-900 text-white">JavaScript (Node.js)</option>
+                        <option value="html" class="bg-slate-900 text-white">HTML / CSS (Live Preview)</option>
+                    </select>
+                </div>
+
+                <button type="button" onclick="resetSandboxCode()" class="px-3 py-1.5 text-xs font-semibold text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-xl border border-slate-700 transition" title="Reset code to original">
+                    <i class="fa-solid fa-rotate-left me-1"></i> Reset
+                </button>
+
+                <button type="button" id="btn-run-code" onclick="runSandboxCode()" class="px-5 py-2 text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-xl shadow-lg shadow-emerald-900/30 transition flex items-center gap-2">
+                    <i id="run-icon" class="fa-solid fa-play"></i>
+                    <span id="run-text">Run Code (Ctrl+Enter)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Editor & Terminal Output Split View -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-800 min-h-[380px]">
+            
+            <!-- Left / Top: Code Editor -->
+            <div class="p-4 flex flex-col justify-between space-y-3 bg-slate-950/80">
+                <div class="flex items-center justify-between text-xs text-slate-400 pb-2 border-b border-slate-800/60">
+                    <span class="font-mono text-[11px] flex items-center gap-2">
+                        <i class="fa-solid fa-code text-indigo-400"></i> Code Editor
+                    </span>
+                    <span class="text-[10px] text-slate-500">Press Tab for indentation</span>
+                </div>
+
+                <div class="relative flex-1">
+                    <textarea id="sandbox-code-editor" spellcheck="false" rows="14" class="w-full h-full bg-slate-900/90 text-emerald-300 font-mono text-xs rounded-2xl p-4 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y leading-relaxed outline-none"><?php
+// Practice Challenge: Loop & Accumulate
+$numbers = [10, 25, 45, 80, 100];
+$sum = 0;
+
+echo "=== Processing Numbers ===\n";
+foreach ($numbers as $num) {
+    $sum += $num;
+    echo "Added: $num | Running Total: $sum\n";
+}
+
+echo "Final Total: " . $sum . "\n";
+?></textarea>
+                </div>
+            </div>
+
+            <!-- Right / Bottom: Live Terminal Output -->
+            <div class="p-4 flex flex-col justify-between space-y-3 bg-slate-900/90">
+                <div class="flex items-center justify-between text-xs text-slate-400 pb-2 border-b border-slate-800/60">
+                    <div class="flex items-center gap-2">
+                        <div class="flex gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+                        </div>
+                        <span class="font-mono text-[11px] font-bold text-slate-300 ms-1">
+                            Terminal Console
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span id="sandbox-execution-badge" class="hidden text-[10px] font-mono px-2 py-0.5 rounded-md font-bold">
+                            <!-- Injected dynamically -->
+                        </span>
+                        <button type="button" onclick="clearTerminalOutput()" class="text-[11px] text-slate-500 hover:text-slate-300">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Terminal Body -->
+                <div class="flex-1 flex flex-col">
+                    <!-- Standard Text Terminal -->
+                    <div id="sandbox-terminal-output" class="w-full flex-1 min-h-[280px] bg-black/80 rounded-2xl p-4 font-mono text-xs text-slate-300 overflow-y-auto whitespace-pre-wrap leading-relaxed border border-slate-800/80">
+<span class="text-slate-500">// Terminal ready. Click 'Run Code' above to execute your solution.</span>
+                    </div>
+
+                    <!-- HTML Iframe Preview (Hidden unless HTML selected) -->
+                    <iframe id="sandbox-html-preview" class="w-full flex-1 min-h-[280px] bg-white rounded-2xl border border-slate-800 hidden" sandbox="allow-scripts"></iframe>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
 
     <!-- Supplementary PDF Learning Resource (Bottom Anchor) -->
     @if($lesson->pdf_file)
@@ -212,4 +353,218 @@
     @endif
 
 </div>
+
+@push('scripts')
+<script>
+    const codeTemplates = {
+        php: `<?php
+// Practice: Loops & Conditionals
+$students = ["Alice" => 88, "Bob" => 62, "Charlie" => 95];
+
+foreach ($students as $name => $score) {
+    $grade = ($score >= 80) ? "Grade A" : "Grade Pass";
+    echo "$name scored $score -> $grade\\n";
+}
+?>`,
+        python: `# Practice in Python 3
+def calculate_grades(scores):
+    return {name: ("A" if score >= 80 else "Pass") for name, score in scores.items()}
+
+students = {"Alice": 88, "Bob": 62, "Charlie": 95}
+print("Evaluated Grades:", calculate_grades(students))`,
+        javascript: `// Practice in JavaScript
+const students = [
+    { name: "Alice", score: 88 },
+    { name: "Bob", score: 62 },
+    { name: "Charlie", score: 95 }
+];
+
+students.forEach(s => {
+    const status = s.score >= 80 ? "Grade A" : "Grade Pass";
+    console.log(\`\${s.name}: \${s.score}pts (\${status})\`);
+});`,
+        html: `<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f8fafc; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        h2 { color: #4f46e5; margin-top: 0; }
+        .badge { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🎉 EDULINK Live Interactive Preview</h2>
+        <p>This markup renders in real-time inside the lesson sandbox.</p>
+        <span class="badge">Status: Live Preview</span>
+    </div>
+</body>
+</html>`
+    };
+
+    function switchSandboxLanguage(lang) {
+        const editor = document.getElementById('sandbox-code-editor');
+        const termOutput = document.getElementById('sandbox-terminal-output');
+        const htmlPreview = document.getElementById('sandbox-html-preview');
+
+        if (codeTemplates[lang]) {
+            editor.value = codeTemplates[lang];
+        }
+
+        if (lang === 'html') {
+            termOutput.classList.add('hidden');
+            htmlPreview.classList.remove('hidden');
+            runSandboxCode();
+        } else {
+            termOutput.classList.remove('hidden');
+            htmlPreview.classList.add('hidden');
+        }
+    }
+
+    function resetSandboxCode() {
+        const lang = document.getElementById('sandbox-language').value;
+        switchSandboxLanguage(lang);
+    }
+
+    function clearTerminalOutput() {
+        document.getElementById('sandbox-terminal-output').innerHTML = '<span class="text-slate-500">// Terminal cleared.</span>';
+        document.getElementById('sandbox-execution-badge').classList.add('hidden');
+    }
+
+    function loadIntoSandbox(code, language) {
+        const editor = document.getElementById('sandbox-code-editor');
+        const select = document.getElementById('sandbox-language');
+
+        language = (language || 'php').toLowerCase();
+        if (['php', 'python', 'javascript', 'html'].includes(language)) {
+            select.value = language;
+        } else {
+            select.value = 'php';
+        }
+
+        editor.value = code;
+
+        // Scroll smoothly to sandbox
+        const section = document.getElementById('practice-sandbox-section');
+        section.scrollIntoView({ behavior: 'smooth' });
+
+        // Highlight flash effect
+        section.classList.add('ring-4', 'ring-indigo-500/50');
+        setTimeout(() => {
+            section.classList.remove('ring-4', 'ring-indigo-500/50');
+        }, 1200);
+
+        // Auto execute for instant feedback
+        runSandboxCode();
+    }
+
+    async function runSandboxCode() {
+        const editor = document.getElementById('sandbox-code-editor');
+        const language = document.getElementById('sandbox-language').value;
+        const terminal = document.getElementById('sandbox-terminal-output');
+        const htmlPreview = document.getElementById('sandbox-html-preview');
+        const badge = document.getElementById('sandbox-execution-badge');
+        const runBtn = document.getElementById('btn-run-code');
+        const runIcon = document.getElementById('run-icon');
+        const runText = document.getElementById('run-text');
+
+        const code = editor.value;
+
+        // If HTML preview mode
+        if (language === 'html') {
+            htmlPreview.srcdoc = code;
+            badge.className = "text-[10px] font-mono px-2 py-0.5 rounded-md font-bold bg-emerald-950 text-emerald-400 border border-emerald-800";
+            badge.textContent = "✓ Live Rendered";
+            badge.classList.remove('hidden');
+            return;
+        }
+
+        // Running state
+        runBtn.disabled = true;
+        runIcon.className = "fa-solid fa-spinner fa-spin";
+        runText.textContent = "Running...";
+        terminal.innerHTML = `<span class="text-indigo-400 font-mono">// Compiling & executing code...</span>`;
+
+        try {
+            const response = await fetch("{{ route('code.execute') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ language, code })
+            });
+
+            const data = await response.json();
+
+            let outputHtml = '';
+            if (data.stdout) {
+                outputHtml += `<span class="text-emerald-300 font-mono">${escapeHtml(data.stdout)}</span>`;
+            }
+            if (data.stderr) {
+                outputHtml += `<span class="text-rose-400 font-mono font-bold block mt-1">${escapeHtml(data.stderr)}</span>`;
+            }
+            if (!data.stdout && !data.stderr) {
+                outputHtml = `<span class="text-slate-500">// Script exited with code ${data.exit_code} (No output printed).</span>`;
+            }
+
+            terminal.innerHTML = outputHtml;
+
+            // Execution stats badge
+            if (data.exit_code === 0) {
+                badge.className = "text-[10px] font-mono px-2 py-0.5 rounded-md font-bold bg-emerald-950 text-emerald-400 border border-emerald-800";
+                badge.textContent = `✓ Exit: 0 • Time: ${data.execution_time}`;
+            } else {
+                badge.className = "text-[10px] font-mono px-2 py-0.5 rounded-md font-bold bg-rose-950 text-rose-400 border border-rose-800";
+                badge.textContent = `✗ Exit: ${data.exit_code} • Time: ${data.execution_time}`;
+            }
+            badge.classList.remove('hidden');
+
+        } catch (err) {
+            terminal.innerHTML = `<span class="text-rose-400 font-mono">Network / Execution Error: ${err.message}</span>`;
+            badge.className = "text-[10px] font-mono px-2 py-0.5 rounded-md font-bold bg-rose-950 text-rose-400 border border-rose-800";
+            badge.textContent = "✗ Network Error";
+            badge.classList.remove('hidden');
+        } finally {
+            runBtn.disabled = false;
+            runIcon.className = "fa-solid fa-play";
+            runText.textContent = "Run Code (Ctrl+Enter)";
+        }
+    }
+
+    // Ctrl+Enter or Cmd+Enter keyboard shortcut to run code
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            const editor = document.getElementById('sandbox-code-editor');
+            if (document.activeElement === editor) {
+                e.preventDefault();
+                runSandboxCode();
+            }
+        }
+    });
+
+    // Tab key support in code editor
+    document.getElementById('sandbox-code-editor')?.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+            this.selectionStart = this.selectionEnd = start + 4;
+        }
+    });
+
+    function escapeHtml(string) {
+        if (!string) return '';
+        return String(string)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+</script>
+@endpush
 @endsection
