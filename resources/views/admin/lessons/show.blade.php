@@ -135,6 +135,7 @@
                     $style = $block['style'] ?? 'tip';
                     $bgClass = $style === 'tip' ? 'bg-emerald-50 border-emerald-200 text-emerald-950' : ($style === 'warning' ? 'bg-amber-50 border-amber-200 text-amber-950' : 'bg-indigo-50 border-indigo-200 text-indigo-950');
                     $iconClass = $style === 'tip' ? 'fa-lightbulb text-emerald-600' : ($style === 'warning' ? 'fa-triangle-exclamation text-amber-600' : 'fa-circle-info text-indigo-600');
+                    $cleanContent = str_replace(['\$', '\\$'], '$', $block['content'] ?? '');
                 @endphp
                 <div class="p-5 rounded-2xl border {{ $bgClass }} flex items-start gap-3">
                     <div class="text-lg mt-0.5">
@@ -144,7 +145,7 @@
                         @if(!empty($block['title']))
                         <h4 class="font-bold text-sm">{{ $block['title'] }}</h4>
                         @endif
-                        <p class="text-xs leading-relaxed opacity-90">{{ $block['content'] ?? '' }}</p>
+                        <p class="text-xs leading-relaxed opacity-90">{{ $cleanContent }}</p>
                     </div>
                 </div>
 
@@ -224,66 +225,100 @@
 
     <!-- ============================================================== -->
     <!-- INTERACTIVE CODE PRACTICE LAB & TERMINAL CONSOLE SANDBOX -->
+    @php
+        $sandboxSetting = $lesson->code_language ?? 'all';
+        $isSandboxDisabled = ($sandboxSetting === 'none');
+        $isLanguageLocked = !in_array($sandboxSetting, ['all', 'none', null, '']);
+        $lockedLang = $isLanguageLocked ? strtolower($sandboxSetting) : null;
+        $initialLang = $lockedLang ?: 'php';
+
+        $languageLabels = [
+            'php' => 'PHP 8.5 (CLI)',
+            'python' => 'Python 3',
+            'javascript' => 'JavaScript (Node.js)',
+            'html' => 'HTML / CSS Live Preview',
+        ];
+    @endphp
+
+    @if(!$isSandboxDisabled)
     <!-- ============================================================== -->
-    <div id="practice-sandbox-section" class="bg-slate-950 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden text-white scroll-mt-24">
+    <!-- INTERACTIVE CODE PRACTICE LAB & TERMINAL CONSOLE SANDBOX -->
+    <!-- ============================================================== -->
+    <div id="practice-sandbox-section" class="w-full bg-slate-950 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden text-white scroll-mt-24">
         
         <!-- Sandbox Header -->
-        <div class="p-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border-b border-slate-800/80 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
-                    <i class="fa-solid fa-terminal text-lg"></i>
+        <div class="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-indigo-950/70 to-slate-900 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 shrink-0">
+                    <i class="fa-solid fa-terminal text-base"></i>
                 </div>
-                <div>
-                    <h2 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
-                        Interactive Code Lab & Practice Console
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Live Runner</span>
-                    </h2>
-                    <p class="text-xs text-slate-400">Write, edit, and execute code in real-time. Instant terminal output.</p>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h2 class="text-sm sm:text-base font-bold tracking-tight text-white">
+                            Interactive Code Practice Lab
+                        </h2>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">
+                            Live Runner
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400 truncate">Write, edit, and execute code in real-time. Instant terminal output.</p>
                 </div>
             </div>
 
             <!-- Controls: Language selector & Actions -->
-            <div class="flex flex-wrap items-center gap-2">
-                <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-700/80 rounded-xl px-2.5 py-1">
-                    <span class="text-[11px] text-slate-400 uppercase font-semibold">Env:</span>
-                    <select id="sandbox-language" onchange="switchSandboxLanguage(this.value)" class="bg-transparent border-none text-xs font-bold text-indigo-300 focus:ring-0 cursor-pointer p-0">
-                        <option value="php" selected class="bg-slate-900 text-white">PHP 8.5 (CLI)</option>
-                        <option value="python" class="bg-slate-900 text-white">Python 3</option>
-                        <option value="javascript" class="bg-slate-900 text-white">JavaScript (Node.js)</option>
-                        <option value="html" class="bg-slate-900 text-white">HTML / CSS (Live Preview)</option>
-                    </select>
-                </div>
+            <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap justify-end shrink-0">
+                @if($isLanguageLocked)
+                    <div class="flex items-center gap-1.5 bg-slate-900 border border-indigo-500/40 rounded-xl px-3 py-1.5 text-xs shadow-sm shrink-0">
+                        <i class="fa-solid fa-lock text-indigo-400 text-[11px]"></i>
+                        <span class="text-[11px] font-semibold text-slate-400">Language:</span>
+                        <span class="font-mono font-bold text-indigo-200 uppercase">{{ $languageLabels[$lockedLang] ?? $lockedLang }}</span>
+                        <span class="text-[10px] text-amber-400/90 font-medium ms-1">(Instructor Locked)</span>
+                    </div>
+                    <input type="hidden" id="sandbox-language" value="{{ $lockedLang }}">
+                @else
+                    <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-700/80 rounded-xl px-2.5 py-1 text-xs shrink-0">
+                        <span class="text-[11px] text-slate-400 uppercase font-semibold">Env:</span>
+                        <select id="sandbox-language" onchange="switchSandboxLanguage(this.value)" class="bg-transparent border-none text-xs font-bold text-indigo-300 focus:ring-0 cursor-pointer p-0 pr-6">
+                            <option value="php" selected class="bg-slate-900 text-white">PHP 8.5 (CLI)</option>
+                            <option value="python" class="bg-slate-900 text-white">Python 3</option>
+                            <option value="javascript" class="bg-slate-900 text-white">JavaScript (Node.js)</option>
+                            <option value="html" class="bg-slate-900 text-white">HTML / CSS (Live Preview)</option>
+                        </select>
+                    </div>
+                @endif
 
-                <button type="button" onclick="resetSandboxCode()" class="px-3 py-1.5 text-xs font-semibold text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-xl border border-slate-700 transition" title="Reset code to original">
-                    <i class="fa-solid fa-rotate-left me-1"></i> Reset
+                <button type="button" onclick="resetSandboxCode()" class="px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-700 transition flex items-center gap-1.5 shrink-0" title="Reset code to original starter template">
+                    <i class="fa-solid fa-rotate-left text-[11px]"></i>
+                    <span>Reset</span>
                 </button>
 
-                <button type="button" id="btn-run-code" onclick="runSandboxCode()" class="px-5 py-2 text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-xl shadow-lg shadow-emerald-900/30 transition flex items-center gap-2">
-                    <i id="run-icon" class="fa-solid fa-play"></i>
-                    <span id="run-text">Run Code (Ctrl+Enter)</span>
+                <button type="button" id="btn-run-code" onclick="runSandboxCode()" class="px-4 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-xl shadow-lg shadow-emerald-900/40 transition flex items-center gap-2 shrink-0">
+                    <i id="run-icon" class="fa-solid fa-play text-[11px]"></i>
+                    <span id="run-text">Run Code</span>
+                    <span class="hidden sm:inline text-[10px] opacity-75 font-mono">(Ctrl+Enter)</span>
                 </button>
             </div>
         </div>
 
         <!-- Editor & Terminal Output Split View -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-800 min-h-[380px]">
+        <div class="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-800 min-h-[380px] w-full min-w-0">
             
             <!-- Left / Top: Code Editor -->
-            <div class="p-4 flex flex-col justify-between space-y-3 bg-slate-950/80">
+            <div class="p-4 flex flex-col justify-between space-y-3 bg-slate-950/80 min-w-0 w-full">
                 <div class="flex items-center justify-between text-xs text-slate-400 pb-2 border-b border-slate-800/60">
-                    <span class="font-mono text-[11px] flex items-center gap-2">
+                    <span class="font-mono text-xs font-bold text-slate-200 flex items-center gap-2">
                         <i class="fa-solid fa-code text-indigo-400"></i> Code Editor
                     </span>
                     <span class="text-[10px] text-slate-500">Press Tab for indentation</span>
                 </div>
 
-                <div class="relative flex-1">
-                    <textarea id="sandbox-code-editor" spellcheck="false" rows="14" class="w-full h-full bg-slate-900/90 text-emerald-300 font-mono text-xs rounded-2xl p-4 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y leading-relaxed outline-none"></textarea>
+                <div class="relative flex-1 min-w-0 w-full">
+                    <textarea id="sandbox-code-editor" spellcheck="false" rows="14" class="w-full h-full min-h-[280px] bg-slate-900/90 text-emerald-300 font-mono text-xs rounded-2xl p-4 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y leading-relaxed outline-none block"></textarea>
                 </div>
             </div>
 
             <!-- Right / Bottom: Live Terminal Output -->
-            <div class="p-4 flex flex-col justify-between space-y-3 bg-slate-900/90">
+            <div class="p-4 flex flex-col justify-between space-y-3 bg-slate-900/90 min-w-0 w-full">
                 <div class="flex items-center justify-between text-xs text-slate-400 pb-2 border-b border-slate-800/60">
                     <div class="flex items-center gap-2">
                         <div class="flex gap-1.5">
@@ -291,7 +326,7 @@
                             <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
                             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
                         </div>
-                        <span class="font-mono text-[11px] font-bold text-slate-300 ms-1">
+                        <span class="font-mono text-xs font-bold text-slate-200 ms-1">
                             Terminal Console
                         </span>
                     </div>
@@ -300,17 +335,17 @@
                         <span id="sandbox-execution-badge" class="hidden text-[10px] font-mono px-2 py-0.5 rounded-md font-bold">
                             <!-- Injected dynamically -->
                         </span>
-                        <button type="button" onclick="clearTerminalOutput()" class="text-[11px] text-slate-500 hover:text-slate-300">
+                        <button type="button" onclick="clearTerminalOutput()" class="text-[11px] text-slate-500 hover:text-slate-300 transition">
                             Clear
                         </button>
                     </div>
                 </div>
 
                 <!-- Terminal Body -->
-                <div class="flex-1 flex flex-col">
+                <div class="flex-1 flex flex-col min-w-0 w-full">
                     <!-- Standard Text Terminal -->
                     <div id="sandbox-terminal-output" class="w-full flex-1 min-h-[280px] bg-black/80 rounded-2xl p-4 font-mono text-xs text-slate-300 overflow-y-auto whitespace-pre-wrap leading-relaxed border border-slate-800/80">
-<span class="text-slate-500">// Terminal ready. Click 'Run Code' above to execute your solution.</span>
+                        <span class="text-slate-500">// Terminal ready. Click 'Run Code' above to execute your solution.</span>
                     </div>
 
                     <!-- HTML Iframe Preview (Hidden unless HTML selected) -->
@@ -321,6 +356,7 @@
         </div>
 
     </div>
+    @endif
 
     <!-- Supplementary PDF Learning Resource (Bottom Anchor) -->
     @if($lesson->pdf_file)
@@ -406,66 +442,109 @@ $codeTemplates = [
 @push('scripts')
 <script>
     const codeTemplates = @json($codeTemplates);
+    const isLocked = @json($isLanguageLocked);
+    const lockedLang = @json($lockedLang);
+    const customStarter = @json($lesson->code_snippet ?? '');
 
     function switchSandboxLanguage(lang) {
+        if (isLocked) {
+            return;
+        }
+
         const editor = document.getElementById('sandbox-code-editor');
         const termOutput = document.getElementById('sandbox-terminal-output');
         const htmlPreview = document.getElementById('sandbox-html-preview');
 
-        if (codeTemplates[lang]) {
+        if (codeTemplates[lang] && editor) {
             editor.value = codeTemplates[lang];
         }
 
         if (lang === 'html') {
-            termOutput.classList.add('hidden');
-            htmlPreview.classList.remove('hidden');
+            termOutput?.classList.add('hidden');
+            htmlPreview?.classList.remove('hidden');
             runSandboxCode();
         } else {
-            termOutput.classList.remove('hidden');
-            htmlPreview.classList.add('hidden');
+            termOutput?.classList.remove('hidden');
+            htmlPreview?.classList.add('hidden');
         }
     }
 
     function resetSandboxCode() {
-        const lang = document.getElementById('sandbox-language').value;
-        switchSandboxLanguage(lang);
+        const langInput = document.getElementById('sandbox-language');
+        const lang = langInput ? langInput.value : 'php';
+        const editor = document.getElementById('sandbox-code-editor');
+
+        if (editor) {
+            if (customStarter && customStarter.trim() && (!isLocked || lang === lockedLang)) {
+                editor.value = customStarter;
+            } else if (codeTemplates[lang]) {
+                editor.value = codeTemplates[lang];
+            }
+        }
+
+        if (lang === 'html') {
+            document.getElementById('sandbox-terminal-output')?.classList.add('hidden');
+            document.getElementById('sandbox-html-preview')?.classList.remove('hidden');
+            runSandboxCode();
+        } else {
+            document.getElementById('sandbox-terminal-output')?.classList.remove('hidden');
+            document.getElementById('sandbox-html-preview')?.classList.add('hidden');
+        }
     }
 
     function clearTerminalOutput() {
-        document.getElementById('sandbox-terminal-output').innerHTML = '<span class="text-slate-500">// Terminal cleared.</span>';
-        document.getElementById('sandbox-execution-badge').classList.add('hidden');
+        const term = document.getElementById('sandbox-terminal-output');
+        if (term) term.innerHTML = '<span class="text-slate-500">// Terminal cleared.</span>';
+        document.getElementById('sandbox-execution-badge')?.classList.add('hidden');
     }
 
     function loadIntoSandbox(code, language) {
-        const editor = document.getElementById('sandbox-code-editor');
-        const select = document.getElementById('sandbox-language');
-
         language = (language || 'php').toLowerCase();
-        if (['php', 'python', 'javascript', 'html'].includes(language)) {
-            select.value = language;
+
+        if (isLocked) {
+            if (language !== lockedLang) {
+                alert('Notice: This practice lab is locked to ' + lockedLang.toUpperCase() + ' by the instructor.');
+                return;
+            }
         } else {
-            select.value = 'php';
+            const select = document.getElementById('sandbox-language');
+            if (select && ['php', 'python', 'javascript', 'html'].includes(language)) {
+                select.value = language;
+            }
         }
 
-        editor.value = code;
+        const editor = document.getElementById('sandbox-code-editor');
+        if (editor) {
+            editor.value = code;
+        }
+
+        const termOutput = document.getElementById('sandbox-terminal-output');
+        const htmlPreview = document.getElementById('sandbox-html-preview');
+        if (language === 'html') {
+            termOutput?.classList.add('hidden');
+            htmlPreview?.classList.remove('hidden');
+        } else {
+            termOutput?.classList.remove('hidden');
+            htmlPreview?.classList.add('hidden');
+        }
 
         // Scroll smoothly to sandbox
         const section = document.getElementById('practice-sandbox-section');
-        section.scrollIntoView({ behavior: 'smooth' });
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth' });
+            section.classList.add('ring-4', 'ring-indigo-500/50');
+            setTimeout(() => {
+                section.classList.remove('ring-4', 'ring-indigo-500/50');
+            }, 1200);
+        }
 
-        // Highlight flash effect
-        section.classList.add('ring-4', 'ring-indigo-500/50');
-        setTimeout(() => {
-            section.classList.remove('ring-4', 'ring-indigo-500/50');
-        }, 1200);
-
-        // Auto execute for instant feedback
         runSandboxCode();
     }
 
     async function runSandboxCode() {
         const editor = document.getElementById('sandbox-code-editor');
-        const language = document.getElementById('sandbox-language').value;
+        const langInput = document.getElementById('sandbox-language');
+        const language = langInput ? langInput.value : 'php';
         const terminal = document.getElementById('sandbox-terminal-output');
         const htmlPreview = document.getElementById('sandbox-html-preview');
         const badge = document.getElementById('sandbox-execution-badge');
@@ -473,22 +552,26 @@ $codeTemplates = [
         const runIcon = document.getElementById('run-icon');
         const runText = document.getElementById('run-text');
 
+        if (!editor || !runBtn) return;
+
         const code = editor.value;
 
         // If HTML preview mode
         if (language === 'html') {
-            htmlPreview.srcdoc = code;
-            badge.className = "text-[10px] font-mono px-2 py-0.5 rounded-md font-bold bg-emerald-950 text-emerald-400 border border-emerald-800";
-            badge.textContent = "✓ Live Rendered";
-            badge.classList.remove('hidden');
+            if (htmlPreview) htmlPreview.srcdoc = code;
+            if (badge) {
+                badge.className = "text-[10px] font-mono px-2 py-0.5 rounded-md font-bold bg-emerald-950 text-emerald-400 border border-emerald-800";
+                badge.textContent = "✓ Live Rendered";
+                badge.classList.remove('hidden');
+            }
             return;
         }
 
         // Running state
         runBtn.disabled = true;
-        runIcon.className = "fa-solid fa-spinner fa-spin";
-        runText.textContent = "Running...";
-        terminal.innerHTML = `<span class="text-indigo-400 font-mono">// Compiling & executing code...</span>`;
+        if (runIcon) runIcon.className = "fa-solid fa-spinner fa-spin text-[11px]";
+        if (runText) runText.textContent = "Running...";
+        if (terminal) terminal.innerHTML = `<span class="text-indigo-400 font-mono">// Compiling & executing code...</span>`;
 
         try {
             const response = await fetch("{{ route('code.execute') }}", {
@@ -514,27 +597,31 @@ $codeTemplates = [
                 outputHtml = `<span class="text-slate-500">// Script exited with code ${data.exit_code} (No output printed).</span>`;
             }
 
-            terminal.innerHTML = outputHtml;
+            if (terminal) terminal.innerHTML = outputHtml;
 
             // Execution stats badge
-            if (data.exit_code === 0) {
-                badge.className = "text-[10px] font-mono px-2 py-0.5 rounded-md font-bold bg-emerald-950 text-emerald-400 border border-emerald-800";
-                badge.textContent = `✓ Exit: 0 • Time: ${data.execution_time}`;
-            } else {
-                badge.className = "text-[10px] font-mono px-2 py-0.5 rounded-md font-bold bg-rose-950 text-rose-400 border border-rose-800";
-                badge.textContent = `✗ Exit: ${data.exit_code} • Time: ${data.execution_time}`;
+            if (badge) {
+                if (data.exit_code === 0) {
+                    badge.className = "text-[10px] font-mono px-2 py-0.5 rounded-md font-bold bg-emerald-950 text-emerald-400 border border-emerald-800";
+                    badge.textContent = `✓ Exit: 0 • Time: ${data.execution_time}`;
+                } else {
+                    badge.className = "text-[10px] font-mono px-2 py-0.5 rounded-md font-bold bg-rose-950 text-rose-400 border border-rose-800";
+                    badge.textContent = `✗ Exit: ${data.exit_code} • Time: ${data.execution_time}`;
+                }
+                badge.classList.remove('hidden');
             }
-            badge.classList.remove('hidden');
 
         } catch (err) {
-            terminal.innerHTML = `<span class="text-rose-400 font-mono">Network / Execution Error: ${err.message}</span>`;
-            badge.className = "text-[10px] font-mono px-2 py-0.5 rounded-md font-bold bg-rose-950 text-rose-400 border border-rose-800";
-            badge.textContent = "✗ Network Error";
-            badge.classList.remove('hidden');
+            if (terminal) terminal.innerHTML = `<span class="text-rose-400 font-mono">Network / Execution Error: ${err.message}</span>`;
+            if (badge) {
+                badge.className = "text-[10px] font-mono px-2 py-0.5 rounded-md font-bold bg-rose-950 text-rose-400 border border-rose-800";
+                badge.textContent = "✗ Network Error";
+                badge.classList.remove('hidden');
+            }
         } finally {
             runBtn.disabled = false;
-            runIcon.className = "fa-solid fa-play";
-            runText.textContent = "Run Code (Ctrl+Enter)";
+            if (runIcon) runIcon.className = "fa-solid fa-play text-[11px]";
+            if (runText) runText.textContent = "Run Code";
         }
     }
 
@@ -570,11 +657,23 @@ $codeTemplates = [
             .replace(/'/g, '&#039;');
     }
 
-    // Initialize sandbox with PHP template
+    // Initialize sandbox with selected or starter template
     document.addEventListener('DOMContentLoaded', () => {
         const editor = document.getElementById('sandbox-code-editor');
-        if (editor && !editor.value.trim() && codeTemplates.php) {
-            editor.value = codeTemplates.php;
+        const targetLang = isLocked ? lockedLang : (document.getElementById('sandbox-language')?.value || 'php');
+
+        if (editor && !editor.value.trim()) {
+            if (customStarter && customStarter.trim() && (!isLocked || targetLang === lockedLang)) {
+                editor.value = customStarter;
+            } else if (codeTemplates[targetLang]) {
+                editor.value = codeTemplates[targetLang];
+            }
+        }
+
+        if (targetLang === 'html') {
+            document.getElementById('sandbox-terminal-output')?.classList.add('hidden');
+            document.getElementById('sandbox-html-preview')?.classList.remove('hidden');
+            runSandboxCode();
         }
     });
 </script>

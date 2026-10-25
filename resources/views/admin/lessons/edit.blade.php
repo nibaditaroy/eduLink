@@ -67,6 +67,43 @@
                 </div>
                 <input class="block text-xs text-gray-900 border border-gray-300 rounded-xl cursor-pointer bg-gray-50 p-2 sm:max-w-xs" id="pdf_file" name="pdf_file" type="file" accept=".pdf">
             </div>
+
+            <!-- Interactive Practice Sandbox Settings -->
+            <div class="pt-4 border-t border-gray-100 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-terminal text-indigo-600"></i> Interactive Practice Sandbox Settings
+                    </span>
+                    <span class="text-[11px] text-gray-400">Controls student code execution environment</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="code_language" class="block mb-1.5 text-xs font-bold text-gray-600">
+                            Allowed Language / Permission:
+                        </label>
+                        @php
+                            $currLang = old('code_language', $lesson->code_language ?? 'all');
+                        @endphp
+                        <select id="code_language" name="code_language" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs font-semibold rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                            <option value="all" {{ $currLang === 'all' ? 'selected' : '' }}>🌐 All Languages (Student can choose PHP, Python, JS, HTML)</option>
+                            <option value="php" {{ $currLang === 'php' ? 'selected' : '' }}>🐘 PHP 8.5 Only (Lock student to PHP)</option>
+                            <option value="python" {{ $currLang === 'python' ? 'selected' : '' }}>🐍 Python 3 Only (Lock student to Python)</option>
+                            <option value="javascript" {{ $currLang === 'javascript' ? 'selected' : '' }}>⚡ JavaScript (Node.js) Only (Lock student to JS)</option>
+                            <option value="html" {{ $currLang === 'html' ? 'selected' : '' }}>🌐 HTML / CSS Live Preview Only (Lock student to HTML)</option>
+                            <option value="none" {{ $currLang === 'none' ? 'selected' : '' }}>🚫 Disabled / No Practice Lab (Theory Only)</option>
+                        </select>
+                        <p class="text-[11px] text-gray-500 mt-1">If "All Languages" is selected, students can switch between environments. If a specific language is chosen, students are locked to it.</p>
+                    </div>
+
+                    <div>
+                        <label for="code_snippet" class="block mb-1.5 text-xs font-bold text-gray-600">
+                            Initial Starter Code (Optional):
+                        </label>
+                        <textarea id="code_snippet" name="code_snippet" rows="3" placeholder="// Pre-load custom starter code or starter function into student editor..." class="bg-gray-50 border border-gray-300 text-gray-900 font-mono text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">{{ old('code_snippet', $lesson->code_snippet) }}</textarea>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Block Builder Section -->
