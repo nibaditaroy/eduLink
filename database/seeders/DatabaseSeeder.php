@@ -54,26 +54,69 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Lesson 1.1
-        Lesson::firstOrCreate(
+        // Lesson 1.1 with Multi-Block Architecture (Multiple Videos, Multiple Code Blocks, Images, Tips, Theory)
+        $lesson1_1 = Lesson::updateOrCreate(
             [
                 'chapter_id' => $chapter1->id,
                 'sort_order' => 1,
             ],
             [
                 'title' => 'PHP Syntax, Variables & Superglobals',
-                'text_content' => "PHP (Hypertext Preprocessor) is a widely-used open-source, server-side scripting language designed specifically for web development.\n\nKey Concepts:\n1. Variables start with the dollar sign ($) followed by the variable name.\n2. PHP is weakly typed; variable types are dynamically evaluated.\n3. Superglobal variables like \$_GET, \$_POST, and \$_SERVER provide access to HTTP requests.\n4. Concatenation is done using the dot (.) operator.",
+                'text_content' => "PHP (Hypertext Preprocessor) is a widely-used open-source, server-side scripting language designed specifically for web development.",
                 'video_url' => 'https://www.youtube.com/watch?v=OK_JCtrrv-c',
-                'code_snippet' => "<?php
-// Declare variables
-\$course = 'EDULINK Web Engineering';
-\$enrolledStudents = 45;
-\$isPublished = true;
-
-// Output with concatenation
-echo \"Course: \" . \$course . \" (Enrolled: \" . \$enrolledStudents . \")\";
-?>",
+                'code_snippet' => "echo 'Hello World';",
                 'code_language' => 'php',
+                'content_blocks' => [
+                    [
+                        'type' => 'text',
+                        'title' => '1. Theoretical Foundations & Architecture',
+                        'content' => "PHP is a server-side scripting language executed on the web server before the HTML is sent to the client browser.\n\nKey Concepts:\n1. Variables start with the dollar sign ($) followed by the variable name.\n2. PHP is dynamically typed; data types are inferred automatically.\n3. Superglobals like \$_GET, \$_POST, and \$_SERVER provide access to request context.",
+                    ],
+                    [
+                        'type' => 'video',
+                        'title' => 'Lecture Video 1: Variables & Dynamic Typing',
+                        'url' => 'https://www.youtube.com/watch?v=OK_JCtrrv-c',
+                    ],
+                    [
+                        'type' => 'code',
+                        'title' => 'Code Block 1: Variable Declaration & String Interpolation',
+                        'language' => 'php',
+                        'code' => "<?php\n\$courseTitle = 'EDULINK University LMS';\n\$enrolledStudents = 120;\n\$rating = 4.9;\n\necho \"Course: {\$courseTitle} - Enrolled: {\$enrolledStudents}\";\n?>",
+                    ],
+                    [
+                        'type' => 'callout',
+                        'title' => 'Best Practice Tip',
+                        'style' => 'tip',
+                        'content' => 'Always use double quotes (" ") when interpolating variables directly inside strings, or single quotes (\' \') for raw static strings to optimize performance.',
+                    ],
+                    [
+                        'type' => 'image',
+                        'url' => 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&q=80',
+                        'caption' => 'Figure 1.1: Web Request/Response Cycle between Client Browser and PHP Engine',
+                    ],
+                    [
+                        'type' => 'text',
+                        'title' => '2. Superglobals & HTTP Requests',
+                        'content' => "Superglobals are built-in variables that are always available in all scopes throughout your PHP application.\nCommon superglobals include:\n- \$_GET: Parameters from query strings\n- \$_POST: Data sent via HTTP POST forms\n- \$_SESSION: Persistent session state",
+                    ],
+                    [
+                        'type' => 'code',
+                        'title' => 'Code Block 2: Handling Form Submissions Securely',
+                        'language' => 'php',
+                        'code' => "<?php\nif (\$_SERVER['REQUEST_METHOD'] === 'POST') {\n    \$email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);\n    if (\$email) {\n        echo \"Valid student email: \" . htmlspecialchars(\$email);\n    }\n}\n?>",
+                    ],
+                    [
+                        'type' => 'video',
+                        'title' => 'Lecture Video 2: Working with Superglobals and Forms',
+                        'url' => 'https://www.youtube.com/watch?v=2eebptXfEvw',
+                    ],
+                    [
+                        'type' => 'callout',
+                        'title' => 'Security Notice',
+                        'style' => 'warning',
+                        'content' => 'Never output raw user input from \$_POST or \$_GET directly without escaping via htmlspecialchars() to prevent Cross-Site Scripting (XSS) vulnerabilities.',
+                    ],
+                ],
             ]
         );
 

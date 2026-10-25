@@ -17,7 +17,12 @@ class Lesson extends Model
         'code_snippet',
         'code_language',
         'pdf_file',
+        'content_blocks',
         'sort_order',
+    ];
+
+    protected $casts = [
+        'content_blocks' => 'array',
     ];
 
     public function chapter()
@@ -36,19 +41,29 @@ class Lesson extends Model
     }
 
     /**
-     * Helper to extract YouTube embed URL if applicable
+     * Helper to extract YouTube/Vimeo embed URL if applicable
      */
-    public function getEmbedVideoUrlAttribute(): ?string
+    public static function getEmbedUrl(?string $url): ?string
     {
-        if (!$this->video_url) {
+        if (!$url) {
             return null;
         }
 
-        // Check if YouTube
-        if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i', $this->video_url, $matches)) {
+        // YouTube regex (supports youtu.be, youtube.com/watch?v=, youtube.com/embed/)
+        if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i', $url, $matches)) {
             return 'https://www.youtube.com/embed/' . $matches[1];
         }
 
-        return $this->video_url;
+        // Vimeo regex
+        if (preg_match('/(?:vimeo\.com\/)(\d+)/i', $url, $matches)) {
+            return 'https://player.vimeo.com/video/' . $matches[1];
+        }
+
+        return $url;
+    }
+
+    public function getEmbedVideoUrlAttribute(): ?string
+    {
+        return self::getEmbedUrl($this->video_url);
     }
 }
