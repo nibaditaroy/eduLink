@@ -68,39 +68,59 @@
                 <input class="block text-xs text-gray-900 border border-gray-300 rounded-xl cursor-pointer bg-gray-50 p-2 sm:max-w-xs" id="pdf_file" name="pdf_file" type="file" accept=".pdf">
             </div>
 
-            <!-- Interactive Practice Sandbox Settings -->
-            <div class="pt-4 border-t border-gray-100 space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-terminal text-indigo-600"></i> Interactive Practice Sandbox Settings
-                    </span>
-                    <span class="text-[11px] text-gray-400">Controls student code execution environment</span>
+            <!-- Interactive Practice Sandbox Settings (Lesson-Wise Enable / Disable) -->
+            @php
+                $currLang = old('code_language', $lesson->code_language ?? 'all');
+                $isSandboxActive = ($currLang !== 'none');
+            @endphp
+            <div class="pt-4 border-t border-gray-100 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm shadow-sm">
+                            <i class="fa-solid fa-terminal"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                                    Interactive Code Practice Sandbox
+                                </span>
+                                <span id="sandbox_status_badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $isSandboxActive ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600' }}">
+                                    {{ $isSandboxActive ? 'Enabled for Lesson' : 'Disabled' }}
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-gray-500">Allow students to write and execute code in live real-time console on this lesson.</p>
+                        </div>
+                    </div>
+
+                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                        <input type="checkbox" id="enable_sandbox_toggle" onchange="toggleSandbox(this.checked)" class="sr-only peer" {{ $isSandboxActive ? 'checked' : '' }}>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                        <span id="sandbox_toggle_text" class="ms-2.5 text-xs font-bold text-gray-800">{{ $isSandboxActive ? 'Active' : 'Off' }}</span>
+                    </label>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Config Panel (Shown when Sandbox Enabled) -->
+                <div id="sandbox_config_panel" class="grid grid-cols-1 md:grid-cols-2 gap-4 {{ $isSandboxActive ? '' : 'hidden' }}">
                     <div>
-                        <label for="code_language" class="block mb-1.5 text-xs font-bold text-gray-600">
-                            Allowed Language / Permission:
+                        <label for="code_language" class="block mb-1.5 text-xs font-bold text-gray-700">
+                            Language Permissions for Students:
                         </label>
-                        @php
-                            $currLang = old('code_language', $lesson->code_language ?? 'all');
-                        @endphp
                         <select id="code_language" name="code_language" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs font-semibold rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
                             <option value="all" {{ $currLang === 'all' ? 'selected' : '' }}>🌐 All Languages (Student can choose PHP, Python, JS, HTML)</option>
                             <option value="php" {{ $currLang === 'php' ? 'selected' : '' }}>🐘 PHP 8.5 Only (Lock student to PHP)</option>
                             <option value="python" {{ $currLang === 'python' ? 'selected' : '' }}>🐍 Python 3 Only (Lock student to Python)</option>
                             <option value="javascript" {{ $currLang === 'javascript' ? 'selected' : '' }}>⚡ JavaScript (Node.js) Only (Lock student to JS)</option>
                             <option value="html" {{ $currLang === 'html' ? 'selected' : '' }}>🌐 HTML / CSS Live Preview Only (Lock student to HTML)</option>
-                            <option value="none" {{ $currLang === 'none' ? 'selected' : '' }}>🚫 Disabled / No Practice Lab (Theory Only)</option>
+                            <option value="none" style="display:none;" {{ $currLang === 'none' ? 'selected' : '' }}>Disabled</option>
                         </select>
-                        <p class="text-[11px] text-gray-500 mt-1">If "All Languages" is selected, students can switch between environments. If a specific language is chosen, students are locked to it.</p>
+                        <p class="text-[11px] text-gray-500 mt-1">If "All Languages" is selected, students can switch environments. If locked, student can only run that language.</p>
                     </div>
 
                     <div>
-                        <label for="code_snippet" class="block mb-1.5 text-xs font-bold text-gray-600">
+                        <label for="code_snippet" class="block mb-1.5 text-xs font-bold text-gray-700">
                             Initial Starter Code (Optional):
                         </label>
-                        <textarea id="code_snippet" name="code_snippet" rows="3" placeholder="// Pre-load custom starter code or starter function into student editor..." class="bg-gray-50 border border-gray-300 text-gray-900 font-mono text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">{{ old('code_snippet', $lesson->code_snippet) }}</textarea>
+                        <textarea id="code_snippet" name="code_snippet" rows="3" placeholder="// Pre-load starter code or template for students..." class="bg-gray-50 border border-gray-300 text-gray-900 font-mono text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">{{ old('code_snippet', $lesson->code_snippet) }}</textarea>
                     </div>
                 </div>
             </div>
@@ -274,7 +294,14 @@
                             </div>
                         </div>
                         <div>
+                            <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Code Snippet</label>
                             <textarea rows="6" oninput="updateBlock(${index}, 'code', this.value)" placeholder="// Enter code snippet..." class="bg-slate-900 border border-slate-800 text-emerald-400 text-xs font-mono rounded-xl p-3 w-full">${escapeHtml(block.code || '')}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-terminal text-emerald-600"></i> Expected Output / Console Result (Optional)
+                            </label>
+                            <textarea rows="3" oninput="updateBlock(${index}, 'output', this.value)" placeholder="e.g. Program output shown to students below the snippet (stdout)..." class="bg-slate-950 border border-slate-800 text-emerald-300 text-xs font-mono rounded-xl p-3 w-full">${escapeHtml(block.output || '')}</textarea>
                         </div>
                     </div>
                 `;
@@ -388,8 +415,31 @@
     }
 
     function addCodeBlock() {
-        blocks.push({ type: 'code', title: '', language: 'php', code: '' });
+        blocks.push({ type: 'code', title: '', language: 'php', code: '', output: '' });
         renderBlocks();
+    }
+
+    function toggleSandbox(enabled) {
+        const configPanel = document.getElementById('sandbox_config_panel');
+        const badge = document.getElementById('sandbox_status_badge');
+        const toggleText = document.getElementById('sandbox_toggle_text');
+        const langSelect = document.getElementById('code_language');
+
+        if (enabled) {
+            configPanel.classList.remove('hidden');
+            badge.textContent = 'Enabled for Lesson';
+            badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800';
+            toggleText.textContent = 'Active';
+            if (langSelect.value === 'none') {
+                langSelect.value = 'all';
+            }
+        } else {
+            configPanel.classList.add('hidden');
+            badge.textContent = 'Disabled';
+            badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600';
+            toggleText.textContent = 'Off';
+            langSelect.value = 'none';
+        }
     }
 
     function addImageBlock() {

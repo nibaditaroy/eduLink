@@ -82,6 +82,7 @@ class DatabaseSeeder extends Seeder
                         'title' => 'Code Block 1: Variable Declaration & String Interpolation',
                         'language' => 'php',
                         'code' => "<?php\n\$courseTitle = 'EDULINK University LMS';\n\$enrolledStudents = 120;\n\$rating = 4.9;\n\necho \"Course: {\$courseTitle} - Enrolled: {\$enrolledStudents}\";\n?>",
+                        'output' => "Course: EDULINK University LMS - Enrolled: 120",
                     ],
                     [
                         'type' => 'callout',
@@ -104,6 +105,7 @@ class DatabaseSeeder extends Seeder
                         'title' => 'Code Block 2: Handling Form Submissions Securely',
                         'language' => 'php',
                         'code' => "<?php\nif (\$_SERVER['REQUEST_METHOD'] === 'POST') {\n    \$email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);\n    if (\$email) {\n        echo \"Valid student email: \" . htmlspecialchars(\$email);\n    }\n}\n?>",
+                        'output' => "Valid student email: student@university.edu",
                     ],
                     [
                         'type' => 'video',

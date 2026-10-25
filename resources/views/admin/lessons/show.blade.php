@@ -3,6 +3,20 @@
 @section('title', 'Preview Lesson - ' . $lesson->title)
 
 @section('content')
+@php
+    $sandboxSetting = $lesson->code_language ?? 'all';
+    $isSandboxDisabled = ($sandboxSetting === 'none');
+    $isLanguageLocked = !in_array($sandboxSetting, ['all', 'none', null, '']);
+    $lockedLang = $isLanguageLocked ? strtolower($sandboxSetting) : null;
+    $initialLang = $lockedLang ?: 'php';
+
+    $languageLabels = [
+        'php' => 'PHP 8.5 (CLI)',
+        'python' => 'Python 3',
+        'javascript' => 'JavaScript (Node.js)',
+        'html' => 'HTML / CSS Live Preview',
+    ];
+@endphp
 <div class="max-w-4xl mx-auto space-y-6">
 
     <!-- Breadcrumb & Header -->
@@ -27,9 +41,11 @@
         </div>
 
         <div class="flex items-center gap-2">
+            @if(!$isSandboxDisabled)
             <a href="#practice-sandbox-section" class="inline-flex items-center px-3.5 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition">
                 <i class="fa-solid fa-terminal me-1.5"></i> Open Practice Lab
             </a>
+            @endif
             <a href="{{ route('admin.lessons.edit', $lesson->id) }}" class="inline-flex items-center px-4 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition">
                 <i class="fa-solid fa-pen me-1.5 text-gray-500"></i> Edit Lesson
             </a>
@@ -83,11 +99,12 @@
                     </div>
                 </div>
 
-                <!-- 3. Code Snippet Block (Supports Multiple Code Blocks!) -->
+                <!-- 3. Code Snippet Block (Supports Multiple Code Blocks & Output Window!) -->
                 @elseif($blockType === 'code' && !empty($block['code']))
                 @php
                     $codeId = 'code-block-' . $idx;
                     $lang = strtolower($block['language'] ?? 'php');
+                    $hasOutput = !empty($block['output']);
                 @endphp
                 <div class="bg-slate-900 rounded-3xl shadow-md border border-slate-800 overflow-hidden">
                     <div class="px-5 py-3 bg-slate-800/90 border-b border-slate-700/80 flex items-center justify-between">
@@ -105,15 +122,32 @@
                             </span>
                         </div>
                         <div class="flex items-center gap-2">
+                            @if(!$isSandboxDisabled)
                             <button type="button" onclick="loadIntoSandbox(@js($block['code']), @js($lang))" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-950/60 border border-emerald-800/60 px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition">
                                 <i class="fa-solid fa-play text-[10px]"></i> Test in Sandbox
                             </button>
+                            @endif
                             <button onclick="navigator.clipboard.writeText(document.getElementById('{{ $codeId }}').innerText); alert('Code snippet copied to clipboard!');" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition px-2 py-1">
                                 <i class="fa-solid fa-copy"></i> Copy
                             </button>
                         </div>
                     </div>
                     <pre class="p-5 overflow-x-auto text-xs font-mono"><code id="{{ $codeId }}" class="language-{{ $lang }}">{{ $block['code'] }}</code></pre>
+
+                    <!-- Code Snippet Output Section -->
+                    @if($hasOutput)
+                    <div class="border-t border-slate-800 bg-black/85 px-5 py-3.5 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-mono font-bold text-slate-400 flex items-center gap-2 uppercase tracking-wider">
+                                <i class="fa-solid fa-terminal text-emerald-400"></i> Output (Console stdout):
+                            </span>
+                            <span class="text-[10px] font-mono text-emerald-400 font-semibold flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span> Result
+                            </span>
+                        </div>
+                        <pre class="font-mono text-xs text-emerald-300 whitespace-pre-wrap leading-relaxed bg-slate-950/90 p-3.5 rounded-xl border border-slate-800/80"><code>{{ $block['output'] }}</code></pre>
+                    </div>
+                    @endif
                 </div>
 
                 <!-- 4. Image / Diagram Block -->
