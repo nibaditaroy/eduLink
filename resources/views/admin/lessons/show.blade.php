@@ -278,19 +278,7 @@
                 </div>
 
                 <div class="relative flex-1">
-                    <textarea id="sandbox-code-editor" spellcheck="false" rows="14" class="w-full h-full bg-slate-900/90 text-emerald-300 font-mono text-xs rounded-2xl p-4 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y leading-relaxed outline-none"><?php
-// Practice Challenge: Loop & Accumulate
-$numbers = [10, 25, 45, 80, 100];
-$sum = 0;
-
-echo "=== Processing Numbers ===\n";
-foreach ($numbers as $num) {
-    $sum += $num;
-    echo "Added: $num | Running Total: $sum\n";
-}
-
-echo "Final Total: " . $sum . "\n";
-?></textarea>
+                    <textarea id="sandbox-code-editor" spellcheck="false" rows="14" class="w-full h-full bg-slate-900/90 text-emerald-300 font-mono text-xs rounded-2xl p-4 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y leading-relaxed outline-none"></textarea>
                 </div>
             </div>
 
@@ -353,55 +341,71 @@ echo "Final Total: " . $sum . "\n";
     @endif
 
 </div>
+@endsection
+
+@php
+$codeTemplates = [
+    'php' => implode("\n", [
+        '<?php',
+        '// Practice: Loops & Accumulate in PHP',
+        '$numbers = [10, 25, 45, 80, 100];',
+        '$sum = 0;',
+        '',
+        'echo "=== Processing Numbers ===\n";',
+        'foreach ($numbers as $num) {',
+        '    $sum += $num;',
+        '    echo "Added: $num | Running Total: $sum\n";',
+        '}',
+        '',
+        'echo "Final Total: " . $sum . "\n";',
+    ]),
+    'python' => implode("\n", [
+        '# Practice in Python 3',
+        'def calculate_grades(scores):',
+        '    return {name: ("Grade A" if score >= 80 else "Grade Pass") for name, score in scores.items()}',
+        '',
+        'students = {"Alice": 88, "Bob": 62, "Charlie": 95}',
+        'print("Evaluated Grades:", calculate_grades(students))',
+    ]),
+    'javascript' => implode("\n", [
+        '// Practice in JavaScript (Node.js)',
+        'const students = [',
+        '    { name: "Alice", score: 88 },',
+        '    { name: "Bob", score: 62 },',
+        '    { name: "Charlie", score: 95 }',
+        '];',
+        '',
+        'students.forEach(s => {',
+        '    const status = s.score >= 80 ? "Grade A" : "Grade Pass";',
+        '    console.log(s.name + ": " + s.score + "pts (" + status + ")");',
+        '});',
+    ]),
+    'html' => implode("\n", [
+        '<!DOCTYPE html>',
+        '<html>',
+        '<head>',
+        '    <style>',
+        '        body { font-family: sans-serif; padding: 20px; background: #f8fafc; }',
+        '        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }',
+        '        h2 { color: #4f46e5; margin-top: 0; }',
+        '        .badge { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-weight: bold; }',
+        '    </style>',
+        '</head>',
+        '<body>',
+        '    <div class="card">',
+        '        <h2>EDULINK Live Interactive Preview</h2>',
+        '        <p>This markup renders in real-time inside the lesson sandbox.</p>',
+        '        <span class="badge">Status: Live Preview</span>',
+        '    </div>',
+        '</body>',
+        '</html>',
+    ]),
+];
+@endphp
 
 @push('scripts')
 <script>
-    const codeTemplates = {
-        php: `<?php
-// Practice: Loops & Conditionals
-$students = ["Alice" => 88, "Bob" => 62, "Charlie" => 95];
-
-foreach ($students as $name => $score) {
-    $grade = ($score >= 80) ? "Grade A" : "Grade Pass";
-    echo "$name scored $score -> $grade\\n";
-}
-?>`,
-        python: `# Practice in Python 3
-def calculate_grades(scores):
-    return {name: ("A" if score >= 80 else "Pass") for name, score in scores.items()}
-
-students = {"Alice": 88, "Bob": 62, "Charlie": 95}
-print("Evaluated Grades:", calculate_grades(students))`,
-        javascript: `// Practice in JavaScript
-const students = [
-    { name: "Alice", score: 88 },
-    { name: "Bob", score: 62 },
-    { name: "Charlie", score: 95 }
-];
-
-students.forEach(s => {
-    const status = s.score >= 80 ? "Grade A" : "Grade Pass";
-    console.log(\`\${s.name}: \${s.score}pts (\${status})\`);
-});`,
-        html: `<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body { font-family: sans-serif; padding: 20px; background: #f8fafc; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        h2 { color: #4f46e5; margin-top: 0; }
-        .badge { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h2>🎉 EDULINK Live Interactive Preview</h2>
-        <p>This markup renders in real-time inside the lesson sandbox.</p>
-        <span class="badge">Status: Live Preview</span>
-    </div>
-</body>
-</html>`
-    };
+    const codeTemplates = @json($codeTemplates);
 
     function switchSandboxLanguage(lang) {
         const editor = document.getElementById('sandbox-code-editor');
@@ -565,6 +569,13 @@ students.forEach(s => {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
     }
+
+    // Initialize sandbox with PHP template
+    document.addEventListener('DOMContentLoaded', () => {
+        const editor = document.getElementById('sandbox-code-editor');
+        if (editor && !editor.value.trim() && codeTemplates.php) {
+            editor.value = codeTemplates.php;
+        }
+    });
 </script>
 @endpush
-@endsection
