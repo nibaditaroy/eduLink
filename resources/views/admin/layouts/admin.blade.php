@@ -65,29 +65,90 @@
                         University Demo Mode
                     </span>
 
-                    <a href="{{ route('admin.courses.create') }}" class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition">
-                        <i class="fa-solid fa-plus me-1.5"></i> New Course
-                    </a>
+                    <!-- Quick Create Dropdown -->
+                    <div class="relative">
+                        <button type="button" id="quick-create-btn" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-xs transition group focus:outline-none">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                            <span>Create</span>
+                            <i class="fa-solid fa-chevron-down text-[9px] ms-0.5 text-indigo-200 group-hover:text-white transition-transform duration-200" id="quick-create-chevron"></i>
+                        </button>
+                        <div id="quick-create-dropdown" class="hidden absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 transform origin-top-right transition-all">
+                            <div class="px-3.5 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Quick Actions</div>
+                            <a href="{{ route('admin.courses.create') }}" class="flex items-center gap-2.5 px-3.5 py-2 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition">
+                                <i class="fa-solid fa-book-bookmark text-indigo-500 w-4 text-center"></i>
+                                <span class="font-medium">New Course</span>
+                            </a>
+                            <a href="{{ route('admin.users.create') }}" class="flex items-center gap-2.5 px-3.5 py-2 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition">
+                                <i class="fa-solid fa-user-plus text-emerald-500 w-4 text-center"></i>
+                                <span class="font-medium">Add New User</span>
+                            </a>
+                            <a href="{{ route('admin.enrollments.index') }}" class="flex items-center gap-2.5 px-3.5 py-2 text-xs text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition">
+                                <i class="fa-solid fa-user-graduate text-purple-500 w-4 text-center"></i>
+                                <span class="font-medium">Enroll Student</span>
+                            </a>
+                        </div>
+                    </div>
 
-                    <!-- User menu -->
-                    <div class="flex items-center ms-3">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm border border-indigo-200">
-                                {{ substr(Auth::user()->name ?? 'Admin', 0, 1) }}
+                    <!-- User Account Dropdown -->
+                    <div class="relative ms-1">
+                        <button type="button" id="user-menu-btn" class="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-100 transition focus:outline-none group">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold flex items-center justify-center text-xs shadow-xs">
+                                {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
                             </div>
-                            <span class="hidden md:inline text-sm font-medium text-gray-700">
-                                {{ Auth::user()->name ?? 'Administrator' }}
-                            </span>
-                            @if(Auth::check())
-                            <form action="{{ route('admin.logout') }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" title="Logout" class="p-1.5 text-gray-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition">
-                                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                                </button>
-                            </form>
-                            @else
-                            <a href="{{ route('admin.quick-login') }}" class="text-xs text-indigo-600 hover:underline">Quick Login</a>
-                            @endif
+                            <div class="hidden md:block text-left">
+                                <div class="text-xs font-bold text-gray-900 leading-tight">{{ Auth::user()->name ?? 'Administrator' }}</div>
+                                <div class="text-[10px] text-gray-400 capitalize">{{ Auth::user()->role ?? 'Admin' }}</div>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 ms-1 transition-transform duration-200 group-hover:text-gray-600" id="user-menu-chevron"></i>
+                        </button>
+
+                        <!-- Dropdown Menu Card -->
+                        <div id="user-menu-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 transform origin-top-right transition-all">
+                            <div class="px-4 py-3 border-b border-gray-100">
+                                <div class="text-xs font-bold text-gray-900">{{ Auth::user()->name ?? 'Administrator' }}</div>
+                                <div class="text-[11px] text-gray-500 truncate">{{ Auth::user()->email ?? 'admin@edulink.test' }}</div>
+                                <div class="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span>{{ ucfirst(Auth::user()->role ?? 'Admin') }} • Active</span>
+                                </div>
+                            </div>
+
+                            <div class="py-1 text-xs text-gray-700">
+                                @if(Auth::check())
+                                <a href="{{ route('admin.users.show', Auth::id()) }}" class="flex items-center gap-2.5 px-4 py-2 hover:bg-indigo-50 hover:text-indigo-600 transition">
+                                    <i class="fa-solid fa-id-badge text-indigo-500 w-4 text-center"></i>
+                                    <span>My Profile & Progress</span>
+                                </a>
+                                @endif
+                                <a href="{{ route('admin.courses.index') }}" class="flex items-center gap-2.5 px-4 py-2 hover:bg-indigo-50 hover:text-indigo-600 transition">
+                                    <i class="fa-solid fa-book-open text-violet-500 w-4 text-center"></i>
+                                    <span>Course Catalog</span>
+                                </a>
+                                <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-2.5 px-4 py-2 hover:bg-indigo-50 hover:text-indigo-600 transition">
+                                    <i class="fa-solid fa-credit-card text-emerald-500 w-4 text-center"></i>
+                                    <span>Payments & Revenue (৳)</span>
+                                </a>
+                                <a href="{{ route('admin.assignment-submissions.index') }}" class="flex items-center gap-2.5 px-4 py-2 hover:bg-indigo-50 hover:text-indigo-600 transition">
+                                    <i class="fa-solid fa-file-signature text-amber-500 w-4 text-center"></i>
+                                    <span>Assignment Grading Hub</span>
+                                </a>
+                            </div>
+
+                            <div class="border-t border-gray-100 pt-1">
+                                <a href="{{ route('admin.quick-login') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 transition">
+                                    <i class="fa-solid fa-users-gear text-slate-400 w-4 text-center"></i>
+                                    <span>Switch Demo Account</span>
+                                </a>
+                                @if(Auth::check())
+                                <form action="{{ route('admin.logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition">
+                                        <i class="fa-solid fa-arrow-right-from-bracket text-rose-500 w-4 text-center"></i>
+                                        <span>Sign Out</span>
+                                    </button>
+                                </form>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -309,6 +370,61 @@
                     const title = form.getAttribute('data-confirm-title') || 'Confirm Deletion';
                     window.openDeleteModal(form, title, msg);
                 });
+            });
+
+            // Navbar Dropdowns Handler
+            function setupDropdown(triggerId, menuId, chevronId = null) {
+                const trigger = document.getElementById(triggerId);
+                const menu = document.getElementById(menuId);
+                const chevron = chevronId ? document.getElementById(chevronId) : null;
+                if (!trigger || !menu) return;
+
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isClosed = menu.classList.contains('hidden');
+                    // Close other dropdowns first
+                    document.querySelectorAll('#user-menu-dropdown, #quick-create-dropdown').forEach(d => {
+                        if (d !== menu) d.classList.add('hidden');
+                    });
+                    document.querySelectorAll('#user-menu-chevron, #quick-create-chevron').forEach(c => {
+                        if (c !== chevron) c.classList.remove('rotate-180');
+                    });
+
+                    if (isClosed) {
+                        menu.classList.remove('hidden');
+                        if (chevron) chevron.classList.add('rotate-180');
+                    } else {
+                        menu.classList.add('hidden');
+                        if (chevron) chevron.classList.remove('rotate-180');
+                    }
+                });
+            }
+
+            setupDropdown('user-menu-btn', 'user-menu-dropdown', 'user-menu-chevron');
+            setupDropdown('quick-create-btn', 'quick-create-dropdown', 'quick-create-chevron');
+
+            // Global Click-away & Escape Listener for Dropdowns
+            document.addEventListener('click', (e) => {
+                const dropdowns = [
+                    { trigger: 'user-menu-btn', menu: 'user-menu-dropdown', chevron: 'user-menu-chevron' },
+                    { trigger: 'quick-create-btn', menu: 'quick-create-dropdown', chevron: 'quick-create-chevron' }
+                ];
+                dropdowns.forEach(item => {
+                    const trig = document.getElementById(item.trigger);
+                    const men = document.getElementById(item.menu);
+                    const chev = document.getElementById(item.chevron);
+                    if (men && !men.contains(e.target) && trig && !trig.contains(e.target)) {
+                        men.classList.add('hidden');
+                        if (chev) chev.classList.remove('rotate-180');
+                    }
+                });
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('#user-menu-dropdown, #quick-create-dropdown').forEach(d => d.classList.add('hidden'));
+                    document.querySelectorAll('#user-menu-chevron, #quick-create-chevron').forEach(c => c.classList.remove('rotate-180'));
+                }
             });
         });
     </script>
