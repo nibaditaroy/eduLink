@@ -35,6 +35,20 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* Custom Select UI Component */
+        .custom-select-wrapper { position: relative; user-select: none; }
+        .custom-select-trigger:hover { border-color: #818cf8; }
+        .custom-select-menu {
+            position: fixed !important;
+            z-index: 999999 !important;
+            box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.16), 0 6px 12px -2px rgba(15, 23, 42, 0.08);
+            scrollbar-width: thin;
+            scrollbar-color: #e2e8f0 transparent;
+        }
+        .custom-select-menu::-webkit-scrollbar { width: 5px; }
+        .custom-select-menu::-webkit-scrollbar-track { background: transparent; }
+        .custom-select-menu::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen antialiased flex flex-col">
@@ -403,7 +417,147 @@
             setupDropdown('user-menu-btn', 'user-menu-dropdown', 'user-menu-chevron');
             setupDropdown('quick-create-btn', 'quick-create-dropdown', 'quick-create-chevron');
 
-            // Global Click-away & Escape Listener for Dropdowns
+            // Custom Select Component Enhancer
+            window.initCustomSelects = function(root = document) {
+                root.querySelectorAll('select:not([data-no-custom]):not(.opacity-0):not([data-customized])').forEach(select => {
+                    select.setAttribute('data-customized', 'true');
+                    select.style.display = 'none';
+
+                    const isBlock = select.classList.contains('w-full') || select.classList.contains('block') || (select.parentElement && select.parentElement.classList.contains('col-span-1'));
+                    const isSmall = select.classList.contains('text-xs') || select.classList.contains('py-1');
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'custom-select-wrapper ' + (isBlock ? 'w-full' : 'inline-block') + ' relative';
+
+                    const trigger = document.createElement('button');
+                    trigger.type = 'button';
+                    trigger.className = `custom-select-trigger w-full flex items-center justify-between gap-2 bg-white border border-gray-200 text-gray-800 rounded-xl shadow-xs transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer ${
+                        isSmall ? 'py-1.5 px-3 text-xs font-semibold' : 'py-2.5 px-3.5 text-xs sm:text-sm font-semibold'
+                    }`;
+
+                    const textSpan = document.createElement('span');
+                    textSpan.className = 'truncate text-left';
+
+                    const chevron = document.createElement('i');
+                    chevron.className = 'fa-solid fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200 shrink-0';
+
+                    trigger.appendChild(textSpan);
+                    trigger.appendChild(chevron);
+                    wrapper.appendChild(trigger);
+
+                    const menu = document.createElement('div');
+                    menu.className = 'custom-select-menu hidden bg-white rounded-2xl shadow-2xl border border-gray-100 py-1.5 max-h-60 overflow-y-auto transform transition-all duration-150';
+
+                    function updateDisplay() {
+                        const current = select.options[select.selectedIndex];
+                        textSpan.textContent = current ? current.textContent.trim() : 'Select...';
+
+                        menu.innerHTML = '';
+                        Array.from(select.options).forEach((opt, idx) => {
+                            const optItem = document.createElement('div');
+                            const isSelected = select.selectedIndex === idx;
+                            optItem.className = `custom-select-option px-3 py-2 mx-1.5 rounded-xl text-xs flex items-center justify-between cursor-pointer transition select-none ${
+                                isSelected ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-gray-700 hover:bg-slate-50 font-medium'
+                            }`;
+
+                            const span = document.createElement('span');
+                            span.className = 'truncate';
+                            span.textContent = opt.textContent.trim();
+                            optItem.appendChild(span);
+
+                            if (isSelected) {
+                                const check = document.createElement('i');
+                                check.className = 'fa-solid fa-check text-indigo-600 text-[10px] shrink-0 ms-2';
+                                optItem.appendChild(check);
+                            }
+
+                            optItem.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                select.selectedIndex = idx;
+                                updateDisplay();
+                                closeMenu();
+
+                                select.dispatchEvent(new Event('input', { bubbles: true }));
+                                select.dispatchEvent(new Event('change', { bubbles: true }));
+                                if (typeof select.onchange === 'function') {
+                                    select.onchange(new Event('change'));
+                                }
+                            });
+
+                            menu.appendChild(optItem);
+                        });
+                    }
+
+                    select._customSync = updateDisplay;
+                    updateDisplay();
+
+                    // Append floating menu to body to escape table overflow clipping
+                    document.body.appendChild(menu);
+
+                    select.parentNode.insertBefore(wrapper, select);
+                    wrapper.appendChild(select);
+
+                    function openMenu() {
+                        document.querySelectorAll('.custom-select-menu').forEach(m => {
+                            if (m !== menu) m.classList.add('hidden');
+                        });
+                        document.querySelectorAll('.custom-select-trigger i.fa-chevron-down').forEach(c => {
+                            if (c !== chevron) c.classList.remove('rotate-180');
+                        });
+
+                        const rect = trigger.getBoundingClientRect();
+                        menu.classList.remove('hidden');
+
+                        const targetWidth = Math.max(rect.width, 160);
+                        menu.style.width = targetWidth + 'px';
+
+                        // Position horizontally
+                        let targetLeft = rect.left;
+                        if (targetLeft + targetWidth > window.innerWidth - 12) {
+                            targetLeft = Math.max(12, window.innerWidth - targetWidth - 12);
+                        }
+                        menu.style.left = targetLeft + 'px';
+
+                        // Position vertically (avoid clipping above or below)
+                        const menuHeight = menu.offsetHeight || 180;
+                        const spaceBelow = window.innerHeight - rect.bottom;
+                        const spaceAbove = rect.top;
+
+                        if (spaceBelow < menuHeight + 10 && spaceAbove > menuHeight + 10) {
+                            menu.style.top = Math.max(10, rect.top - menuHeight - 6) + 'px';
+                            menu.style.transformOrigin = 'bottom';
+                        } else {
+                            menu.style.top = Math.min(rect.bottom + 6, window.innerHeight - menuHeight - 10) + 'px';
+                            menu.style.transformOrigin = 'top';
+                        }
+
+                        chevron.classList.add('rotate-180');
+                    }
+
+                    function closeMenu() {
+                        menu.classList.add('hidden');
+                        chevron.classList.remove('rotate-180');
+                    }
+
+                    trigger.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (menu.classList.contains('hidden')) {
+                            openMenu();
+                        } else {
+                            closeMenu();
+                        }
+                    });
+
+                    select.addEventListener('change', () => {
+                        updateDisplay();
+                    });
+                });
+            };
+
+            // Initialize custom selects on page load
+            window.initCustomSelects();
+
+            // Global Click-away & Escape Listener for Custom Selects and Dropdowns
             document.addEventListener('click', (e) => {
                 const dropdowns = [
                     { trigger: 'user-menu-btn', menu: 'user-menu-dropdown', chevron: 'user-menu-chevron' },
@@ -418,12 +572,21 @@
                         if (chev) chev.classList.remove('rotate-180');
                     }
                 });
+
+                document.querySelectorAll('.custom-select-menu').forEach(m => m.classList.add('hidden'));
+                document.querySelectorAll('.custom-select-trigger i.fa-chevron-down').forEach(c => c.classList.remove('rotate-180'));
             });
+
+            // Close custom select menus on scroll to maintain visual integrity
+            window.addEventListener('scroll', () => {
+                document.querySelectorAll('.custom-select-menu').forEach(m => m.classList.add('hidden'));
+                document.querySelectorAll('.custom-select-trigger i.fa-chevron-down').forEach(c => c.classList.remove('rotate-180'));
+            }, true);
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
-                    document.querySelectorAll('#user-menu-dropdown, #quick-create-dropdown').forEach(d => d.classList.add('hidden'));
-                    document.querySelectorAll('#user-menu-chevron, #quick-create-chevron').forEach(c => c.classList.remove('rotate-180'));
+                    document.querySelectorAll('#user-menu-dropdown, #quick-create-dropdown, .custom-select-menu').forEach(d => d.classList.add('hidden'));
+                    document.querySelectorAll('#user-menu-chevron, #quick-create-chevron, .custom-select-trigger i.fa-chevron-down').forEach(c => c.classList.remove('rotate-180'));
                 }
             });
         });

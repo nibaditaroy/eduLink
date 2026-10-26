@@ -315,6 +315,7 @@ function handleUserStatusChange(selectElement, userId, userName, currentStatus, 
     form.action = `/admin/users/${userId}/status`;
     nameEl.textContent = userName;
     statusSelect.value = targetStatus;
+    if (statusSelect._customSync) statusSelect._customSync();
     reasonEl.value = currentReason || '';
 
     modal.classList.remove('opacity-0', 'pointer-events-none');
@@ -332,6 +333,7 @@ function closeUserStatusModal() {
     document.body.style.overflow = '';
     if (activeStatusSelect && originalStatusVal) {
         activeStatusSelect.value = originalStatusVal;
+        if (activeStatusSelect._customSync) activeStatusSelect._customSync();
     }
 }
 
