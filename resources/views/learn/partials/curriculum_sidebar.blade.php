@@ -44,8 +44,17 @@
                                     @endif
                                     <span class="truncate">{{ $lesson->title }}</span>
                                 </div>
-                                @if($lesson->code_snippet)
-                                    <span class="text-[9px] px-1 py-0.2 rounded font-mono {{ $isActive ? 'bg-indigo-700 text-indigo-100' : 'bg-slate-200 text-slate-600' }}">Code</span>
+                                @php
+                                    $hasCode = !empty($lesson->code_snippet) || (is_array($lesson->content_blocks) && collect($lesson->content_blocks)->contains(fn($b) => in_array($b['type'] ?? '', ['code', 'practice'])));
+                                @endphp
+                                @if($hasCode)
+                                    @if($isActive)
+                                        <button type="button" onclick="event.preventDefault(); event.stopPropagation(); if (typeof scrollToPracticeLab === 'function') { scrollToPracticeLab(); } else { window.location.hash = 'practice-sandbox-section'; }" title="Jump to Practice Code Lab" class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-indigo-700 hover:bg-indigo-800 text-indigo-100 flex items-center gap-1 transition shadow-2xs">
+                                            <i class="fa-solid fa-terminal text-[8px]"></i> Code
+                                        </button>
+                                    @else
+                                        <span class="text-[9px] px-1 py-0.2 rounded font-mono bg-slate-200 text-slate-600">Code</span>
+                                    @endif
                                 @endif
                             </a>
                         @endif

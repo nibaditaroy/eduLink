@@ -94,6 +94,50 @@ class DatabaseSeeder extends Seeder
                         'code_language' => 'python',
                         'code_snippet' => "# Welcome to Python for Beginners!\nplatform_name = 'eduLink LMS'\nlearner_level = 'Beginner'\nprint(f'Hello from {platform_name}! Starting your journey at {learner_level} level.')\n\n# Calculate basic metrics\ncourses_completed = 0\ntarget_courses = 2\nprint(f'Progress: {courses_completed}/{target_courses} tracks.')",
                         'text_content' => "Welcome to Python Programming for Beginners!\n\nPython is an interpreted, high-level, general-purpose programming language known for its clean syntax and readability.\n\nKey Concepts:\n1. Indentation matters: Python uses indentation to define code blocks instead of curly braces.\n2. Dynamic Typing: Variables do not require explicit type declaration.\n3. The print() function writes formatted text directly to stdout.",
+                        'content_blocks' => [
+                            [
+                                'type' => 'video',
+                                'title' => 'Video Lecture: Getting Started with Python 3',
+                                'url' => 'https://www.youtube.com/watch?v=kqtD5dpn9C8',
+                            ],
+                            [
+                                'type' => 'text',
+                                'title' => 'Core Architecture & The Python Interpreter',
+                                'content' => "Python is an interpreted language, meaning code is executed line-by-line by the Python interpreter without requiring a compilation step beforehand.\n\nWhy Python is loved by developers:\n• Human-readable, clean syntax that focuses on developer productivity\n• Batteries-included standard library for file I/O, networking, and mathematical utilities\n• Enormous ecosystem for Web Development, Data Science, and Machine Learning.",
+                            ],
+                            [
+                                'type' => 'code',
+                                'title' => 'Script 1: Printing & Variable Interpolation',
+                                'language' => 'python',
+                                'code' => "platform_name = 'eduLink LMS'\ncountry = 'Bangladesh'\nprint(f'Welcome to {platform_name} in {country}!')\n\n# Dynamic types\nactive_learners = 1500\nrating = 4.95\nprint(f'Active Learners: {active_learners} | Rating: {rating} ★')",
+                                'output' => "Welcome to eduLink LMS in Bangladesh!\nActive Learners: 1500 | Rating: 4.95 ★",
+                                'runnable' => true,
+                            ],
+                            [
+                                'type' => 'callout',
+                                'style' => 'tip',
+                                'title' => 'PEP 8 Style Recommendation: Snake Case',
+                                'content' => "In Python, variable names should use snake_case (all lowercase words separated by underscores). Avoid camelCase for variables and functions in Python.",
+                            ],
+                            [
+                                'type' => 'code',
+                                'title' => 'Script 2: Math Calculations & Course Enrollment Pricing',
+                                'language' => 'python',
+                                'code' => "course_fee = 2500\ndiscount_percent = 20\nsavings = course_fee * (discount_percent / 100)\nfinal_price = course_fee - savings\n\nprint(f'Original Fee: ৳{course_fee} Tk')\nprint(f'Discount: {discount_percent}% (Saved: ৳{int(savings)} Tk)')\nprint(f'Final Payable: ৳{int(final_price)} Tk')",
+                                'output' => "Original Fee: ৳2500 Tk\nDiscount: 20% (Saved: ৳500 Tk)\nFinal Payable: ৳2000 Tk",
+                                'runnable' => true,
+                            ],
+                            [
+                                'type' => 'practice',
+                                'title' => 'Hands-on Challenge: Currency & Fee Calculator',
+                                'language' => 'python',
+                                'instructions' => "Write a Python script that calculates the tuition fee for 2 courses:\n1. course_1 = 2500\n2. course_2 = 3000\n3. Calculate total = course_1 + course_2\n4. Print exactly: Total Fee: ৳5500 Tk",
+                                'code' => "# Write your solution below:\ncourse_1 = 2500\ncourse_2 = 3000\n\n# Calculate and print total fee\n",
+                                'expected_output' => "Total Fee: ৳5500 Tk",
+                                'hints' => "Use f-string formatting: print(f'Total Fee: ৳{total} Tk')",
+                                'solution_code' => "course_1 = 2500\ncourse_2 = 3000\ntotal = course_1 + course_2\nprint(f'Total Fee: ৳{total} Tk')",
+                            ],
+                        ],
                     ],
                     [
                         'title' => 'Variables, Data Types & Console Input',
@@ -101,6 +145,27 @@ class DatabaseSeeder extends Seeder
                         'code_language' => 'python',
                         'code_snippet' => "item_name = 'Python Essentials Guide'\nprice_bdt = 1250\nquantity = 2\nis_digital = True\n\ntotal_due = price_bdt * quantity\nprint(f'Order for: {item_name}')\nprint(f'Total Due: ৳{total_due} Tk | Digital Delivery: {is_digital}')",
                         'text_content' => "In Python, variables store references to values in memory.\n\nCore Data Types:\n- int: Integer numbers (e.g. 42)\n- float: Floating point numbers with decimals (e.g. 19.99)\n- str: Text characters enclosed in quotes (e.g. 'Dhaka')\n- bool: Boolean truth values (True or False)",
+                        'content_blocks' => [
+                            [
+                                'type' => 'text',
+                                'title' => 'Understanding Primitive Python Data Types',
+                                'content' => "Python has four essential scalar primitive types:\n1. Integer (int): Whole numbers like 10, -5, 0.\n2. Float (float): Real numbers with decimal points like 3.1416.\n3. String (str): Text enclosed in single or double quotes.\n4. Boolean (bool): Binary logic True or False.",
+                            ],
+                            [
+                                'type' => 'code',
+                                'title' => 'Type Inspection with type()',
+                                'language' => 'python',
+                                'code' => "score = 95\nratio = 0.95\nstudent = 'Naima'\nenrolled = True\n\nprint(type(score))\nprint(type(ratio))\nprint(type(student))\nprint(type(enrolled))",
+                                'output' => "<class 'int'>\n<class 'float'>\n<class 'str'>\n<class 'bool'>",
+                                'runnable' => true,
+                            ],
+                            [
+                                'type' => 'callout',
+                                'style' => 'tip',
+                                'title' => 'Dynamic Rebinding',
+                                'content' => "In Python, a variable can change its type at runtime. While powerful, keep variable types consistent for clean and maintainable code.",
+                            ],
+                        ],
                     ]
                 ],
                 'quiz' => [
@@ -342,6 +407,7 @@ class DatabaseSeeder extends Seeder
                     'code_language' => $lData['code_language'],
                     'code_snippet' => $lData['code_snippet'],
                     'text_content' => $lData['text_content'],
+                    'content_blocks' => $lData['content_blocks'] ?? null,
                     'sort_order' => $lIndex + 1,
                 ]);
             }
@@ -413,6 +479,50 @@ class DatabaseSeeder extends Seeder
                         'code_language' => 'php',
                         'code_snippet' => "<?php\n\$platform = 'eduLink Bangladesh';\n\$track = 'PHP Web Development';\n\$price_bdt = 3000;\n\necho \"Welcome to {\$platform}!\";\necho \"\\nEnrolled in: {\$track}\";\necho \"\\nCourse Fee: ৳\" . number_format(\$price_bdt, 0) . \" Tk\";\n?>",
                         'text_content' => "PHP (Hypertext Preprocessor) is an open-source, server-side scripting language designed for web development.\n\nKey Concepts:\n1. PHP scripts start with <?php.\n2. Variables always begin with a dollar sign ($).\n3. Statements conclude with a semicolon (;).\n4. Double-quoted strings support variable interpolation.",
+                        'content_blocks' => [
+                            [
+                                'type' => 'video',
+                                'title' => 'Video Lecture: Modern PHP 8.x Architecture',
+                                'url' => 'https://www.youtube.com/watch?v=OK_JCtrrv-c',
+                            ],
+                            [
+                                'type' => 'text',
+                                'title' => 'The PHP 8.x Web Execution Model',
+                                'content' => "When a client requests a .php file, the web server passes the request to the PHP engine. The server executes the script, generates pure HTML/JSON output, and delivers it to the browser.\n\nKey features in modern PHP 8+:\n• Just-In-Time (JIT) compilation for improved CPU-intensive tasks\n• Strict typing and return type hints\n• Match expressions and constructor property promotion.",
+                            ],
+                            [
+                                'type' => 'code',
+                                'title' => 'Script 1: Variable Interpolation & Formatting',
+                                'language' => 'php',
+                                'code' => "<?php\n\$institution = 'eduLink LMS';\n\$course = 'Modern PHP for Beginners';\n\$students = 850;\n\necho \"Welcome to {\$institution}!\\n\";\necho \"Course: {\$course}\\n\";\necho \"Total Enrolled Students: {\$students}\\n\";\n?>",
+                                'output' => "Welcome to eduLink LMS!\nCourse: Modern PHP for Beginners\nTotal Enrolled Students: 850",
+                                'runnable' => true,
+                            ],
+                            [
+                                'type' => 'callout',
+                                'style' => 'tip',
+                                'title' => 'String Quotation Differences',
+                                'content' => "Double quotes (\"...\") parse and interpolate variables like \$name directly. Single quotes ('...') treat everything as literal text without variable parsing.",
+                            ],
+                            [
+                                'type' => 'code',
+                                'title' => 'Script 2: Currency & VAT Calculations in BDT',
+                                'language' => 'php',
+                                'code' => "<?php\n\$courseFee = 3000;\n\$vatRate = 0.05;\n\$vatAmount = \$courseFee * \$vatRate;\n\$grandTotal = \$courseFee + \$vatAmount;\n\necho \"Base Fee: ৳{\$courseFee} Tk\\n\";\necho \"VAT (5%): ৳{\$vatAmount} Tk\\n\";\necho \"Grand Total: ৳{\$grandTotal} Tk\";\n?>",
+                                'output' => "Base Fee: ৳3000 Tk\nVAT (5%): ৳150 Tk\nGrand Total: ৳3150 Tk",
+                                'runnable' => true,
+                            ],
+                            [
+                                'type' => 'practice',
+                                'title' => 'Hands-on Challenge: Print Course Invoice in PHP',
+                                'language' => 'php',
+                                'instructions' => "Write a PHP script that declares:\n\$fee = 3000;\n\$discount = 500;\nCalculate the net total and echo exactly: Net Payable: ৳2500 Tk",
+                                'code' => "<?php\n// Declare variables and calculate net payable:\n\$fee = 3000;\n\$discount = 500;\n\n// Echo the exact expected output:\n",
+                                'expected_output' => "Net Payable: ৳2500 Tk",
+                                'hints' => "Use: echo 'Net Payable: ৳' . (\$fee - \$discount) . ' Tk';",
+                                'solution_code' => "<?php\n\$fee = 3000;\n\$discount = 500;\n\$net = \$fee - \$discount;\necho \"Net Payable: ৳{\$net} Tk\";\n?>",
+                            ],
+                        ],
                     ],
                     [
                         'title' => 'Variables, Data Types & Concatenation',
@@ -420,6 +530,21 @@ class DatabaseSeeder extends Seeder
                         'code_language' => 'php',
                         'code_snippet' => "<?php\n\$courseName = 'PHP for Beginners';\n\$rating = 4.95;\n\$isPublished = true;\n\necho 'Course: ' . \$courseName . ' | Rating: ' . \$rating;\n?>",
                         'text_content' => "PHP is dynamically typed; data types are inferred automatically.\n\nScalar Types:\n- int: Integer numbers (e.g. 100)\n- float: Floating point numbers (e.g. 99.50)\n- string: Text (e.g. 'Dhaka')\n- bool: Booleans (true or false)\n\nThe dot operator (.) concatenates strings.",
+                        'content_blocks' => [
+                            [
+                                'type' => 'text',
+                                'title' => 'PHP Data Types & Variable Rules',
+                                'content' => "In PHP, variable names must begin with a dollar sign ($), followed by a letter or underscore. Variable names are case-sensitive (\$score and \$Score are different).\n\nUse var_dump() during debugging to inspect the exact type and value of any expression.",
+                            ],
+                            [
+                                'type' => 'code',
+                                'title' => 'Debugging with var_dump()',
+                                'language' => 'php',
+                                'code' => "<?php\n\$title = 'Full-Stack PHP';\n\$lessonsCount = 12;\n\$isLive = true;\n\nvar_dump(\$title);\nvar_dump(\$lessonsCount);\nvar_dump(\$isLive);\n?>",
+                                'output' => "string(14) \"Full-Stack PHP\"\nint(12)\nbool(true)",
+                                'runnable' => true,
+                            ],
+                        ],
                     ]
                 ],
                 'quiz' => [
@@ -647,6 +772,7 @@ class DatabaseSeeder extends Seeder
                     'code_language' => $lData['code_language'],
                     'code_snippet' => $lData['code_snippet'],
                     'text_content' => $lData['text_content'],
+                    'content_blocks' => $lData['content_blocks'] ?? null,
                     'sort_order' => $lIndex + 1,
                 ]);
             }

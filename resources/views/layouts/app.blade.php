@@ -299,6 +299,10 @@
     <!-- User dropdown click script -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            if (window.hljs) {
+                hljs.highlightAll();
+            }
+
             const btn = document.getElementById('user-menu-btn');
             const menu = document.getElementById('user-menu-content');
             if (btn && menu) {
