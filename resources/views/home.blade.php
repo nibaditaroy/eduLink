@@ -88,29 +88,64 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($featuredCourses as $course)
                 <div class="bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group">
-                    <!-- Thumbnail / Banner -->
-                    <div class="relative h-48 bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-800 p-5 flex flex-col justify-between overflow-hidden">
-                        <!-- Abstract glow -->
-                        <div class="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-indigo-500/20 blur-2xl group-hover:bg-indigo-500/30 transition"></div>
+                    <!-- Clickable Tech Banner linked to Syllabus -->
+                    <a href="{{ route('courses.show', $course->slug) }}" class="relative block h-52 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-5 overflow-hidden group/thumb cursor-pointer">
+                        <!-- Geometric Dot Matrix Texture -->
+                        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 16px 16px;"></div>
+                        
+                        <!-- Ambient Neon Glow -->
+                        <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full {{ Str::contains(strtolower($course->title), 'python') ? 'bg-cyan-500/25' : 'bg-indigo-500/25' }} blur-2xl group-hover/thumb:scale-125 transition duration-500"></div>
+                        <div class="absolute -left-12 -bottom-12 w-48 h-48 rounded-full {{ Str::contains(strtolower($course->title), 'python') ? 'bg-amber-500/20' : 'bg-rose-500/20' }} blur-2xl"></div>
 
-                        <div class="flex items-center justify-between relative z-10">
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/10 text-white backdrop-blur-md border border-white/20">
-                                {{ $course->category }}
-                            </span>
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $course->level === 'beginner' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : ($course->level === 'intermediate' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30') }}">
-                                {{ ucfirst($course->level) }}
-                            </span>
-                        </div>
-
-                        <div class="relative z-10">
-                            <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xl mb-2 group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-laptop-code text-cyan-300"></i>
+                        <div class="relative z-10 flex flex-col justify-between h-full">
+                            <!-- Badges Bar -->
+                            <div class="flex items-center justify-between">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/10 text-white backdrop-blur-md border border-white/20 shadow-xs">
+                                    {{ $course->category }}
+                                </span>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $course->level === 'beginner' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : ($course->level === 'intermediate' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30') }}">
+                                    {{ ucfirst($course->level) }}
+                                </span>
                             </div>
-                            <h3 class="font-bold text-white text-base line-clamp-2 leading-snug group-hover:text-cyan-200 transition">
-                                {{ $course->title }}
-                            </h3>
+
+                            <!-- Tech Centerpiece Icon & Stack Indicator -->
+                            <div class="my-auto py-2 flex items-center justify-between">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr {{ Str::contains(strtolower($course->title), 'python') ? 'from-amber-500 to-cyan-400' : 'from-indigo-600 to-rose-500' }} p-0.5 shadow-lg group-hover/thumb:scale-110 transition duration-300">
+                                    <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-xl">
+                                        @if(Str::contains(strtolower($course->title), 'python'))
+                                            <i class="fa-brands fa-python text-amber-400 text-2xl"></i>
+                                        @elseif(Str::contains(strtolower($course->title), ['laravel', 'php']))
+                                            <i class="fa-brands fa-laravel text-rose-500 text-2xl"></i>
+                                        @else
+                                            <i class="fa-solid fa-code text-cyan-400 text-2xl"></i>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Tech Tag Pills -->
+                                <div class="text-right">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-700/80 text-[10px] font-mono text-cyan-300 shadow-xs">
+                                        <i class="fa-solid fa-microchip text-[9px]"></i>
+                                        @if(Str::contains(strtolower($course->title), 'python'))
+                                            Python 3 &bull; DSA
+                                        @elseif(Str::contains(strtolower($course->title), ['laravel', 'php']))
+                                            PHP 8.2 &bull; Laravel 12
+                                        @else
+                                            Full Stack Lab
+                                        @endif
+                                    </span>
+                                    <span class="block text-[10px] text-slate-400 font-semibold mt-1">Interactive Sandbox &bull; Verified</span>
+                                </div>
+                            </div>
+
+                            <!-- Title on banner -->
+                            <div>
+                                <h3 class="font-bold text-white text-base line-clamp-2 leading-snug group-hover/thumb:text-cyan-300 transition">
+                                    {{ $course->title }}
+                                </h3>
+                            </div>
                         </div>
-                    </div>
+                    </a>
 
                     <!-- Course Info -->
                     <div class="p-6 flex-grow flex flex-col justify-between">
@@ -143,19 +178,25 @@
                                 @endif
                             </div>
 
-                            @if(in_array($course->id, $enrolledCourseIds))
-                                <a href="{{ route('learn.course', $course->slug) }}" class="px-4 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition flex items-center gap-1.5">
-                                    <i class="fa-solid fa-circle-play text-emerald-600"></i> Resume
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('courses.show', $course->slug) }}" class="px-3 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition flex items-center gap-1">
+                                    <i class="fa-solid fa-book-open text-xs"></i>
+                                    <span>Syllabus</span>
                                 </a>
-                            @elseif($course->isFree())
-                                <a href="{{ route('courses.show', $course->slug) }}" class="px-4 py-2 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition">
-                                    View Syllabus
-                                </a>
-                            @else
-                                <a href="{{ route('checkout.show', $course->slug) }}" class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-600/20 transition flex items-center gap-1">
-                                    Enroll Now
-                                </a>
-                            @endif
+                                @if(in_array($course->id, $enrolledCourseIds))
+                                    <a href="{{ route('learn.course', $course->slug) }}" class="px-4 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition flex items-center gap-1.5">
+                                        <i class="fa-solid fa-circle-play text-emerald-600"></i> Resume
+                                    </a>
+                                @elseif($course->isFree())
+                                    <a href="{{ route('courses.show', $course->slug) }}" class="px-4 py-2 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition">
+                                        Enroll Free
+                                    </a>
+                                @else
+                                    <a href="{{ route('checkout.show', $course->slug) }}" class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-600/20 transition flex items-center gap-1">
+                                        Enroll Now
+                                    </a>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
