@@ -15,13 +15,13 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $search = $request->query('search');
-        $role = $request->query('role');
-        $status = $request->query('status');
+        $search = trim((string) $request->input('search'));
+        $role = strtolower(trim((string) $request->input('role')));
+        $status = strtolower(trim((string) $request->input('status')));
 
         $query = User::query()->withCount(['enrollments', 'transactions']);
 
-        if ($search) {
+        if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
@@ -29,15 +29,15 @@ class UserController extends Controller
             });
         }
 
-        if ($role && in_array($role, ['admin', 'student'])) {
+        if ($role !== '' && in_array($role, ['admin', 'student'])) {
             $query->where('role', $role);
         }
 
-        if ($status && in_array($status, ['active', 'suspended', 'blocked'])) {
+        if ($status !== '' && in_array($status, ['active', 'suspended', 'blocked'])) {
             $query->where('status', $status);
         }
 
-        $users = $query->latest()->paginate(15)->withQueryString();
+        $users = $query->latest('id')->paginate(15)->withQueryString();
 
         $stats = [
             'total' => User::count(),
@@ -125,7 +125,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        if ($user->id === Auth::id()) {
+        if (Auth::check() && $user->id === Auth::id()) {
             return back()->with('error', 'You cannot change your own account status.');
         }
 
@@ -133,6 +133,10 @@ class UserController extends Controller
             'status' => 'required|in:active,suspended,blocked',
             'status_reason' => 'nullable|string|max:500',
         ]);
+
+        if ($validated['status'] === 'active' && empty($request->input('status_reason'))) {
+            $validated['status_reason'] = null;
+        }
 
         $user->update($validated);
 

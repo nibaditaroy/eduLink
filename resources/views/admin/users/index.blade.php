@@ -18,38 +18,44 @@
         </div>
     </div>
 
-    <!-- Quick Stats Cards -->
+    <!-- Quick Stats Cards (Click to filter) -->
     <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
-        <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
+        <a href="{{ route('admin.users.index') }}" 
+           class="bg-white p-4 rounded-2xl border {{ !request('role') && !request('status') ? 'border-slate-900 ring-2 ring-slate-900/10' : 'border-gray-200 hover:border-gray-300' }} shadow-sm transition block">
             <div class="text-xs text-gray-500 font-medium">Total Users</div>
             <div class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($stats['total']) }}</div>
-        </div>
-        <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
+        </a>
+        <a href="{{ route('admin.users.index', ['role' => 'student', 'search' => request('search')]) }}" 
+           class="bg-white p-4 rounded-2xl border {{ request('role') === 'student' ? 'border-indigo-600 ring-2 ring-indigo-600/10' : 'border-gray-200 hover:border-indigo-200' }} shadow-sm transition block">
             <div class="text-xs text-indigo-600 font-medium">Students</div>
             <div class="text-2xl font-bold text-indigo-600 mt-1">{{ number_format($stats['students']) }}</div>
-        </div>
-        <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
+        </a>
+        <a href="{{ route('admin.users.index', ['role' => 'admin', 'search' => request('search')]) }}" 
+           class="bg-white p-4 rounded-2xl border {{ request('role') === 'admin' ? 'border-purple-600 ring-2 ring-purple-600/10' : 'border-gray-200 hover:border-purple-200' }} shadow-sm transition block">
             <div class="text-xs text-purple-600 font-medium">Admins</div>
             <div class="text-2xl font-bold text-purple-600 mt-1">{{ number_format($stats['admins']) }}</div>
-        </div>
-        <div class="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200 shadow-sm">
+        </a>
+        <a href="{{ route('admin.users.index', ['status' => 'active', 'search' => request('search')]) }}" 
+           class="bg-emerald-50/70 p-4 rounded-2xl border {{ request('status') === 'active' ? 'border-emerald-600 ring-2 ring-emerald-600/20' : 'border-emerald-200 hover:border-emerald-300' }} shadow-sm transition block">
             <div class="text-xs text-emerald-700 font-medium flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Active
             </div>
             <div class="text-2xl font-bold text-emerald-800 mt-1">{{ number_format($stats['active']) }}</div>
-        </div>
-        <div class="bg-amber-50/70 p-4 rounded-2xl border border-amber-200 shadow-sm">
+        </a>
+        <a href="{{ route('admin.users.index', ['status' => 'suspended', 'search' => request('search')]) }}" 
+           class="bg-amber-50/70 p-4 rounded-2xl border {{ request('status') === 'suspended' ? 'border-amber-600 ring-2 ring-amber-600/20' : 'border-amber-200 hover:border-amber-300' }} shadow-sm transition block">
             <div class="text-xs text-amber-700 font-medium flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-amber-500"></span> Suspended
             </div>
             <div class="text-2xl font-bold text-amber-800 mt-1">{{ number_format($stats['suspended']) }}</div>
-        </div>
-        <div class="bg-rose-50/70 p-4 rounded-2xl border border-rose-200 shadow-sm">
+        </a>
+        <a href="{{ route('admin.users.index', ['status' => 'blocked', 'search' => request('search')]) }}" 
+           class="bg-rose-50/70 p-4 rounded-2xl border {{ request('status') === 'blocked' ? 'border-rose-600 ring-2 ring-rose-600/20' : 'border-rose-200 hover:border-rose-300' }} shadow-sm transition block">
             <div class="text-xs text-rose-700 font-medium flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-rose-500"></span> Blocked
             </div>
             <div class="text-2xl font-bold text-rose-800 mt-1">{{ number_format($stats['blocked']) }}</div>
-        </div>
+        </a>
     </div>
 
     <!-- Filters & Search Bar -->
@@ -59,12 +65,12 @@
                 <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-gray-400">
                     <i class="fa-solid fa-magnifying-glass text-xs"></i>
                 </div>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name, email, or phone..." 
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name, email, or phone (press Enter)..." 
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full ps-9 p-2.5">
             </div>
 
             <div>
-                <select name="role" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                <select name="role" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
                     <option value="">All Roles</option>
                     <option value="student" {{ request('role') === 'student' ? 'selected' : '' }}>Student</option>
                     <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
@@ -72,17 +78,17 @@
             </div>
 
             <div class="flex items-center gap-2">
-                <select name="status" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                <select name="status" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
                     <option value="">All Statuses</option>
                     <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
                     <option value="suspended" {{ request('status') === 'suspended' ? 'selected' : '' }}>Suspended</option>
                     <option value="blocked" {{ request('status') === 'blocked' ? 'selected' : '' }}>Blocked</option>
                 </select>
-                <button type="submit" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition">
+                <button type="submit" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition flex-shrink-0">
                     Filter
                 </button>
                 @if(request('search') || request('role') || request('status'))
-                <a href="{{ route('admin.users.index') }}" class="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition text-xs" title="Reset Filters">
+                <a href="{{ route('admin.users.index') }}" class="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition text-xs flex-shrink-0" title="Reset Filters">
                     <i class="fa-solid fa-rotate-left"></i>
                 </a>
                 @endif
