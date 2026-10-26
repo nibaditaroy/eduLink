@@ -345,30 +345,60 @@
                     </div>
                 `;
             } else if (block.type === 'practice') {
-                headerBadge = `<span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-violet-50 text-violet-700 border border-violet-200"><i class="fa-solid fa-terminal me-1"></i> Interactive Coding Challenge</span>`;
+                headerBadge = `<span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase bg-violet-100/90 text-violet-800 border border-violet-200 flex items-center gap-1.5"><i class="fa-solid fa-laptop-code text-violet-600"></i> Interactive Coding Challenge</span>`;
                 contentHtml = `
-                    <div class="space-y-2">
+                    <div class="space-y-3">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div class="md:col-span-2">
-                                <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Challenge Title</label>
-                                <input type="text" value="${escapeHtml(block.title || '')}" oninput="updateBlock(${index}, 'title', this.value)" placeholder="e.g. Practice: Calculate Fibonacci Sequence" class="bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full">
+                                <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Challenge Title</label>
+                                <input type="text" value="${escapeHtml(block.title || '')}" oninput="updateBlock(${index}, 'title', this.value)" placeholder="e.g. Practice: Calculate Fibonacci Sequence" class="bg-gray-50/80 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full focus:bg-white focus:ring-1 focus:ring-violet-500">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Language</label>
-                                <select onchange="updateBlock(${index}, 'language', this.value)" class="bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full font-semibold">
+                                <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Target Language</label>
+                                <select onchange="updateBlock(${index}, 'language', this.value)" class="bg-gray-50/80 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full font-semibold focus:bg-white focus:ring-1 focus:ring-violet-500">
                                     ${['php', 'python', 'javascript', 'html'].map(lang => 
                                         `<option value="${lang}" ${block.language === lang ? 'selected' : ''}>${lang.toUpperCase()}</option>`
                                     ).join('')}
                                 </select>
                             </div>
                         </div>
+
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Task Instructions / Problem Statement</label>
-                            <textarea rows="2" oninput="updateBlock(${index}, 'instructions', this.value)" placeholder="Describe what students need to compute or output..." class="bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full">${escapeHtml(block.instructions || '')}</textarea>
+                            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Task Instructions / Problem Statement</label>
+                            <textarea rows="2" oninput="updateBlock(${index}, 'instructions', this.value)" placeholder="Describe what students need to compute or output..." class="bg-gray-50/80 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full focus:bg-white focus:ring-1 focus:ring-violet-500 leading-relaxed">${escapeHtml(block.instructions || '')}</textarea>
                         </div>
+
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Starter Code Template</label>
-                            <textarea rows="5" oninput="updateBlock(${index}, 'code', this.value)" class="bg-slate-900 border border-slate-800 text-emerald-400 text-xs font-mono rounded-xl p-3 w-full">${escapeHtml(block.code || '')}</textarea>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-[11px] font-bold text-gray-700 uppercase">Starter Code Template</label>
+                                <span class="text-[10px] text-gray-400 font-mono">Loaded in student editor</span>
+                            </div>
+                            <textarea rows="4" oninput="updateBlock(${index}, 'code', this.value)" class="bg-slate-950 border border-slate-800 text-emerald-400 text-xs font-mono rounded-xl p-3 w-full focus:ring-1 focus:ring-violet-500 leading-relaxed">${escapeHtml(block.code || '')}</textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-200/70 space-y-1">
+                                <label class="block text-[11px] font-bold text-emerald-900 uppercase flex items-center gap-1.5">
+                                    <i class="fa-solid fa-bullseye text-emerald-600"></i> Target Expected Output (Auto-Verification)
+                                </label>
+                                <textarea rows="3" oninput="updateBlock(${index}, 'expected_output', this.value)" placeholder="e.g. Total: 260&#10;System checks student terminal output against this to auto-pass!" class="bg-white border border-emerald-200 text-slate-900 text-xs font-mono rounded-lg p-2.5 w-full focus:ring-1 focus:ring-emerald-500 leading-relaxed">${escapeHtml(block.expected_output || '')}</textarea>
+                            </div>
+                            <div class="p-3 bg-amber-50/50 rounded-xl border border-amber-200/70 space-y-1">
+                                <label class="block text-[11px] font-bold text-amber-900 uppercase flex items-center gap-1.5">
+                                    <i class="fa-solid fa-lightbulb text-amber-500"></i> Hint / Clue for Students (Optional)
+                                </label>
+                                <textarea rows="3" oninput="updateBlock(${index}, 'hints', this.value)" placeholder="e.g. Iterate through the array using a foreach loop and accumulate sum..." class="bg-white border border-amber-200 text-slate-900 text-xs rounded-lg p-2.5 w-full focus:ring-1 focus:ring-amber-500 leading-relaxed">${escapeHtml(block.hints || '')}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-[11px] font-bold text-emerald-400 uppercase flex items-center gap-1.5">
+                                    <i class="fa-solid fa-key text-emerald-400"></i> Official Instructor Solution & Model Answer (Optional)
+                                </label>
+                                <span class="text-[10px] text-slate-400 font-mono">Revealed to students if stuck</span>
+                            </div>
+                            <textarea rows="4" oninput="updateBlock(${index}, 'solution_code', this.value)" placeholder="// Full working solution code that students can view or load into sandbox..." class="bg-slate-950 border border-slate-800 text-emerald-300 text-xs font-mono rounded-lg p-3 w-full focus:ring-1 focus:ring-emerald-500 leading-relaxed">${escapeHtml(block.solution_code || '')}</textarea>
                         </div>
                     </div>
                 `;
@@ -458,7 +488,10 @@
             title: 'Hands-on Practice Challenge',
             instructions: 'Write a program to solve the task below and test the output:',
             language: 'php',
-            code: '<?php\n// Write your solution below:\n\n?>'
+            code: '<?php\n// Write your solution below:\n\n?>',
+            expected_output: '',
+            solution_code: '',
+            hints: ''
         });
         renderBlocks();
     }

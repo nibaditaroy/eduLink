@@ -14,11 +14,11 @@ class CodeRunnerController extends Controller
     public function execute(Request $request)
     {
         $validated = $request->validate([
-            'code' => 'required|string|max:10000',
+            'code' => 'nullable|string|max:20000',
             'language' => 'required|in:php,javascript,python,html,sql',
         ]);
 
-        $code = $validated['code'];
+        $code = $validated['code'] ?? '';
         $language = $validated['language'];
 
         $startTime = microtime(true);
@@ -30,6 +30,17 @@ class CodeRunnerController extends Controller
         $stdout = '';
         $stderr = '';
         $exitCode = 0;
+
+        if (trim($code) === '') {
+            return response()->json([
+                'success' => true,
+                'stdout' => '',
+                'stderr' => '',
+                'exit_code' => 0,
+                'execution_time' => '0.001s',
+                'language' => $language,
+            ]);
+        }
 
         try {
             if ($language === 'php') {
