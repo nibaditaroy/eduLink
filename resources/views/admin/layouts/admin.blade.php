@@ -10,6 +10,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     
     <script>
         tailwind.config = {
@@ -111,6 +112,30 @@
                     <a href="{{ route('admin.courses.index') }}" class="flex items-center p-2.5 text-gray-900 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 group {{ request()->routeIs('admin.courses.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : '' }} transition">
                         <i class="fa-solid fa-book-open w-6 text-center text-gray-500 group-hover:text-indigo-600 {{ request()->routeIs('admin.courses.*') ? 'text-indigo-600' : '' }}"></i>
                         <span class="ms-3">Courses & Hierarchy</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.users.index') }}" class="flex items-center p-2.5 text-gray-900 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 group {{ request()->routeIs('admin.users.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : '' }} transition">
+                        <i class="fa-solid fa-users w-6 text-center text-gray-500 group-hover:text-indigo-600 {{ request()->routeIs('admin.users.*') ? 'text-indigo-600' : '' }}"></i>
+                        <span class="ms-3">User Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.enrollments.index') }}" class="flex items-center p-2.5 text-gray-900 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 group {{ request()->routeIs('admin.enrollments.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : '' }} transition">
+                        <i class="fa-solid fa-user-graduate w-6 text-center text-gray-500 group-hover:text-indigo-600 {{ request()->routeIs('admin.enrollments.*') ? 'text-indigo-600' : '' }}"></i>
+                        <span class="ms-3">Enrollments & Popularity</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.transactions.index') }}" class="flex items-center p-2.5 text-gray-900 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 group {{ request()->routeIs('admin.transactions.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : '' }} transition">
+                        <i class="fa-solid fa-credit-card w-6 text-center text-gray-500 group-hover:text-indigo-600 {{ request()->routeIs('admin.transactions.*') ? 'text-indigo-600' : '' }}"></i>
+                        <span class="ms-3">Payments & Revenue</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.assignment-submissions.index') }}" class="flex items-center p-2.5 text-gray-900 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 group {{ request()->routeIs('admin.assignment-submissions.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : '' }} transition">
+                        <i class="fa-solid fa-file-signature w-6 text-center text-gray-500 group-hover:text-indigo-600 {{ request()->routeIs('admin.assignment-submissions.*') ? 'text-indigo-600' : '' }}"></i>
+                        <span class="ms-3">Assignment Grading</span>
                     </a>
                 </li>
                 <li>

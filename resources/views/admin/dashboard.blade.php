@@ -164,7 +164,7 @@
                             </span>
                             @else
                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-600 text-white shadow-sm">
-                                ${{ number_format($course->price, 2) }}
+                                ৳{{ number_format($course->price, 2) }} Tk
                             </span>
                             @endif
                         </div>

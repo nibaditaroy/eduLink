@@ -50,4 +50,14 @@ class Course extends Model
     {
         return (float) $this->price <= 0;
     }
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }

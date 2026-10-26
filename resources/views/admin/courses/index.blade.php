@@ -63,7 +63,7 @@
                             </span>
                             @else
                             <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                ${{ number_format($course->price, 2) }}
+                                ৳{{ number_format($course->price, 2) }} Tk
                             </span>
                             @endif
                         </td>

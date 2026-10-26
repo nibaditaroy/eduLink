@@ -55,13 +55,14 @@
             <!-- Price & Publish State -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label for="price" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Course Price ($ USD) *</label>
+                    <label for="price" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Course Price (Tk / ৳ BDT) *</label>
                     <div class="relative">
-                        <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-gray-500 text-sm">
-                            $
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-gray-500 font-bold text-xs">
+                            Tk
                         </div>
-                        <input type="number" step="0.01" min="0" id="price" name="price" value="{{ old('price', $course->price) }}" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full ps-8 p-3">
+                        <input type="number" step="0.01" min="0" id="price" name="price" value="{{ old('price', $course->price) }}" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full ps-11 p-3">
                     </div>
+                    <p class="text-[11px] text-gray-500 mt-1">Enter 0.00 to make this a Free Course (0 Tk).</p>
                 </div>
 
                 <div>
