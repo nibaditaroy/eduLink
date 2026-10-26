@@ -91,7 +91,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/quick-login', [AdminAuthController::class, 'quickDemoLogin'])->name('quick-login');
 
     // Admin Protected Routes
-    Route::middleware(['web'])->group(function () {
+    Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Course Management (Course -> Chapter -> Lesson)

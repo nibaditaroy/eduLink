@@ -15,7 +15,7 @@ class AuthController extends Controller
         if (Auth::check() && Auth::user()->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
-        return view('admin.auth.login');
+        return redirect()->route('login');
     }
 
     public function login(Request $request)

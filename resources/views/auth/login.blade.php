@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Sign In - eduLink Learning Platform')
+@section('title', 'Sign In - eduLink Platform')
 
 @section('content')
 <div class="py-12 lg:py-20 flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -11,7 +11,7 @@
                 <i class="fa-solid fa-graduation-cap"></i>
             </div>
             <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Welcome Back</h1>
-            <p class="text-xs text-slate-500 mt-1">Sign in to resume your active courses and code labs</p>
+            <p class="text-xs text-slate-500 mt-1">Sign in to your Student or Administrator account</p>
         </div>
 
         @if(session()->has('url.intended') && Str::contains(session('url.intended'), '/learn/'))
@@ -78,11 +78,11 @@
                     <input type="checkbox" name="remember" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
                     <span>Remember me</span>
                 </label>
-                <span class="text-slate-400 text-[11px]">Bangladeshi Student Portal</span>
+                <span class="text-slate-400 text-[11px]">Student & Admin Unified Portal</span>
             </div>
 
             <button type="submit" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-lg shadow-indigo-600/25 transition">
-                Sign In to My Classroom
+                Sign In to Account
             </button>
         </form>
 
