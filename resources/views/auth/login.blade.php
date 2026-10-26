@@ -26,14 +26,25 @@
 
         <!-- Quick 1-Click Demo Login Bar -->
         <div class="mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-2">⚡ 1-Click Demo Credentials</span>
-            <div class="grid grid-cols-2 gap-2 text-xs font-bold">
-                <a href="{{ route('quick-demo-login', 'student') }}" class="p-2 rounded-xl bg-white hover:bg-indigo-50 border border-slate-200 text-indigo-700 transition flex items-center justify-center gap-1.5 shadow-2xs">
-                    <i class="fa-solid fa-user-graduate text-indigo-500"></i> Student (Nipa)
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-2">⚡ 1-Click Demo Login</span>
+            <div class="grid grid-cols-2 gap-2.5 text-xs font-bold">
+                <a href="{{ route('quick-demo-login', 'student') }}" class="p-2.5 rounded-xl bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 text-indigo-700 transition flex items-center justify-center gap-2 shadow-xs">
+                    <i class="fa-solid fa-user-graduate text-indigo-500 text-sm"></i>
+                    <div class="text-left">
+                        <span class="block text-xs font-bold leading-tight">Student</span>
+                        <span class="block text-[9px] text-slate-400 font-normal leading-tight">student@gmail.com</span>
+                    </div>
                 </a>
-                <a href="{{ route('quick-demo-login', 'naima') }}" class="p-2 rounded-xl bg-white hover:bg-indigo-50 border border-slate-200 text-purple-700 transition flex items-center justify-center gap-1.5 shadow-2xs">
-                    <i class="fa-solid fa-user-shield text-purple-500"></i> Kazi Naima
+                <a href="{{ route('quick-demo-login', 'admin') }}" class="p-2.5 rounded-xl bg-white hover:bg-purple-50 border border-slate-200 hover:border-purple-300 text-purple-700 transition flex items-center justify-center gap-2 shadow-xs">
+                    <i class="fa-solid fa-user-shield text-purple-500 text-sm"></i>
+                    <div class="text-left">
+                        <span class="block text-xs font-bold leading-tight">Admin</span>
+                        <span class="block text-[9px] text-slate-400 font-normal leading-tight">admin@gmail.com</span>
+                    </div>
                 </a>
+            </div>
+            <div class="mt-2 text-[10px] text-slate-400">
+                Default Password: <code class="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200 font-bold text-slate-600">password</code>
             </div>
         </div>
 
@@ -44,7 +55,7 @@
                 <label for="email" class="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
                 <div class="relative">
                     <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus
-                        placeholder="e.g. student@edulink.test"
+                        placeholder="student@gmail.com or admin@gmail.com"
                         class="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
                     <i class="fa-solid fa-envelope absolute left-3 top-3 text-slate-400 text-xs"></i>
                 </div>

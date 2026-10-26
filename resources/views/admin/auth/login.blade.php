@@ -62,7 +62,7 @@
                     <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-slate-400 text-xs">
                         <i class="fa-solid fa-envelope"></i>
                     </div>
-                    <input type="email" id="email" name="email" value="{{ old('email', 'admin@edulink.test') }}" required class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full ps-10 p-2.5" placeholder="admin@edulink.test">
+                    <input type="email" id="email" name="email" value="{{ old('email', 'admin@gmail.com') }}" required class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full ps-10 p-2.5" placeholder="admin@gmail.com">
                 </div>
             </div>
 

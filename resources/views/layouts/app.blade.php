@@ -117,10 +117,6 @@
                             <a href="{{ route('register') }}" class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-600/25 transition">
                                 Get Started
                             </a>
-                            <!-- 1-Click Demo Testing Button -->
-                            <a href="{{ route('quick-demo-login', 'student') }}" title="1-Click Student Demo Login" class="p-2 text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition text-xs font-bold flex items-center gap-1">
-                                <i class="fa-solid fa-bolt"></i> Demo
-                            </a>
                         </div>
                     @else
                         <!-- User Account Dropdown -->
