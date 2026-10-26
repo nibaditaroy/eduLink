@@ -6,14 +6,26 @@
 <div class="bg-slate-100/60 border-b border-slate-200 py-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Student Hub</span>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
-                    Welcome, {{ Auth::user()->name }}! 👋
-                </h1>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1">Track your course progression, quizzes, and lab project submissions.</p>
+            <div class="flex items-center gap-4">
+                @if(Auth::user()->avatar_url)
+                    <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-md ring-2 ring-indigo-500/20">
+                @else
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-black text-2xl flex items-center justify-center shadow-md">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    </div>
+                @endif
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Student Hub</span>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-0.5">
+                        Welcome, {{ Auth::user()->name }}! 👋
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">Track your course progression, quizzes, and lab project submissions.</p>
+                </div>
             </div>
-            <div>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('profile.show') }}" class="px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-white text-slate-700 text-xs font-bold shadow-xs transition flex items-center gap-2">
+                    <i class="fa-solid fa-user-pen text-indigo-600 text-xs"></i> Edit Profile
+                </a>
                 <a href="{{ route('courses.index') }}" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition flex items-center gap-2">
                     <i class="fa-solid fa-plus text-xs"></i> Browse More Courses
                 </a>

@@ -7,6 +7,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\CoursePlayerController;
 use App\Http\Controllers\CodeRunnerController;
+use App\Http\Controllers\ProfileController;
 
 // Admin Controllers
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
@@ -76,6 +77,11 @@ Route::middleware(['auth'])->group(function () {
     // Assignments & Submissions
     Route::get('/learn/{slug}/assignment/{assignment}', [CoursePlayerController::class, 'showAssignment'])->name('learn.assignment');
     Route::post('/learn/{slug}/assignment/{assignment}/submit', [CoursePlayerController::class, 'submitAssignment'])->name('learn.assignment.submit');
+
+    // Student & User Profile Management
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 });
 
 /*
@@ -93,6 +99,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Admin Protected Routes (Strictly Administrator role only)
     Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Admin Personal Profile Management
+        Route::get('/profile', [ProfileController::class, 'adminShow'])->name('profile');
+        Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
         // Course Management (Course -> Chapter -> Lesson)
         Route::resource('courses', CourseController::class);
