@@ -71,6 +71,12 @@ class StudentAuthController extends Controller
                     ->with('success', "Welcome back, Administrator {$user->name}!");
             }
 
+            // Clear any admin intended redirect for non-admin users
+            $intended = session()->get('url.intended');
+            if ($intended && str_contains($intended, '/admin')) {
+                session()->forget('url.intended');
+            }
+
             return redirect()->intended(route('student.dashboard'))
                 ->with('success', "Welcome back, {$user->name}! Ready to continue learning?");
         }
@@ -143,6 +149,11 @@ class StudentAuthController extends Controller
         if ($user->isAdmin()) {
             return redirect()->intended(route('admin.dashboard'))
                 ->with('success', "Logged in as {$user->name} (Admin: {$user->email}).");
+        }
+
+        $intended = session()->get('url.intended');
+        if ($intended && str_contains($intended, '/admin')) {
+            session()->forget('url.intended');
         }
 
         return redirect()->intended(route('student.dashboard'))

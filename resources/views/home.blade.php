@@ -264,8 +264,134 @@
     </div>
 </section>
 
+<!-- Frequently Asked Questions (FAQ) Section -->
+<section class="py-20 bg-slate-50 border-t border-slate-200/80">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Section Header -->
+        <div class="text-center max-w-2xl mx-auto mb-14">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 mb-3">
+                <i class="fa-solid fa-circle-question text-indigo-500"></i> Got Questions? We Have Answers
+            </span>
+            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Frequently Asked Questions</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-2">
+                Everything you need to know about hands-on labs, Bangladeshi payment options, course certifications, and enrollment.
+            </p>
+        </div>
+
+        <!-- FAQ Accordion List -->
+        <div class="space-y-4">
+            <!-- FAQ Item 1 -->
+            <div class="faq-item rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden transition-all duration-200">
+                <button type="button" onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex items-center justify-between gap-4 font-bold text-slate-800 hover:text-indigo-600 transition">
+                    <span class="flex items-center gap-3 text-sm">
+                        <span class="w-7 h-7 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs shrink-0">
+                            <i class="fa-solid fa-bangladeshi-taka-sign"></i>
+                        </span>
+                        <span>How do Bangladeshi Taka (৳ BDT) payments work with bKash, Nagad & Rocket?</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down faq-icon text-xs text-slate-400 transition-transform duration-200"></i>
+                </button>
+                <div class="faq-content px-6 pb-5 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100 hidden">
+                    All courses on eduLink are priced transparently in <strong class="text-slate-800">Bangladeshi Taka (৳ BDT)</strong> without hidden exchange or conversion fees. During checkout, select your preferred mobile wallet (<strong class="text-indigo-600">bKash</strong>, <strong class="text-indigo-600">Nagad</strong>, or <strong class="text-indigo-600">Rocket</strong>), submit your transaction ID (TrxID) or mobile number, and your course is instantly unlocked with permanent lifetime access.
+                </div>
+            </div>
+
+            <!-- FAQ Item 2 -->
+            <div class="faq-item rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden transition-all duration-200">
+                <button type="button" onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex items-center justify-between gap-4 font-bold text-slate-800 hover:text-indigo-600 transition">
+                    <span class="flex items-center gap-3 text-sm">
+                        <span class="w-7 h-7 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs shrink-0">
+                            <i class="fa-solid fa-play"></i>
+                        </span>
+                        <span>Can I try lessons and practice in the sandbox before purchasing?</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down faq-icon text-xs text-slate-400 transition-transform duration-200"></i>
+                </button>
+                <div class="faq-content px-6 pb-5 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100 hidden">
+                    Yes! Every course on eduLink provides <strong class="text-slate-800">Free Preview Lessons</strong>. You can inspect curriculum chapters, watch video lectures, and test your code directly inside the classroom execution sandbox without paying a single Taka. Just create a free student account to begin.
+                </div>
+            </div>
+
+            <!-- FAQ Item 3 -->
+            <div class="faq-item rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden transition-all duration-200">
+                <button type="button" onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex items-center justify-between gap-4 font-bold text-slate-800 hover:text-indigo-600 transition">
+                    <span class="flex items-center gap-3 text-sm">
+                        <span class="w-7 h-7 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-xs shrink-0">
+                            <i class="fa-solid fa-terminal"></i>
+                        </span>
+                        <span>Do I need to install Python, PHP, or local compilers on my computer?</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down faq-icon text-xs text-slate-400 transition-transform duration-200"></i>
+                </button>
+                <div class="faq-content px-6 pb-5 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100 hidden">
+                    No local installation is required. eduLink features an <strong class="text-slate-800">In-Browser Practice Sandbox</strong> supporting Python 3, PHP 8.5, JavaScript, and live HTML/Tailwind rendering. You write code in the editor, click "Run Code", and receive immediate real-time output (stdout/stderr) right on your screen.
+                </div>
+            </div>
+
+            <!-- FAQ Item 4 -->
+            <div class="faq-item rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden transition-all duration-200">
+                <button type="button" onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex items-center justify-between gap-4 font-bold text-slate-800 hover:text-indigo-600 transition">
+                    <span class="flex items-center gap-3 text-sm">
+                        <span class="w-7 h-7 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xs shrink-0">
+                            <i class="fa-solid fa-list-check"></i>
+                        </span>
+                        <span>How do chapter quizzes and lab assignments work?</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down faq-icon text-xs text-slate-400 transition-transform duration-200"></i>
+                </button>
+                <div class="faq-content px-6 pb-5 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100 hidden">
+                    Each chapter includes interactive <strong class="text-slate-800">MCQ Quizzes</strong> with instant automated scoring and explanations. For practical mastery, <strong class="text-slate-800">Lab Assignments</strong> challenge you to solve real problems and submit your solution. Your instructor reviews your submission and provides individual marks and constructive feedback.
+                </div>
+            </div>
+
+            <!-- FAQ Item 5 -->
+            <div class="faq-item rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden transition-all duration-200">
+                <button type="button" onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex items-center justify-between gap-4 font-bold text-slate-800 hover:text-indigo-600 transition">
+                    <span class="flex items-center gap-3 text-sm">
+                        <span class="w-7 h-7 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xs shrink-0">
+                            <i class="fa-solid fa-certificate"></i>
+                        </span>
+                        <span>Will I receive a verified certificate upon course completion?</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down faq-icon text-xs text-slate-400 transition-transform duration-200"></i>
+                </button>
+                <div class="faq-content px-6 pb-5 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100 hidden">
+                    Yes! Once you finish all syllabus lessons, pass required quizzes, and submit all assignments, a verifiable graduation certificate is issued directly to your student dashboard. You can download it as a PDF or showcase the credential on your LinkedIn profile and resume.
+                </div>
+            </div>
+
+            <!-- FAQ Item 6 -->
+            <div class="faq-item rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden transition-all duration-200">
+                <button type="button" onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex items-center justify-between gap-4 font-bold text-slate-800 hover:text-indigo-600 transition">
+                    <span class="flex items-center gap-3 text-sm">
+                        <span class="w-7 h-7 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xs shrink-0">
+                            <i class="fa-solid fa-infinity"></i>
+                        </span>
+                        <span>Is course access lifetime or does it expire after a few months?</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down faq-icon text-xs text-slate-400 transition-transform duration-200"></i>
+                </button>
+                <div class="faq-content px-6 pb-5 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100 hidden">
+                    All enrollments on eduLink include <strong class="text-slate-800">unlimited Lifetime Access</strong>. There are no monthly subscriptions, expirations, or renewal fees. You can learn at your own pace and revisit video lessons and code sandboxes whenever you want.
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Support Prompt -->
+        <div class="mt-10 p-6 rounded-2xl bg-indigo-50/60 border border-indigo-100 text-center flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-left">
+                <h4 class="text-xs font-bold text-indigo-950">Still have a question or need payment assistance?</h4>
+                <p class="text-[11px] text-indigo-700 mt-0.5">Our Dhaka-based support team is available 24/7 to help you get started.</p>
+            </div>
+            <a href="mailto:support@edulink.com" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition whitespace-nowrap shadow-xs">
+                <i class="fa-solid fa-envelope mr-1.5"></i> Contact Support
+            </a>
+        </div>
+    </div>
+</section>
+
 <!-- Call to Action Banner -->
-<section class="py-16 bg-slate-900 relative overflow-hidden">
+<section class="py-20 bg-slate-900 relative overflow-hidden border-t border-slate-800">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
             Ready to upgrade your engineering skillset?
@@ -283,4 +409,38 @@
         </div>
     </div>
 </section>
+
+<script>
+    function toggleFaq(button) {
+        const item = button.closest('.faq-item');
+        const content = item.querySelector('.faq-content');
+        const icon = item.querySelector('.faq-icon');
+        const isHidden = content.classList.contains('hidden');
+
+        // Close other FAQ items
+        document.querySelectorAll('.faq-item').forEach(otherItem => {
+            if (otherItem !== item) {
+                otherItem.querySelector('.faq-content').classList.add('hidden');
+                otherItem.querySelector('.faq-icon').classList.remove('rotate-180');
+                otherItem.classList.remove('border-indigo-300', 'ring-2', 'ring-indigo-500/10');
+            }
+        });
+
+        if (isHidden) {
+            content.classList.remove('hidden');
+            icon.classList.add('rotate-180');
+            item.classList.add('border-indigo-300', 'ring-2', 'ring-indigo-500/10');
+        } else {
+            content.classList.add('hidden');
+            icon.classList.remove('rotate-180');
+            item.classList.remove('border-indigo-300', 'ring-2', 'ring-indigo-500/10');
+        }
+    }
+
+    // Auto-expand first item on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const firstBtn = document.querySelector('.faq-item button');
+        if (firstBtn) toggleFaq(firstBtn);
+    });
+</script>
 @endsection

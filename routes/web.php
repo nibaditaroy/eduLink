@@ -90,8 +90,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
     Route::get('/quick-login', [AdminAuthController::class, 'quickDemoLogin'])->name('quick-login');
 
-    // Admin Protected Routes
-    Route::middleware(['auth'])->group(function () {
+    // Admin Protected Routes (Strictly Administrator role only)
+    Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Course Management (Course -> Chapter -> Lesson)

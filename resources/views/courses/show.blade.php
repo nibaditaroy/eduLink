@@ -15,9 +15,6 @@
                     <span class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/10 text-slate-300 border border-white/20">
                         {{ ucfirst($course->level) }} Level
                     </span>
-                    <span class="text-xs text-amber-400 font-bold flex items-center gap-1 ml-2">
-                        <i class="fa-solid fa-star"></i> 4.9 ({{ $course->enrollments_count + 18 }} reviews)
-                    </span>
                 </div>
 
                 <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white mb-4 leading-tight">
@@ -265,11 +262,27 @@
                 <!-- Payment Partners Badges -->
                 <div class="mt-6 pt-4 border-t border-slate-100 text-center">
                     <span class="text-[10px] text-slate-400 font-semibold block mb-2">Secure Bangladeshi Payment Channels</span>
-                    <div class="flex items-center justify-center gap-2 text-[10px] font-bold text-slate-500">
-                        <span class="px-2 py-0.5 rounded bg-slate-100 text-pink-600">bKash</span>
-                        <span class="px-2 py-0.5 rounded bg-slate-100 text-orange-600">Nagad</span>
-                        <span class="px-2 py-0.5 rounded bg-slate-100 text-purple-600">Rocket</span>
-                        <span class="px-2 py-0.5 rounded bg-slate-100 text-blue-600">Cards</span>
+                    @php
+                        $getPaymentCourseAsset = function($name) {
+                            if (file_exists(public_path("images/payments/{$name}.png"))) {
+                                return asset("images/payments/{$name}.png");
+                            }
+                            return asset("images/payments/{$name}.svg");
+                        };
+                    @endphp
+                    <div class="flex items-center justify-center gap-2 text-[10px] font-bold text-slate-600">
+                        <span class="px-2 py-0.5 rounded bg-slate-100 text-pink-700 flex items-center gap-1 border border-slate-200/60 shadow-2xs">
+                            <img src="{{ $getPaymentCourseAsset('bkash') }}" alt="bKash" class="w-3 h-3 object-contain rounded-xs"> bKash
+                        </span>
+                        <span class="px-2 py-0.5 rounded bg-slate-100 text-orange-700 flex items-center gap-1 border border-slate-200/60 shadow-2xs">
+                            <img src="{{ $getPaymentCourseAsset('nagad') }}" alt="Nagad" class="w-3 h-3 object-contain rounded-xs"> Nagad
+                        </span>
+                        <span class="px-2 py-0.5 rounded bg-slate-100 text-purple-700 flex items-center gap-1 border border-slate-200/60 shadow-2xs">
+                            <img src="{{ $getPaymentCourseAsset('rocket') }}" alt="Rocket" class="w-3 h-3 object-contain rounded-xs"> Rocket
+                        </span>
+                        <span class="px-2 py-0.5 rounded bg-slate-100 text-blue-700 flex items-center gap-1 border border-slate-200/60 shadow-2xs">
+                            <img src="{{ $getPaymentCourseAsset('card') }}" alt="Cards" class="w-3 h-3 object-contain rounded-xs"> Cards
+                        </span>
                     </div>
                 </div>
             </div>

@@ -186,6 +186,20 @@
             </div>
         @endif
 
+        @if(session('error'))
+            <div class="mb-4 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center justify-between shadow-sm animate-fade-in">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-lg bg-rose-500 text-white flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                    </span>
+                    <span>{{ session('error') }}</span>
+                </div>
+                <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        @endif
+
         @if(session('warning'))
             <div class="mb-4 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold flex items-center justify-between shadow-sm">
                 <div class="flex items-center gap-2.5">
@@ -234,7 +248,7 @@
     </main>
 
     <!-- Platform Footer -->
-    <footer class="bg-slate-900 text-slate-400 text-xs mt-20 border-t border-slate-800">
+    <footer class="bg-slate-900 text-slate-400 text-xs mt-auto border-t border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
                 <div class="col-span-1 md:col-span-2">
@@ -265,18 +279,26 @@
 
                 <div>
                     <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-3">Accepted Payments</h4>
+                    @php
+                        $getPaymentFooterAsset = function($name) {
+                            if (file_exists(public_path("images/payments/{$name}.png"))) {
+                                return asset("images/payments/{$name}.png");
+                            }
+                            return asset("images/payments/{$name}.svg");
+                        };
+                    @endphp
                     <div class="flex flex-wrap gap-2 text-slate-300 mb-3">
-                        <span class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[10px] text-pink-400 flex items-center gap-1">
-                            <i class="fa-solid fa-wallet"></i> bKash
+                        <span class="px-2.5 py-1 rounded-lg bg-slate-800/90 border border-slate-700/80 font-bold text-[10px] text-pink-300 flex items-center gap-1.5 shadow-xs">
+                            <img src="{{ $getPaymentFooterAsset('bkash') }}" alt="bKash" class="w-3.5 h-3.5 object-contain rounded-sm"> bKash
                         </span>
-                        <span class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[10px] text-orange-400 flex items-center gap-1">
-                            <i class="fa-solid fa-mobile-screen"></i> Nagad
+                        <span class="px-2.5 py-1 rounded-lg bg-slate-800/90 border border-slate-700/80 font-bold text-[10px] text-orange-300 flex items-center gap-1.5 shadow-xs">
+                            <img src="{{ $getPaymentFooterAsset('nagad') }}" alt="Nagad" class="w-3.5 h-3.5 object-contain rounded-sm"> Nagad
                         </span>
-                        <span class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[10px] text-purple-400 flex items-center gap-1">
-                            <i class="fa-solid fa-rocket"></i> Rocket
+                        <span class="px-2.5 py-1 rounded-lg bg-slate-800/90 border border-slate-700/80 font-bold text-[10px] text-purple-300 flex items-center gap-1.5 shadow-xs">
+                            <img src="{{ $getPaymentFooterAsset('rocket') }}" alt="Rocket" class="w-3.5 h-3.5 object-contain rounded-sm"> Rocket
                         </span>
-                        <span class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[10px] text-cyan-400 flex items-center gap-1">
-                            <i class="fa-solid fa-credit-card"></i> Cards (Tk)
+                        <span class="px-2.5 py-1 rounded-lg bg-slate-800/90 border border-slate-700/80 font-bold text-[10px] text-cyan-300 flex items-center gap-1.5 shadow-xs">
+                            <img src="{{ $getPaymentFooterAsset('card') }}" alt="Cards" class="w-3.5 h-3.5 object-contain rounded-sm"> Cards (Tk)
                         </span>
                     </div>
                     <p class="text-[10px] text-slate-500">Fast digital issuance upon payment confirmation.</p>
@@ -316,6 +338,143 @@
                     }
                 });
             }
+
+            // Global Custom Select Component Handler
+            function initCustomSelects() {
+                document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
+                    if (wrapper.dataset.initialized) return;
+                    wrapper.dataset.initialized = 'true';
+
+                    const trigger = wrapper.querySelector('.custom-select-trigger');
+                    const menu = wrapper.querySelector('.custom-select-menu');
+                    const hiddenInput = wrapper.querySelector('.custom-select-hidden');
+                    const labelSpan = wrapper.querySelector('.custom-select-label');
+                    const chevron = wrapper.querySelector('.custom-select-chevron');
+                    const shouldSubmit = wrapper.dataset.submit === 'true';
+
+                    if (!trigger || !menu || !hiddenInput) return;
+
+                    trigger.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        // Close other custom selects
+                        document.querySelectorAll('.custom-select-menu').forEach(m => {
+                            if (m !== menu) {
+                                m.classList.add('hidden');
+                                const otherChevron = m.closest('.custom-select-wrapper')?.querySelector('.custom-select-chevron');
+                                if (otherChevron) otherChevron.classList.remove('rotate-180');
+                            }
+                        });
+
+                        const isHidden = menu.classList.contains('hidden');
+                        if (isHidden) {
+                            menu.classList.remove('hidden');
+                            if (chevron) chevron.classList.add('rotate-180');
+                            trigger.setAttribute('aria-expanded', 'true');
+                        } else {
+                            menu.classList.add('hidden');
+                            if (chevron) chevron.classList.remove('rotate-180');
+                            trigger.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+
+                    wrapper.querySelectorAll('.custom-select-option').forEach(option => {
+                        option.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const val = option.dataset.value;
+                            const label = option.dataset.label;
+
+                            hiddenInput.value = val;
+                            if (labelSpan) labelSpan.textContent = label;
+
+                            // Update active styles on options
+                            wrapper.querySelectorAll('.custom-select-option').forEach(opt => {
+                                const isMatch = opt.dataset.value === String(val);
+                                if (isMatch) {
+                                    opt.classList.add('bg-indigo-50', 'text-indigo-700', 'font-bold');
+                                    opt.classList.remove('text-slate-600', 'font-medium', 'hover:bg-slate-50', 'hover:text-slate-900');
+                                    const dot = opt.querySelector('span > span');
+                                    if (dot) {
+                                        dot.classList.add('bg-indigo-600');
+                                        dot.classList.remove('bg-slate-300');
+                                    }
+                                    const check = opt.querySelector('.custom-select-check');
+                                    if (check) check.classList.remove('hidden');
+                                    opt.setAttribute('aria-selected', 'true');
+                                } else {
+                                    opt.classList.remove('bg-indigo-50', 'text-indigo-700', 'font-bold');
+                                    opt.classList.add('text-slate-600', 'hover:bg-slate-50', 'hover:text-slate-900', 'font-medium');
+                                    const dot = opt.querySelector('span > span');
+                                    if (dot) {
+                                        dot.classList.remove('bg-indigo-600');
+                                        dot.classList.add('bg-slate-300');
+                                    }
+                                    const check = opt.querySelector('.custom-select-check');
+                                    if (check) check.classList.add('hidden');
+                                    opt.setAttribute('aria-selected', 'false');
+                                }
+                            });
+
+                            // Update trigger button active styles
+                            const hasSelection = (val !== null && val !== '');
+                            if (hasSelection) {
+                                trigger.classList.add('bg-indigo-50/70', 'border-indigo-300', 'text-indigo-700');
+                                trigger.classList.remove('bg-slate-50/90', 'border-slate-200', 'text-slate-700');
+                                const triggerIcon = trigger.querySelector('i:not(.custom-select-chevron)');
+                                if (triggerIcon) {
+                                    triggerIcon.classList.add('text-indigo-600');
+                                    triggerIcon.classList.remove('text-slate-400');
+                                }
+                            } else {
+                                trigger.classList.remove('bg-indigo-50/70', 'border-indigo-300', 'text-indigo-700');
+                                trigger.classList.add('bg-slate-50/90', 'border-slate-200', 'text-slate-700');
+                                const triggerIcon = trigger.querySelector('i:not(.custom-select-chevron)');
+                                if (triggerIcon) {
+                                    triggerIcon.classList.remove('text-indigo-600');
+                                    triggerIcon.classList.add('text-slate-400');
+                                }
+                            }
+
+                            // Close dropdown
+                            menu.classList.add('hidden');
+                            if (chevron) chevron.classList.remove('rotate-180');
+                            trigger.setAttribute('aria-expanded', 'false');
+
+                            // Dispatch change event on hidden input
+                            hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+                            // Auto submit form if requested
+                            if (shouldSubmit) {
+                                const form = wrapper.closest('form');
+                                if (form) form.submit();
+                            }
+                        });
+                    });
+                });
+            }
+
+            initCustomSelects();
+
+            // Click outside closes any open custom-select
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.custom-select-wrapper')) {
+                    document.querySelectorAll('.custom-select-menu').forEach(m => {
+                        m.classList.add('hidden');
+                        const chevron = m.closest('.custom-select-wrapper')?.querySelector('.custom-select-chevron');
+                        if (chevron) chevron.classList.remove('rotate-180');
+                    });
+                }
+            });
+
+            // Escape key closes open custom-select
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.custom-select-menu').forEach(m => {
+                        m.classList.add('hidden');
+                        const chevron = m.closest('.custom-select-wrapper')?.querySelector('.custom-select-chevron');
+                        if (chevron) chevron.classList.remove('rotate-180');
+                    });
+                }
+            });
         });
     </script>
     @stack('scripts')

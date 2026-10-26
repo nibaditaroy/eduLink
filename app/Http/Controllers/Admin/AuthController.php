@@ -12,8 +12,10 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
-        if (Auth::check() && Auth::user()->isAdmin()) {
-            return redirect()->route('admin.dashboard');
+        if (Auth::check()) {
+            return Auth::user()->isAdmin()
+                ? redirect()->route('admin.dashboard')
+                : redirect()->route('student.dashboard')->with('error', 'Unauthorized access: You are logged in as a student. Admin dashboard is restricted to administrators.');
         }
         return redirect()->route('login');
     }
@@ -37,12 +39,30 @@ class AuthController extends Controller
         }
 
         if ($authenticated) {
-            $request->session()->regenerate();
+            $user = Auth::user();
 
-            if (!Auth::user()->isAdmin()) {
-                // For university demo, auto-grant admin or redirect
-                Auth::user()->update(['role' => 'admin']);
+            // Strict check: Only users with admin role can access admin dashboard
+            if (!$user->isAdmin()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors([
+                    'email' => 'Access denied: Only administrators can log in to the admin dashboard.',
+                ])->onlyInput('email');
             }
+
+            if ($user->status === 'suspended' || $user->status === 'blocked') {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors([
+                    'email' => 'Your administrator account has been restricted.',
+                ])->onlyInput('email');
+            }
+
+            $request->session()->regenerate();
 
             return redirect()->intended(route('admin.dashboard'));
         }
@@ -64,6 +84,10 @@ class AuthController extends Controller
             ]
         );
 
+        if (!$admin->isAdmin()) {
+            $admin->update(['role' => 'admin']);
+        }
+
         Auth::login($admin);
         request()->session()->regenerate();
 
@@ -76,6 +100,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login')->with('success', 'You have been logged out.');
+        return redirect()->route('login')->with('success', 'You have been logged out.');
     }
 }

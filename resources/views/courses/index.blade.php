@@ -19,45 +19,71 @@
         <!-- Search Input -->
         <div class="relative w-full md:w-80">
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search title or topics..." 
-                class="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                class="w-full pl-9 pr-8 py-2 text-xs rounded-xl bg-slate-50/90 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-slate-800 placeholder-slate-400 font-medium transition shadow-xs">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+            @if(request('search'))
+                <a href="{{ route('courses.index', request()->except('search')) }}" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs transition" title="Clear search">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </a>
+            @endif
         </div>
 
-        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
             <!-- Category Filter -->
-            <select name="category" onchange="this.form.submit()" class="text-xs rounded-xl border-slate-200 bg-slate-50 py-2 px-3 focus:ring-2 focus:ring-indigo-500 outline-none">
-                <option value="">All Categories</option>
-                @foreach($allCategories as $cat)
-                    <option value="{{ $cat }}" {{ request('category') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
-                @endforeach
-            </select>
+            <x-custom-select 
+                name="category" 
+                :options="$allCategories" 
+                :selected="request('category')" 
+                placeholder="All Categories" 
+                icon="fa-solid fa-shapes"
+                :submitOnChange="true"
+            />
 
             <!-- Level Filter -->
-            <select name="level" onchange="this.form.submit()" class="text-xs rounded-xl border-slate-200 bg-slate-50 py-2 px-3 focus:ring-2 focus:ring-indigo-500 outline-none">
-                <option value="">All Levels</option>
-                <option value="beginner" {{ request('level') === 'beginner' ? 'selected' : '' }}>Beginner</option>
-                <option value="intermediate" {{ request('level') === 'intermediate' ? 'selected' : '' }}>Intermediate</option>
-                <option value="advanced" {{ request('level') === 'advanced' ? 'selected' : '' }}>Advanced</option>
-            </select>
+            <x-custom-select 
+                name="level" 
+                :options="[
+                    'beginner' => 'Beginner',
+                    'intermediate' => 'Intermediate',
+                    'advanced' => 'Advanced'
+                ]" 
+                :selected="request('level')" 
+                placeholder="All Levels" 
+                icon="fa-solid fa-layer-group"
+                :submitOnChange="true"
+            />
 
             <!-- Price Filter -->
-            <select name="pricing" onchange="this.form.submit()" class="text-xs rounded-xl border-slate-200 bg-slate-50 py-2 px-3 focus:ring-2 focus:ring-indigo-500 outline-none">
-                <option value="">All Prices</option>
-                <option value="free" {{ request('pricing') === 'free' ? 'selected' : '' }}>Free Only</option>
-                <option value="paid" {{ request('pricing') === 'paid' ? 'selected' : '' }}>Paid Only (৳ BDT)</option>
-            </select>
+            <x-custom-select 
+                name="pricing" 
+                :options="[
+                    'free' => 'Free Only',
+                    'paid' => 'Paid Only (৳ BDT)'
+                ]" 
+                :selected="request('pricing')" 
+                placeholder="All Prices" 
+                icon="fa-solid fa-tag"
+                :submitOnChange="true"
+            />
 
             <!-- Sort By -->
-            <select name="sort" onchange="this.form.submit()" class="text-xs rounded-xl border-slate-200 bg-slate-50 py-2 px-3 focus:ring-2 focus:ring-indigo-500 outline-none">
-                <option value="latest" {{ request('sort') === 'latest' ? 'selected' : '' }}>Newest Tracks</option>
-                <option value="popular" {{ request('sort') === 'popular' ? 'selected' : '' }}>Most Enrolled</option>
-                <option value="price_low" {{ request('sort') === 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
-                <option value="price_high" {{ request('sort') === 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
-            </select>
+            <x-custom-select 
+                name="sort" 
+                :options="[
+                    'latest' => 'Newest Tracks',
+                    'popular' => 'Most Enrolled',
+                    'price_low' => 'Price: Low to High',
+                    'price_high' => 'Price: High to Low'
+                ]" 
+                :selected="request('sort', 'latest')" 
+                placeholder="Sort By" 
+                icon="fa-solid fa-arrow-down-wide-short"
+                :submitOnChange="true"
+            />
 
             @if(request()->hasAny(['search', 'category', 'level', 'pricing', 'sort']))
-                <a href="{{ route('courses.index') }}" class="px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition">
-                    <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+                <a href="{{ route('courses.index') }}" class="px-3.5 py-2 text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50/80 hover:bg-rose-100/80 border border-rose-200/80 rounded-xl transition flex items-center gap-1.5 shadow-xs">
+                    <i class="fa-solid fa-rotate-left text-xs"></i> Reset
                 </a>
             @endif
         </div>
