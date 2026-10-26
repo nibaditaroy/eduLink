@@ -107,7 +107,7 @@
                     </span>
                     <h3 class="font-bold text-gray-900 text-sm">{{ $q->question }}</h3>
                 </div>
-                <form action="{{ route('admin.quizzes.questions.destroy', $q->id) }}" method="POST" onsubmit="return confirm('Delete this question?');">
+                <form action="{{ route('admin.quizzes.questions.destroy', $q->id) }}" method="POST" data-confirm-delete="Are you sure you want to delete Question #{{ $idx + 1 }}?" data-confirm-title="Delete Question">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="text-rose-500 hover:text-rose-700 p-1 text-xs">

@@ -292,6 +292,7 @@
                         <th scope="col" class="px-6 py-4 text-center">Status</th>
                         <th scope="col" class="px-6 py-4 text-center">Quick Update</th>
                         <th scope="col" class="px-6 py-4 text-right">Date & Time</th>
+                        <th scope="col" class="px-6 py-4 text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -383,15 +384,47 @@
                         </td>
 
                         <!-- Date -->
-                        <td class="px-6 py-4 text-right text-xs text-gray-500">
+                        <td class="px-6 py-4 text-right text-xs text-gray-500 whitespace-nowrap">
                             <div>{{ $trx->created_at->format('M d, Y') }}</div>
                             <div class="text-[10px] text-gray-400">{{ $trx->created_at->format('h:i A') }}</div>
+                        </td>
+
+                        <!-- Actions (Quick Modal & Full Page) -->
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button type="button" 
+                                    onclick='openTrxModal(@json([
+                                        "id" => $trx->id,
+                                        "transaction_id" => $trx->transaction_id,
+                                        "status" => $trx->status,
+                                        "student_name" => $trx->user->name ?? "Unknown Student",
+                                        "student_email" => $trx->user->email ?? "—",
+                                        "student_phone" => $trx->user->phone ?? "—",
+                                        "course_title" => $trx->course->title ?? "Course #" . $trx->course_id,
+                                        "course_category" => $trx->course->category ?? "General",
+                                        "amount" => number_format($trx->amount, 2),
+                                        "currency" => $trx->currency,
+                                        "payment_method" => strtoupper($trx->payment_method),
+                                        "card_type" => $trx->card_type ?? "MFS",
+                                        "date" => $trx->created_at->format("M d, Y h:i A"),
+                                        "gateway_response" => $trx->gateway_response,
+                                        "show_url" => route("admin.transactions.show", $trx->id)
+                                    ]))' 
+                                    title="Quick Inspect Modal" 
+                                    class="p-2 text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition text-xs font-semibold">
+                                    <i class="fa-solid fa-magnifying-glass-arrow-right"></i>
+                                </button>
+                                <a href="{{ route('admin.transactions.show', $trx->id) }}" title="Full Audit View" 
+                                   class="p-2 text-gray-500 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-xl transition text-xs">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </a>
+                            </div>
                         </td>
 
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="px-6 py-12 text-center text-gray-400">
+                        <td colspan="9" class="px-6 py-12 text-center text-gray-400">
                             <div class="w-12 h-12 rounded-2xl bg-gray-100 text-gray-400 flex items-center justify-center mx-auto mb-3 text-lg">
                                 <i class="fa-solid fa-receipt"></i>
                             </div>
@@ -412,6 +445,117 @@
     </div>
 
 </div>
+
+<!-- Transaction Inspector Modal -->
+<div id="trx-inspector-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200 ease-out" role="dialog" aria-modal="true">
+    <div id="trx-inspector-card" class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-gray-100 transform scale-95 transition-transform duration-200 ease-out max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-4 border-b border-gray-100 mb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg border border-emerald-100">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-gray-900" id="modal-trx-id">Transaction</h3>
+                    <p class="text-[11px] text-gray-400" id="modal-trx-date"></p>
+                </div>
+            </div>
+            <span id="modal-trx-status-badge"></span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                <div class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Student</div>
+                <div class="font-bold text-xs text-gray-900 mt-0.5" id="modal-trx-student"></div>
+                <div class="text-[11px] text-gray-500" id="modal-trx-email"></div>
+                <div class="text-[11px] text-gray-400" id="modal-trx-phone"></div>
+            </div>
+
+            <div class="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                <div class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Course & Amount</div>
+                <div class="font-bold text-xs text-indigo-600 truncate mt-0.5" id="modal-trx-course"></div>
+                <div class="text-base font-extrabold text-gray-900 mt-1" id="modal-trx-amount"></div>
+            </div>
+        </div>
+
+        <div class="mb-4 p-3 bg-slate-900 text-white rounded-xl">
+            <div class="flex items-center justify-between text-xs mb-1">
+                <span class="text-slate-400">Gateway Processor</span>
+                <span class="font-bold uppercase text-emerald-400" id="modal-trx-gateway"></span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-400">Payment Channel</span>
+                <span class="font-semibold text-slate-200" id="modal-trx-card"></span>
+            </div>
+        </div>
+
+        <div>
+            <div class="text-[11px] uppercase font-bold text-gray-500 tracking-wider mb-1 flex items-center justify-between">
+                <span>Gateway JSON Response</span>
+                <span class="text-[10px] text-gray-400 font-normal">Raw Payload</span>
+            </div>
+            <pre class="bg-gray-900 text-emerald-400 p-3 rounded-xl text-xs font-mono overflow-x-auto max-h-40 border border-gray-800" id="modal-trx-json"></pre>
+        </div>
+
+        <div class="mt-6 flex items-center justify-between pt-3 border-t border-gray-100">
+            <a href="#" id="modal-trx-full-link" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                View Complete Audit &rarr;
+            </a>
+            <button type="button" onclick="closeTrxModal()" class="px-4 py-2 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function openTrxModal(data) {
+    document.getElementById('modal-trx-id').textContent = data.transaction_id;
+    document.getElementById('modal-trx-date').textContent = data.date;
+    document.getElementById('modal-trx-student').textContent = data.student_name;
+    document.getElementById('modal-trx-email').textContent = data.student_email;
+    document.getElementById('modal-trx-phone').textContent = data.student_phone;
+    document.getElementById('modal-trx-course').textContent = data.course_title;
+    document.getElementById('modal-trx-amount').textContent = '৳' + data.amount + ' Tk';
+    document.getElementById('modal-trx-gateway').textContent = data.payment_method;
+    document.getElementById('modal-trx-card').textContent = data.card_type;
+    document.getElementById('modal-trx-json').textContent = data.gateway_response ? JSON.stringify(data.gateway_response, null, 2) : 'No gateway payload recorded.';
+    document.getElementById('modal-trx-full-link').href = data.show_url;
+
+    const badge = document.getElementById('modal-trx-status-badge');
+    if (data.status === 'completed') {
+        badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800';
+        badge.textContent = 'Completed';
+    } else if (data.status === 'pending') {
+        badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800';
+        badge.textContent = 'Pending';
+    } else {
+        badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800';
+        badge.textContent = data.status.toUpperCase();
+    }
+
+    const modal = document.getElementById('trx-inspector-modal');
+    const card = document.getElementById('trx-inspector-card');
+    modal.classList.remove('opacity-0', 'pointer-events-none');
+    card.classList.remove('scale-95');
+    card.classList.add('scale-100');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeTrxModal() {
+    const modal = document.getElementById('trx-inspector-modal');
+    const card = document.getElementById('trx-inspector-card');
+    modal.classList.add('opacity-0', 'pointer-events-none');
+    card.classList.remove('scale-100');
+    card.classList.add('scale-95');
+    document.body.style.overflow = '';
+}
+
+document.getElementById('trx-inspector-modal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('trx-inspector-modal')) {
+        closeTrxModal();
+    }
+});
+</script>
 
 <!-- ApexCharts Script Initialization -->
 <script>

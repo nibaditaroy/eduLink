@@ -367,7 +367,7 @@
                                    class="p-2 text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition text-xs">
                                     <i class="fa-solid fa-chart-line"></i>
                                 </a>
-                                <form action="{{ route('admin.enrollments.destroy', $enrollment->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this course enrollment?')">
+                                <form action="{{ route('admin.enrollments.destroy', $enrollment->id) }}" method="POST" class="inline" data-confirm-delete="Are you sure you want to revoke student &lt;strong&gt;{{ addslashes($enrollment->user->name ?? 'Student') }}&lt;/strong&gt;'s enrollment in &lt;strong&gt;{{ addslashes($enrollment->course->title ?? 'this course') }}&lt;/strong&gt;?" data-confirm-title="Revoke Course Enrollment">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" title="Remove Enrollment" class="p-2 text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 rounded-lg transition text-xs">

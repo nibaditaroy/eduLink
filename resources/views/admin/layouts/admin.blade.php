@@ -219,12 +219,97 @@
         </div>
     </div>
 
+    <!-- Global Delete Confirmation Modal -->
+    <div id="global-delete-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200 ease-out" role="dialog" aria-modal="true" aria-labelledby="global-delete-modal-title">
+        <div id="global-delete-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-gray-100 transform scale-95 transition-transform duration-200 ease-out">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center text-xl shrink-0 shadow-inner">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <h3 id="global-delete-modal-title" class="text-base font-bold text-gray-900">Confirm Deletion</h3>
+                    <p class="text-xs text-gray-400">This action is permanent and cannot be undone.</p>
+                </div>
+            </div>
+
+            <div class="py-2">
+                <p id="global-delete-modal-message" class="text-xs text-gray-600 leading-relaxed bg-gray-50 p-3.5 rounded-xl border border-gray-100">
+                    Are you sure you want to permanently delete this item?
+                </p>
+            </div>
+
+            <div class="mt-5 flex items-center justify-end gap-3">
+                <button type="button" id="global-delete-modal-cancel" class="px-4 py-2.5 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition shadow-sm">
+                    Cancel
+                </button>
+                <button type="button" id="global-delete-modal-confirm" class="inline-flex items-center px-4 py-2.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition shadow-md shadow-rose-600/20">
+                    <i class="fa-solid fa-trash-can me-1.5"></i> Yes, Delete Permanently
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             hljs.highlightAll();
+
+            // Setup Global Delete Modal
+            const deleteModal = document.getElementById('global-delete-modal');
+            const deleteModalCard = document.getElementById('global-delete-modal-card');
+            const deleteModalTitle = document.getElementById('global-delete-modal-title');
+            const deleteModalMessage = document.getElementById('global-delete-modal-message');
+            const deleteModalCancel = document.getElementById('global-delete-modal-cancel');
+            const deleteModalConfirm = document.getElementById('global-delete-modal-confirm');
+            let pendingDeleteForm = null;
+
+            window.openDeleteModal = function(form, title = 'Confirm Deletion', message = null) {
+                pendingDeleteForm = form;
+                deleteModalTitle.textContent = title;
+                if (message) {
+                    deleteModalMessage.innerHTML = message;
+                } else {
+                    deleteModalMessage.textContent = 'Are you sure you want to permanently delete this item?';
+                }
+
+                deleteModal.classList.remove('opacity-0', 'pointer-events-none');
+                deleteModalCard.classList.remove('scale-95');
+                deleteModalCard.classList.add('scale-100');
+                document.body.style.overflow = 'hidden';
+            };
+
+            function closeDeleteModal() {
+                deleteModal.classList.add('opacity-0', 'pointer-events-none');
+                deleteModalCard.classList.remove('scale-100');
+                deleteModalCard.classList.add('scale-95');
+                document.body.style.overflow = '';
+                pendingDeleteForm = null;
+            }
+
+            deleteModalCancel.addEventListener('click', closeDeleteModal);
+            deleteModal.addEventListener('click', (e) => {
+                if (e.target === deleteModal) closeDeleteModal();
+            });
+
+            deleteModalConfirm.addEventListener('click', () => {
+                if (pendingDeleteForm) {
+                    deleteModalConfirm.disabled = true;
+                    deleteModalConfirm.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1.5"></i> Deleting...';
+                    pendingDeleteForm.submit();
+                }
+            });
+
+            // Intercept forms with data-confirm-delete attribute or forms with native confirm in onsubmit
+            document.querySelectorAll('form[data-confirm-delete]').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const msg = form.getAttribute('data-confirm-delete') || 'Are you sure you want to delete this record?';
+                    const title = form.getAttribute('data-confirm-title') || 'Confirm Deletion';
+                    window.openDeleteModal(form, title, msg);
+                });
+            });
         });
     </script>
     @stack('scripts')

@@ -96,7 +96,7 @@
                                 <a href="{{ route('admin.courses.edit', $course->id) }}" title="Edit Details" class="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
-                                <form action="{{ route('admin.courses.destroy', $course->id) }}" method="POST" onsubmit="return confirm('Delete this course and all its chapters, lessons, quizzes, and assignments?');" class="inline">
+                                <form action="{{ route('admin.courses.destroy', $course->id) }}" method="POST" data-confirm-delete="Are you sure you want to delete course &lt;strong&gt;{{ addslashes($course->title) }}&lt;/strong&gt;? This will permanently delete all its chapters, lessons, quizzes, and assignments." data-confirm-title="Delete Course" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" title="Delete Course" class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition">

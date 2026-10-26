@@ -102,7 +102,7 @@
                     <a href="{{ route('admin.chapters.edit', $chapter->id) }}" title="Edit Chapter" class="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition">
                         <i class="fa-solid fa-pen text-xs"></i>
                     </a>
-                    <form action="{{ route('admin.chapters.destroy', $chapter->id) }}" method="POST" onsubmit="return confirm('Delete this Chapter along with its lessons and quizzes?');" class="inline">
+                    <form action="{{ route('admin.chapters.destroy', $chapter->id) }}" method="POST" data-confirm-delete="Are you sure you want to delete chapter &lt;strong&gt;{{ addslashes($chapter->title) }}&lt;/strong&gt; along with all its lessons, quizzes, and assignments?" data-confirm-title="Delete Chapter" class="inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" title="Delete Chapter" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition">
@@ -214,7 +214,7 @@
                                 <a href="{{ route('admin.lessons.edit', $lesson->id) }}" class="p-1.5 text-gray-500 hover:bg-gray-200 rounded-lg transition" title="Edit Lesson">
                                     <i class="fa-solid fa-pen text-xs"></i>
                                 </a>
-                                <form action="{{ route('admin.lessons.destroy', $lesson->id) }}" method="POST" onsubmit="return confirm('Delete this lesson?');" class="inline">
+                                <form action="{{ route('admin.lessons.destroy', $lesson->id) }}" method="POST" data-confirm-delete="Are you sure you want to delete lesson &lt;strong&gt;{{ addslashes($lesson->title) }}&lt;/strong&gt;?" data-confirm-title="Delete Lesson" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="p-1.5 text-rose-500 hover:bg-rose-100 rounded-lg transition" title="Delete Lesson">
@@ -259,7 +259,7 @@
                                 <a href="{{ route('admin.quizzes.edit', $quiz->id) }}" class="p-1.5 text-gray-500 hover:bg-amber-200/50 rounded-lg transition" title="Edit Quiz">
                                     <i class="fa-solid fa-pen text-xs"></i>
                                 </a>
-                                <form action="{{ route('admin.quizzes.destroy', $quiz->id) }}" method="POST" onsubmit="return confirm('Delete this quiz?');" class="inline">
+                                <form action="{{ route('admin.quizzes.destroy', $quiz->id) }}" method="POST" data-confirm-delete="Are you sure you want to delete quiz &lt;strong&gt;{{ addslashes($quiz->title) }}&lt;/strong&gt; and its questions?" data-confirm-title="Delete Quiz" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="p-1.5 text-rose-500 hover:bg-rose-100 rounded-lg transition" title="Delete Quiz">
@@ -308,7 +308,7 @@
                                 <a href="{{ route('admin.assignments.edit', $assignment->id) }}" class="p-1.5 text-gray-500 hover:bg-purple-200/50 rounded-lg transition" title="Edit Assignment">
                                     <i class="fa-solid fa-pen text-xs"></i>
                                 </a>
-                                <form action="{{ route('admin.assignments.destroy', $assignment->id) }}" method="POST" onsubmit="return confirm('Delete this assignment?');" class="inline">
+                                <form action="{{ route('admin.assignments.destroy', $assignment->id) }}" method="POST" data-confirm-delete="Are you sure you want to delete assignment &lt;strong&gt;{{ addslashes($assignment->title) }}&lt;/strong&gt;?" data-confirm-title="Delete Assignment" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="p-1.5 text-rose-500 hover:bg-rose-100 rounded-lg transition" title="Delete Assignment">

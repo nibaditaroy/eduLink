@@ -188,15 +188,13 @@
                         <!-- Quick Status Switch Form -->
                         <td class="px-6 py-4 text-center">
                             @if(Auth::id() !== $user->id)
-                            <form action="{{ route('admin.users.status', $user->id) }}" method="POST" class="inline-flex items-center gap-1">
-                                @csrf
-                                @method('PATCH')
-                                <select name="status" onchange="this.form.submit()" class="text-xs py-1 px-2 rounded-lg border border-gray-300 bg-white font-medium text-gray-700 focus:ring-indigo-500 focus:border-indigo-500">
+                            <div class="inline-flex items-center gap-1">
+                                <select onchange="handleUserStatusChange(this, {{ $user->id }}, '{{ addslashes($user->name) }}', '{{ $user->status }}', '{{ addslashes($user->status_reason ?? '') }}')" class="text-xs py-1 px-2 rounded-lg border border-gray-300 bg-white font-medium text-gray-700 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer shadow-xs">
                                     <option value="active" {{ $user->status === 'active' ? 'selected' : '' }}>✅ Active</option>
                                     <option value="suspended" {{ $user->status === 'suspended' ? 'selected' : '' }}>⏸️ Suspended</option>
                                     <option value="blocked" {{ $user->status === 'blocked' ? 'selected' : '' }}>🚫 Blocked</option>
                                 </select>
-                            </form>
+                            </div>
                             @else
                             <span class="text-[11px] text-gray-400 italic">Self Account</span>
                             @endif
@@ -214,7 +212,7 @@
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
                                 @if(Auth::id() !== $user->id)
-                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete user \'{{ $user->name }}\'? This will remove all their enrollments and records.')">
+                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline" data-confirm-delete="Are you sure you want to permanently delete user &lt;strong&gt;{{ addslashes($user->name) }}&lt;/strong&gt; ({{ $user->email }})? All course enrollments, learning progress, and payments will be removed." data-confirm-title="Delete User Account">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" title="Delete User" class="p-2 text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 rounded-lg transition text-xs">
@@ -248,4 +246,99 @@
     </div>
 
 </div>
+
+<!-- User Status Change Modal -->
+<div id="user-status-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200 ease-out" role="dialog" aria-modal="true">
+    <div id="user-status-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-gray-100 transform scale-95 transition-transform duration-200 ease-out">
+        <form id="user-status-form" method="POST" action="">
+            @csrf
+            @method('PATCH')
+            
+            <div class="flex items-center gap-3 mb-4">
+                <div id="status-icon-box" class="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center text-lg shrink-0">
+                    <i class="fa-solid fa-user-lock"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-gray-900">Change Account Status</h3>
+                    <p id="status-modal-user-name" class="text-xs text-gray-500 font-medium"></p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Account Status</label>
+                    <select name="status" id="modal-status-select" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 font-semibold">
+                        <option value="active">🟢 Active (Full Access)</option>
+                        <option value="suspended">⏸️ Suspended (Temporary Hold)</option>
+                        <option value="blocked">🚫 Blocked (Restricted)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        Reason for Suspension / Restriction <span class="text-gray-400 font-normal">(Optional)</span>
+                    </label>
+                    <textarea name="status_reason" id="modal-status-reason" rows="3" 
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"
+                        placeholder="e.g. Account flagged for academic irregularity, disputed payment, etc."></textarea>
+                </div>
+            </div>
+
+            <div class="mt-6 flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
+                <button type="button" onclick="closeUserStatusModal()" class="px-4 py-2.5 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition shadow-xs">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition shadow-md shadow-indigo-600/20">
+                    <i class="fa-solid fa-check me-1.5"></i> Update Status
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let activeStatusSelect = null;
+let originalStatusVal = null;
+
+function handleUserStatusChange(selectElement, userId, userName, currentStatus, currentReason) {
+    activeStatusSelect = selectElement;
+    originalStatusVal = currentStatus;
+    const targetStatus = selectElement.value;
+
+    const modal = document.getElementById('user-status-modal');
+    const modalCard = document.getElementById('user-status-modal-card');
+    const form = document.getElementById('user-status-form');
+    const nameEl = document.getElementById('status-modal-user-name');
+    const statusSelect = document.getElementById('modal-status-select');
+    const reasonEl = document.getElementById('modal-status-reason');
+
+    form.action = `/admin/users/${userId}/status`;
+    nameEl.textContent = userName;
+    statusSelect.value = targetStatus;
+    reasonEl.value = currentReason || '';
+
+    modal.classList.remove('opacity-0', 'pointer-events-none');
+    modalCard.classList.remove('scale-95');
+    modalCard.classList.add('scale-100');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeUserStatusModal() {
+    const modal = document.getElementById('user-status-modal');
+    const modalCard = document.getElementById('user-status-modal-card');
+    modal.classList.add('opacity-0', 'pointer-events-none');
+    modalCard.classList.remove('scale-100');
+    modalCard.classList.add('scale-95');
+    document.body.style.overflow = '';
+    if (activeStatusSelect && originalStatusVal) {
+        activeStatusSelect.value = originalStatusVal;
+    }
+}
+
+document.getElementById('user-status-modal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('user-status-modal')) {
+        closeUserStatusModal();
+    }
+});
+</script>
 @endsection
