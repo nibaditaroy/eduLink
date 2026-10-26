@@ -262,7 +262,7 @@ CREATE TABLE chapters (
                 'title' => 'Data Structures & Algorithms in Python',
                 'category' => 'Computer Science',
                 'level' => 'intermediate',
-                'price' => 39.99, // Paid
+                'price' => 4200.00, // ৳4,200 BDT
                 'is_published' => true,
                 'description' => 'Master time and space complexity, binary search trees, graph traversals, and dynamic programming with Python 3.',
             ]

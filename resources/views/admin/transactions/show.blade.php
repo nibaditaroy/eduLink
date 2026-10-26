@@ -86,7 +86,7 @@
             
             <div class="flex items-center justify-between text-sm py-2 border-b border-slate-800">
                 <span class="text-slate-300">Course Tuition Fee</span>
-                <span class="font-semibold">৳{{ number_format($transaction->amount, 2) }} {{ $transaction->currency }}</span>
+                <span class="font-semibold">৳{{ number_format($transaction->amount, 2) }} Tk ({{ $transaction->currency }})</span>
             </div>
 
             <div class="flex items-center justify-between text-sm py-2 border-b border-slate-800">
@@ -96,7 +96,7 @@
 
             <div class="flex items-center justify-between text-base font-bold pt-1">
                 <span class="text-white">Total Paid</span>
-                <span class="text-emerald-400 text-xl font-extrabold">৳{{ number_format($transaction->amount, 2) }}</span>
+                <span class="text-emerald-400 text-xl font-extrabold">৳{{ number_format($transaction->amount, 2) }} Tk</span>
             </div>
         </div>
 

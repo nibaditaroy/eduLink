@@ -126,9 +126,9 @@
             <div class="text-2xl font-bold text-amber-600 mt-1">{{ $user->assignmentSubmissions->count() }}</div>
         </div>
         <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm col-span-2 md:col-span-1">
-            <div class="text-xs text-gray-500 font-medium">Total Paid (BDT)</div>
+            <div class="text-xs text-gray-500 font-medium">Total Paid (Tk / BDT)</div>
             <div class="text-2xl font-bold text-gray-900 mt-1">
-                ৳{{ number_format($user->transactions->where('status', 'completed')->sum('amount'), 2) }}
+                ৳{{ number_format($user->transactions->where('status', 'completed')->sum('amount'), 2) }} <span class="text-xs font-normal text-gray-500">Tk</span>
             </div>
         </div>
     </div>
@@ -311,7 +311,7 @@
                         <td class="px-4 py-3 font-mono font-bold text-indigo-600">{{ $trx->transaction_id }}</td>
                         <td class="px-4 py-3 font-semibold text-gray-900">{{ $trx->course->title ?? 'Course #' . $trx->course_id }}</td>
                         <td class="px-4 py-3 text-center uppercase font-semibold text-gray-600">{{ $trx->payment_method ?? 'SSLCommerz' }}</td>
-                        <td class="px-4 py-3 text-center font-bold text-gray-900">৳{{ number_format($trx->amount, 2) }}</td>
+                        <td class="px-4 py-3 text-center font-bold text-gray-900">৳{{ number_format($trx->amount, 2) }} Tk</td>
                         <td class="px-4 py-3 text-center">
                             @if($trx->status === 'completed')
                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">

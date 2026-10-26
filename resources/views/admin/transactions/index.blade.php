@@ -22,12 +22,12 @@
     <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
         <div class="bg-gradient-to-br from-indigo-900 to-slate-900 p-4 rounded-2xl text-white shadow-sm">
             <div class="text-xs text-indigo-200 font-medium">Total Revenue (Completed)</div>
-            <div class="text-2xl font-extrabold mt-1">৳{{ number_format($stats['total_revenue'], 2) }}</div>
+            <div class="text-2xl font-extrabold mt-1">৳{{ number_format($stats['total_revenue'], 2) }} <span class="text-xs font-normal text-indigo-200">Tk</span></div>
         </div>
 
         <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
             <div class="text-xs text-amber-600 font-medium">Pending Settlement</div>
-            <div class="text-2xl font-bold text-amber-700 mt-1">৳{{ number_format($stats['pending_revenue'], 2) }}</div>
+            <div class="text-2xl font-bold text-amber-700 mt-1">৳{{ number_format($stats['pending_revenue'], 2) }} <span class="text-xs font-normal text-amber-600">Tk</span></div>
         </div>
 
         <a href="{{ route('admin.transactions.index', ['status' => 'completed']) }}" 
@@ -171,7 +171,7 @@
                     <div class="mt-3 flex items-center justify-between pt-2 border-t border-gray-200/60">
                         <span class="text-[11px] text-gray-500">Total Collected:</span>
                         <span class="text-sm font-extrabold text-indigo-600">
-                            ৳{{ number_format($course->transactions_sum_amount ?? 0, 2) }}
+                            ৳{{ number_format($course->transactions_sum_amount ?? 0, 2) }} Tk
                         </span>
                     </div>
                 </div>
@@ -332,7 +332,7 @@
                         <!-- Amount -->
                         <td class="px-6 py-4 text-center">
                             <span class="text-sm font-extrabold text-gray-900">
-                                ৳{{ number_format($trx->amount, 2) }}
+                                ৳{{ number_format($trx->amount, 2) }} Tk
                             </span>
                             <span class="block text-[10px] text-gray-400 font-medium">{{ $trx->currency }}</span>
                         </td>
@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function () {
             fontFamily: 'Plus Jakarta Sans, sans-serif',
         },
         series: [{
-            name: 'Collected Revenue (BDT)',
+            name: 'Collected Revenue (Tk / BDT)',
             data: @json($revenueTrendSeries),
         }],
         xaxis: {
@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         yaxis: {
             labels: {
-                formatter: function (val) { return '৳' + val.toLocaleString(); },
+                formatter: function (val) { return '৳' + val.toLocaleString() + ' Tk'; },
                 style: { colors: '#94a3b8', fontSize: '11px' }
             },
             min: 0,
@@ -455,7 +455,7 @@ document.addEventListener('DOMContentLoaded', function () {
         grid: { borderColor: '#f1f5f9' },
         tooltip: {
             y: {
-                formatter: function (val) { return '৳' + val.toLocaleString(); }
+                formatter: function (val) { return '৳' + val.toLocaleString() + ' Tk'; }
             },
             theme: 'light'
         }
@@ -484,7 +484,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             show: true,
                             label: 'Total Revenue',
                             formatter: function (w) {
-                                return '৳' + w.globals.seriesTotals.reduce((a, b) => a + b, 0).toLocaleString();
+                                return '৳' + w.globals.seriesTotals.reduce((a, b) => a + b, 0).toLocaleString() + ' Tk';
                             },
                             fontSize: '11px',
                             fontWeight: 700,
@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         tooltip: {
             y: {
-                formatter: function (val) { return '৳' + val.toLocaleString(); }
+                formatter: function (val) { return '৳' + val.toLocaleString() + ' Tk'; }
             },
             theme: 'light'
         }
