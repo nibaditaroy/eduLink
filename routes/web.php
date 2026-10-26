@@ -46,8 +46,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/quizzes/{id}/questions', [QuizController::class, 'storeQuestion'])->name('quizzes.questions.store');
         Route::delete('/quiz-questions/{id}', [QuizController::class, 'destroyQuestion'])->name('quizzes.questions.destroy');
 
-        // Assignment Management (Under Chapter/Lesson)
+        // Assignment Management & Student Submissions
         Route::resource('assignments', AssignmentController::class)->except(['index']);
+        Route::post('/assignments/{id}/submit', [AssignmentController::class, 'submit'])->name('assignments.submit');
+        Route::patch('/assignment-submissions/{id}/grade', [AssignmentController::class, 'gradeSubmission'])->name('assignment-submissions.grade');
+        Route::get('/assignment-submissions', [AssignmentController::class, 'submissionsIndex'])->name('assignment-submissions.index');
 
         // User & Student Management (Active, Suspended, Blocked & Progress/Payments)
         Route::resource('users', UserController::class);

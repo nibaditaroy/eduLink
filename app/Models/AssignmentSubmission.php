@@ -15,12 +15,16 @@ class AssignmentSubmission extends Model
         'submission_text',
         'submission_file',
         'status',
+        'is_late',
+        'submitted_at',
         'marks_obtained',
         'instructor_feedback',
         'graded_at',
     ];
 
     protected $casts = [
+        'is_late' => 'boolean',
+        'submitted_at' => 'datetime',
         'marks_obtained' => 'integer',
         'graded_at' => 'datetime',
     ];

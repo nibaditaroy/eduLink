@@ -33,4 +33,14 @@ class Assignment extends Model
     {
         return $this->belongsTo(Lesson::class);
     }
+
+    public function submissions()
+    {
+        return $this->hasMany(AssignmentSubmission::class);
+    }
+
+    public function isPastDeadline(): bool
+    {
+        return $this->deadline ? now()->gt($this->deadline) : false;
+    }
 }
