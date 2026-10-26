@@ -86,6 +86,58 @@
                 <textarea id="description" name="description" rows="4" placeholder="Describe the course curriculum, learning outcomes, and prerequisites..." class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3">{{ old('description') }}</textarea>
             </div>
 
+            <!-- What You Will Learn & Build (Key Learning Outcomes) -->
+            <div class="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100">
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-bullseye text-indigo-600"></i> What You Will Learn & Build
+                    </label>
+                    <button type="button" onclick="addLearningPoint()" class="px-2.5 py-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-white hover:bg-indigo-50 rounded-lg border border-indigo-200 transition flex items-center gap-1 shadow-2xs">
+                        <i class="fa-solid fa-plus text-[10px]"></i> Add Point
+                    </button>
+                </div>
+                <p class="text-[11px] text-gray-500 mb-3">Add the specific competencies, architecture patterns, and practical skills students will master in this track.</p>
+
+                <div id="learning-points-container" class="space-y-2">
+                    <div class="flex items-center gap-2 learning-point-row">
+                        <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <input type="text" name="what_you_will_learn[]" placeholder="e.g. Full grasp of modern industry paradigms and relational schemas" class="bg-white border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                        <button type="button" onclick="this.closest('.learning-point-row').remove()" class="p-2 text-gray-400 hover:text-rose-600 transition">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 learning-point-row">
+                        <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <input type="text" name="what_you_will_learn[]" placeholder="e.g. In-browser code execution for immediate interactive practice" class="bg-white border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                        <button type="button" onclick="this.closest('.learning-point-row').remove()" class="p-2 text-gray-400 hover:text-rose-600 transition">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 learning-point-row">
+                        <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <input type="text" name="what_you_will_learn[]" placeholder="e.g. Timed MCQ quizzes with instant scoring and pass/fail badges" class="bg-white border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                        <button type="button" onclick="this.closest('.learning-point-row').remove()" class="p-2 text-gray-400 hover:text-rose-600 transition">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 learning-point-row">
+                        <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <input type="text" name="what_you_will_learn[]" placeholder="e.g. Production-grade lab projects with instructor grading" class="bg-white border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                        <button type="button" onclick="this.closest('.learning-point-row').remove()" class="p-2 text-gray-400 hover:text-rose-600 transition">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Thumbnail Upload -->
             <div>
                 <label for="thumbnail" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Course Thumbnail</label>
@@ -106,4 +158,22 @@
     </div>
 
 </div>
+
+<script>
+function addLearningPoint(val = '') {
+    const container = document.getElementById('learning-points-container');
+    const div = document.createElement('div');
+    div.className = 'flex items-center gap-2 learning-point-row';
+    div.innerHTML = `
+        <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs flex-shrink-0">
+            <i class="fa-solid fa-check"></i>
+        </span>
+        <input type="text" name="what_you_will_learn[]" value="${val}" placeholder="e.g. Master asynchronous patterns and API design" class="bg-white border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+        <button type="button" onclick="this.closest('.learning-point-row').remove()" class="p-2 text-gray-400 hover:text-rose-600 transition">
+            <i class="fa-solid fa-trash-can text-xs"></i>
+        </button>
+    `;
+    container.appendChild(div);
+}
+</script>
 @endsection

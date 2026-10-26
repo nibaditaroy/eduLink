@@ -19,11 +19,13 @@ class Course extends Model
         'is_published',
         'thumbnail',
         'description',
+        'what_you_will_learn',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'is_published' => 'boolean',
+        'what_you_will_learn' => 'array',
     ];
 
     protected static function boot()

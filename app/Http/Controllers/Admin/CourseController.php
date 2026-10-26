@@ -34,6 +34,7 @@ class CourseController extends Controller
             'description' => 'nullable|string',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'is_published' => 'nullable|boolean',
+            'what_you_will_learn' => 'nullable',
         ]);
 
         $validated['is_published'] = $request->has('is_published');
@@ -42,6 +43,13 @@ class CourseController extends Controller
         if ($request->hasFile('thumbnail')) {
             $path = $request->file('thumbnail')->store('thumbnails', 'public');
             $validated['thumbnail'] = $path;
+        }
+
+        if ($request->has('what_you_will_learn')) {
+            $items = is_array($request->what_you_will_learn) 
+                ? $request->what_you_will_learn 
+                : explode("\n", (string) $request->what_you_will_learn);
+            $validated['what_you_will_learn'] = array_values(array_filter(array_map('trim', $items)));
         }
 
         $course = Course::create($validated);
@@ -86,6 +94,7 @@ class CourseController extends Controller
             'description' => 'nullable|string',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'is_published' => 'nullable|boolean',
+            'what_you_will_learn' => 'nullable',
         ]);
 
         $validated['is_published'] = $request->has('is_published');
@@ -96,6 +105,13 @@ class CourseController extends Controller
             }
             $path = $request->file('thumbnail')->store('thumbnails', 'public');
             $validated['thumbnail'] = $path;
+        }
+
+        if ($request->has('what_you_will_learn')) {
+            $items = is_array($request->what_you_will_learn) 
+                ? $request->what_you_will_learn 
+                : explode("\n", (string) $request->what_you_will_learn);
+            $validated['what_you_will_learn'] = array_values(array_filter(array_map('trim', $items)));
         }
 
         $course->update($validated);

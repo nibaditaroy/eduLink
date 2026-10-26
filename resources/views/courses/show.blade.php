@@ -58,22 +58,20 @@
                     <i class="fa-solid fa-bullseye text-indigo-600"></i> What You Will Learn & Build
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600">
-                    <div class="flex items-start gap-2.5">
-                        <i class="fa-solid fa-check text-emerald-500 mt-0.5"></i>
-                        <span>Full grasp of modern industry paradigms and relational schemas.</span>
-                    </div>
-                    <div class="flex items-start gap-2.5">
-                        <i class="fa-solid fa-check text-emerald-500 mt-0.5"></i>
-                        <span>In-browser code execution for immediate interactive practice.</span>
-                    </div>
-                    <div class="flex items-start gap-2.5">
-                        <i class="fa-solid fa-check text-emerald-500 mt-0.5"></i>
-                        <span>Timed MCQ quizzes with instant scoring and pass/fail badges.</span>
-                    </div>
-                    <div class="flex items-start gap-2.5">
-                        <i class="fa-solid fa-check text-emerald-500 mt-0.5"></i>
-                        <span>Production-grade lab projects with instructor grading.</span>
-                    </div>
+                    @php
+                        $learnItems = !empty($course->what_you_will_learn) ? $course->what_you_will_learn : [
+                            'Full grasp of modern industry paradigms and relational schemas.',
+                            'In-browser code execution for immediate interactive practice.',
+                            'Timed MCQ quizzes with instant scoring and pass/fail badges.',
+                            'Production-grade lab projects with instructor grading.'
+                        ];
+                    @endphp
+                    @foreach($learnItems as $item)
+                        <div class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-check text-emerald-500 mt-0.5 flex-shrink-0"></i>
+                            <span>{{ $item }}</span>
+                        </div>
+                    @endforeach
                 </div>
             </div>
 
