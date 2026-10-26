@@ -1,7 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Auth\StudentAuthController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\StudentDashboardController;
+use App\Http\Controllers\CoursePlayerController;
+use App\Http\Controllers\CodeRunnerController;
+
+// Admin Controllers
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\ChapterController;
@@ -11,22 +19,76 @@ use App\Http\Controllers\Admin\AssignmentController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\EnrollmentController;
 use App\Http\Controllers\Admin\TransactionController;
-use App\Http\Controllers\CodeRunnerController;
 
-// Redirect root to Admin Dashboard (or login)
-Route::get('/', function () {
-    return redirect()->route('admin.dashboard');
-});
+/*
+|--------------------------------------------------------------------------
+| Public & Marketplace Routes
+|--------------------------------------------------------------------------
+*/
+
+// Homepage / Course Marketplace
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Course Catalog & Details
+Route::get('/courses', [HomeController::class, 'courses'])->name('courses.index');
+Route::get('/courses/{slug}', [HomeController::class, 'courseDetails'])->name('courses.show');
 
 // Interactive Code Runner API (Safe execution sandbox for lesson practice)
 Route::post('/code/execute', [CodeRunnerController::class, 'execute'])->name('code.execute');
 
-// Admin Auth Routes
+/*
+|--------------------------------------------------------------------------
+| Student Authentication
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/login', [StudentAuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [StudentAuthController::class, 'login'])->name('login.post');
+Route::get('/register', [StudentAuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [StudentAuthController::class, 'register'])->name('register.post');
+Route::post('/logout', [StudentAuthController::class, 'logout'])->name('logout');
+Route::get('/quick-demo-login/{role?}', [StudentAuthController::class, 'quickDemoLogin'])->name('quick-demo-login');
+
+/*
+|--------------------------------------------------------------------------
+| Student Protected Learning & Checkout Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])->group(function () {
+    // Checkout & Purchase Flow (Tk / BDT)
+    Route::get('/checkout/{slug}', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::post('/checkout/{slug}/process', [CheckoutController::class, 'process'])->name('checkout.process');
+    Route::post('/checkout/{slug}/free', [CheckoutController::class, 'freeEnroll'])->name('checkout.free');
+
+    // Student Dashboard & Enrolled Courses
+    Route::get('/my-courses', [StudentDashboardController::class, 'myCourses'])->name('student.dashboard');
+
+    // Course Learning Player & Classroom
+    Route::get('/learn/{slug}', [CoursePlayerController::class, 'learn'])->name('learn.course');
+    Route::get('/learn/{slug}/lesson/{lesson}', [CoursePlayerController::class, 'learn'])->name('learn.lesson');
+    Route::post('/learn/{slug}/lesson/{lesson}/toggle', [CoursePlayerController::class, 'toggleComplete'])->name('learn.lesson.toggle');
+
+    // Interactive Quizzes
+    Route::get('/learn/{slug}/quiz/{quiz}', [CoursePlayerController::class, 'showQuiz'])->name('learn.quiz');
+    Route::post('/learn/{slug}/quiz/{quiz}/submit', [CoursePlayerController::class, 'submitQuiz'])->name('learn.quiz.submit');
+
+    // Assignments & Submissions
+    Route::get('/learn/{slug}/assignment/{assignment}', [CoursePlayerController::class, 'showAssignment'])->name('learn.assignment');
+    Route::post('/learn/{slug}/assignment/{assignment}/submit', [CoursePlayerController::class, 'submitAssignment'])->name('learn.assignment.submit');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin Portal & Management Routes
+|--------------------------------------------------------------------------
+*/
+
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/quick-login', [AuthController::class, 'quickDemoLogin'])->name('quick-login');
+    Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AdminAuthController::class, 'login'])->name('login.post');
+    Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+    Route::get('/quick-login', [AdminAuthController::class, 'quickDemoLogin'])->name('quick-login');
 
     // Admin Protected Routes
     Route::middleware(['web'])->group(function () {

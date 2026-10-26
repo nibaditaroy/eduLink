@@ -1,0 +1,245 @@
+@extends('layouts.app')
+
+@section('title', 'eduLink - Master In-Demand Tech Skills with Interactive Practice')
+
+@section('content')
+<!-- Hero Section -->
+<section class="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 bg-gradient-to-b from-indigo-50/60 via-slate-50 to-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center max-w-3xl mx-auto">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-100/80 border border-indigo-200 text-indigo-700 text-xs font-bold mb-6 animate-pulse">
+                <i class="fa-solid fa-code text-indigo-600"></i>
+                <span>Interactive Live Code Execution Sandbox &bull; Real Projects</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15] mb-6">
+                Master Modern Tech with <span class="gradient-text">Interactive Code Practice</span>
+            </h1>
+
+            <p class="text-base sm:text-lg text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto font-normal">
+                Structured university-grade engineering courses with interactive code sandboxes, timed MCQ exams, project assignments with instructor feedback, and instant enrollment in <strong class="text-indigo-600 font-semibold">Bangladeshi Taka (৳ BDT)</strong>.
+            </p>
+
+            <!-- Search & Quick CTA -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-xl mx-auto mb-10">
+                <form action="{{ route('courses.index') }}" method="GET" class="w-full flex items-center shadow-lg shadow-indigo-500/10 rounded-2xl bg-white border border-slate-200 p-1.5">
+                    <i class="fa-solid fa-magnifying-glass text-slate-400 ml-3 mr-2 text-sm"></i>
+                    <input type="text" name="search" placeholder="What skill do you want to master today?" class="w-full text-xs sm:text-sm bg-transparent outline-none text-slate-800 placeholder-slate-400">
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold transition whitespace-nowrap shadow-sm">
+                        Explore Courses
+                    </button>
+                </form>
+            </div>
+
+            <!-- Category Pills -->
+            <div class="flex flex-wrap items-center justify-center gap-2 text-xs">
+                <span class="text-slate-400 font-semibold mr-1">Popular Topics:</span>
+                @foreach($categories as $cat)
+                    <a href="{{ route('courses.index', ['category' => $cat->category]) }}" class="px-3 py-1.5 rounded-full bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 text-slate-700 font-medium transition shadow-2xs">
+                        {{ $cat->category }} <span class="text-indigo-500 font-bold ml-0.5">({{ $cat->total }})</span>
+                    </a>
+                @endforeach
+                <a href="{{ route('courses.index', ['pricing' => 'free']) }}" class="px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold transition shadow-2xs">
+                    <i class="fa-solid fa-gift mr-1 text-emerald-600"></i> Free Courses
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Counter Bar -->
+<section class="border-y border-slate-200 bg-white py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-1">{{ number_format($stats['total_students']) }}+</div>
+                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Students</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div class="text-2xl sm:text-3xl font-extrabold text-indigo-600 mb-1">{{ $stats['total_courses'] }}</div>
+                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Specialized Tracks</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div class="text-2xl sm:text-3xl font-extrabold text-emerald-600 mb-1">{{ $stats['completion_rate'] }}%</div>
+                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pass & Completion Rate</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div class="text-2xl sm:text-3xl font-extrabold text-amber-500 mb-1">৳ BDT</div>
+                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">bKash / Nagad Ready</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Courses Section -->
+<section class="py-16 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Hands-on Engineering</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Featured Career Courses</h2>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">Enroll in practical curricula designed for top software engineering roles.</p>
+            </div>
+            <a href="{{ route('courses.index') }}" class="text-xs sm:text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                View all {{ $stats['total_courses'] }} courses <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @forelse($featuredCourses as $course)
+                <div class="bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group">
+                    <!-- Thumbnail / Banner -->
+                    <div class="relative h-48 bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-800 p-5 flex flex-col justify-between overflow-hidden">
+                        <!-- Abstract glow -->
+                        <div class="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-indigo-500/20 blur-2xl group-hover:bg-indigo-500/30 transition"></div>
+
+                        <div class="flex items-center justify-between relative z-10">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/10 text-white backdrop-blur-md border border-white/20">
+                                {{ $course->category }}
+                            </span>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $course->level === 'beginner' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : ($course->level === 'intermediate' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30') }}">
+                                {{ ucfirst($course->level) }}
+                            </span>
+                        </div>
+
+                        <div class="relative z-10">
+                            <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xl mb-2 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-laptop-code text-cyan-300"></i>
+                            </div>
+                            <h3 class="font-bold text-white text-base line-clamp-2 leading-snug group-hover:text-cyan-200 transition">
+                                {{ $course->title }}
+                            </h3>
+                        </div>
+                    </div>
+
+                    <!-- Course Info -->
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div>
+                            <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4">
+                                {{ $course->description ?? 'Master core principles through interactive lessons, real-world coding exercises, and instructor graded assignments.' }}
+                            </p>
+
+                            <div class="flex items-center gap-4 text-xs text-slate-500 pb-4 border-b border-slate-100">
+                                <span class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-layer-group text-indigo-500"></i> {{ $course->chapters_count }} Chapters
+                                </span>
+                                <span class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-play text-emerald-500"></i> {{ $course->lessons_count }} Lessons
+                                </span>
+                                <span class="flex items-center gap-1.5 ml-auto text-amber-500 font-bold">
+                                    <i class="fa-solid fa-star"></i> 4.9
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Price & Action -->
+                        <div class="mt-4 pt-2 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block">Tuition Fee</span>
+                                @if($course->isFree())
+                                    <span class="text-base font-extrabold text-emerald-600">Free Access</span>
+                                @else
+                                    <span class="text-base font-extrabold text-slate-900">৳{{ number_format($course->price, 0) }} <span class="text-xs font-semibold text-slate-400">Tk</span></span>
+                                @endif
+                            </div>
+
+                            @if(in_array($course->id, $enrolledCourseIds))
+                                <a href="{{ route('learn.course', $course->slug) }}" class="px-4 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-play text-emerald-600"></i> Resume
+                                </a>
+                            @elseif($course->isFree())
+                                <a href="{{ route('courses.show', $course->slug) }}" class="px-4 py-2 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition">
+                                    View Syllabus
+                                </a>
+                            @else
+                                <a href="{{ route('checkout.show', $course->slug) }}" class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-600/20 transition flex items-center gap-1">
+                                    Enroll Now
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="col-span-3 text-center py-12 text-slate-400">
+                    <p>No courses published yet.</p>
+                </div>
+            @endforelse
+        </div>
+    </div>
+</section>
+
+<!-- Interactive Platform Highlights -->
+<section class="py-20 bg-white border-t border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">How eduLink Works</span>
+            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Built For Practical Mastery, Not Just Videos</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-2">Everything you need to learn, test your knowledge, write real code, and earn verified credentials.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 relative group hover:bg-indigo-50/40 hover:border-indigo-200 transition">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl mb-6 shadow-md shadow-indigo-600/20">
+                    <i class="fa-solid fa-terminal"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">In-Browser Code Execution</h3>
+                <p class="text-xs text-slate-500 leading-relaxed mb-4">
+                    Run PHP and algorithms right inside lesson classrooms using our built-in interactive execution sandbox. No local installation required.
+                </p>
+                <span class="text-xs font-bold text-indigo-600 flex items-center gap-1">
+                    Live PHP Sandbox &rarr;
+                </span>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 relative group hover:bg-emerald-50/40 hover:border-emerald-200 transition">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-xl mb-6 shadow-md shadow-emerald-600/20">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Timed Assessments & Quizzes</h3>
+                <p class="text-xs text-slate-500 leading-relaxed mb-4">
+                    Test your understanding with chapter quizzes. Get instant score percentage, pass/fail certification verification, and detailed answer breakdowns.
+                </p>
+                <span class="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                    Instant Evaluations &rarr;
+                </span>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 relative group hover:bg-cyan-50/40 hover:border-cyan-200 transition">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-600 text-white flex items-center justify-center text-xl mb-6 shadow-md shadow-cyan-600/20">
+                    <i class="fa-solid fa-file-circle-check"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Project Assignments & Marks</h3>
+                <p class="text-xs text-slate-500 leading-relaxed mb-4">
+                    Submit assignments before deadlines. Instructors grade your code submission and provide actionable feedback directly on your portal.
+                </p>
+                <span class="text-xs font-bold text-cyan-600 flex items-center gap-1">
+                    Verified Reviews &rarr;
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Banner -->
+<section class="py-16 bg-slate-900 relative overflow-hidden">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
+            Ready to upgrade your engineering skillset?
+        </h2>
+        <p class="text-slate-400 text-sm max-w-xl mx-auto mb-8">
+            Join thousands of Bangladeshi engineers learning with eduLink. Pay securely via bKash or Nagad and start coding today.
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-4">
+            <a href="{{ route('courses.index') }}" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold shadow-lg shadow-indigo-600/30 transition">
+                Browse All Courses
+            </a>
+            <a href="{{ route('register') }}" class="px-6 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-sm font-bold transition">
+                Create Free Account
+            </a>
+        </div>
+    </div>
+</section>
+@endsection
