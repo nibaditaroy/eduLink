@@ -120,6 +120,18 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('admin.enrollments.index') }}" class="flex items-center p-2.5 text-gray-900 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 group {{ request()->routeIs('admin.enrollments.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : '' }} transition">
+                        <i class="fa-solid fa-user-graduate w-6 text-center text-gray-500 group-hover:text-indigo-600 {{ request()->routeIs('admin.enrollments.*') ? 'text-indigo-600' : '' }}"></i>
+                        <span class="ms-3">Enrollments & Popularity</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.transactions.index') }}" class="flex items-center p-2.5 text-gray-900 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 group {{ request()->routeIs('admin.transactions.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : '' }} transition">
+                        <i class="fa-solid fa-credit-card w-6 text-center text-gray-500 group-hover:text-indigo-600 {{ request()->routeIs('admin.transactions.*') ? 'text-indigo-600' : '' }}"></i>
+                        <span class="ms-3">Payments & Revenue</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('admin.courses.create') }}" class="flex items-center p-2.5 text-gray-900 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 group transition">
                         <i class="fa-solid fa-folder-plus w-6 text-center text-gray-500 group-hover:text-indigo-600"></i>
                         <span class="ms-3">Create Course</span>

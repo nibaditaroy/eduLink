@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\LessonController;
 use App\Http\Controllers\Admin\QuizController;
 use App\Http\Controllers\Admin\AssignmentController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\EnrollmentController;
+use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\CodeRunnerController;
 
 // Redirect root to Admin Dashboard (or login)
@@ -50,5 +52,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // User & Student Management (Active, Suspended, Blocked & Progress/Payments)
         Route::resource('users', UserController::class);
         Route::patch('/users/{id}/status', [UserController::class, 'toggleStatus'])->name('users.status');
+
+        // Dedicated Course Enrollments & Popularity Analytics
+        Route::get('/enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
+        Route::patch('/enrollments/{id}/status', [EnrollmentController::class, 'updateStatus'])->name('enrollments.status');
+        Route::delete('/enrollments/{id}', [EnrollmentController::class, 'destroy'])->name('enrollments.destroy');
+
+        // Dedicated Transactions & Payment Gateway Audit Records
+        Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+        Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
+        Route::patch('/transactions/{id}/status', [TransactionController::class, 'updateStatus'])->name('transactions.status');
     });
 });
