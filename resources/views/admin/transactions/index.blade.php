@@ -9,7 +9,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Payments & Revenue Records</h1>
-            <p class="text-xs text-gray-500 mt-0.5">Audit SSLCommerz, bKash, Nagad, and Card transactions, verify course purchases, and track gateway revenue.</p>
+            <p class="text-xs text-gray-500 mt-0.5">Audit SSLCommerz, bKash, Nagad, and Card transactions, verify revenue trends, and filter by date.</p>
         </div>
         <div class="flex items-center gap-2">
             <a href="{{ route('admin.enrollments.index') }}" class="inline-flex items-center px-4 py-2 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl shadow-sm transition">
@@ -55,13 +55,47 @@
         </a>
     </div>
 
+    <!-- Visual Graphs & Analytics (ApexCharts Grace) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Graph 1: Revenue Velocity Trend (2 Cols) -->
+        <div class="lg:col-span-2 bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
+            <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+                <div>
+                    <h2 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-emerald-600"></i> Daily Revenue Collection (BDT)
+                    </h2>
+                    <p class="text-[11px] text-gray-400">Total payments collected over the last 7 days</p>
+                </div>
+                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700">7-Day Velocity</span>
+            </div>
+            <div class="mt-4">
+                <div id="revenue-trend-chart" class="w-full" style="min-height: 250px;"></div>
+            </div>
+        </div>
+
+        <!-- Graph 2: Payment Gateway Breakdown Donut Chart (1 Col) -->
+        <div class="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
+            <div class="pb-3 border-b border-gray-100">
+                <h2 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fa-solid fa-pie-chart text-indigo-600"></i> Gateway Share
+                </h2>
+                <p class="text-[11px] text-gray-400">Revenue split across payment methods</p>
+            </div>
+            <div class="mt-4 flex items-center justify-center">
+                <div id="gateway-donut-chart" class="w-full" style="min-height: 250px;"></div>
+            </div>
+        </div>
+
+    </div>
+
     <!-- Channels & Top Earning Courses Row -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Gateway Channel Breakdown -->
         <div class="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
             <h2 class="text-sm font-bold text-gray-900 pb-3 border-b border-gray-100 flex items-center gap-2">
-                <i class="fa-solid fa-wallet text-indigo-600"></i> Payment Gateway Channels
+                <i class="fa-solid fa-wallet text-indigo-600"></i> Payment Channels
             </h2>
             <div class="mt-4 space-y-3">
                 
@@ -149,59 +183,96 @@
 
     </div>
 
-    <!-- Filters & Search Bar -->
-    <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
-        <form method="GET" action="{{ route('admin.transactions.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
+    <!-- Filters Bar with Date Range -->
+    <div class="bg-white p-5 rounded-3xl border border-gray-200 shadow-sm space-y-3">
+        <form method="GET" action="{{ route('admin.transactions.index') }}" class="space-y-3">
             
-            <!-- Search -->
-            <div class="md:col-span-2 relative">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-gray-400">
-                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+            <!-- Row 1: Search, Course, Status, Gateway -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <!-- Search -->
+                <div class="relative">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                    </div>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by TrxID, card, student..." 
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full ps-9 p-2.5">
                 </div>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by TrxID, card, student, or course..." 
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full ps-9 p-2.5">
+
+                <!-- Course Dropdown -->
+                <div>
+                    <select name="course_id" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
+                        <option value="">All Courses</option>
+                        @foreach($courses as $c)
+                        <option value="{{ $c->id }}" {{ request('course_id') == $c->id ? 'selected' : '' }}>
+                            {{ Str::limit($c->title, 26) }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Status Dropdown -->
+                <div>
+                    <select name="status" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
+                        <option value="">All Statuses</option>
+                        <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>✅ Completed</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>⏳ Pending</option>
+                        <option value="failed" {{ request('status') === 'failed' ? 'selected' : '' }}>❌ Failed</option>
+                        <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>🚫 Cancelled</option>
+                    </select>
+                </div>
+
+                <!-- Gateway Dropdown -->
+                <div>
+                    <select name="method" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
+                        <option value="">All Gateways</option>
+                        <option value="bkash" {{ request('method') === 'bkash' ? 'selected' : '' }}>bKash MFS</option>
+                        <option value="nagad" {{ request('method') === 'nagad' ? 'selected' : '' }}>Nagad Direct</option>
+                        <option value="card" {{ request('method') === 'card' ? 'selected' : '' }}>Visa / Cards</option>
+                        <option value="sslcommerz" {{ request('method') === 'sslcommerz' ? 'selected' : '' }}>SSLCommerz</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- Filter by Course -->
-            <div>
-                <select name="course_id" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
-                    <option value="">All Courses</option>
-                    @foreach($courses as $c)
-                    <option value="{{ $c->id }}" {{ request('course_id') == $c->id ? 'selected' : '' }}>
-                        {{ Str::limit($c->title, 28) }}
-                    </option>
-                    @endforeach
-                </select>
-            </div>
+            <!-- Row 2: Date Presets + Custom Date Range -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-6 gap-3 items-center pt-2 border-t border-gray-100">
+                
+                <!-- Date Presets -->
+                <div class="sm:col-span-2">
+                    <select name="date_filter" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer font-medium">
+                        <option value="all" {{ request('date_filter', 'all') === 'all' ? 'selected' : '' }}>📅 Date Range: All Time</option>
+                        <option value="today" {{ request('date_filter') === 'today' ? 'selected' : '' }}>Today</option>
+                        <option value="yesterday" {{ request('date_filter') === 'yesterday' ? 'selected' : '' }}>Yesterday</option>
+                        <option value="this_week" {{ request('date_filter') === 'this_week' ? 'selected' : '' }}>This Week</option>
+                        <option value="this_month" {{ request('date_filter') === 'this_month' ? 'selected' : '' }}>This Month</option>
+                        <option value="last_30_days" {{ request('date_filter') === 'last_30_days' ? 'selected' : '' }}>Last 30 Days</option>
+                        <option value="this_year" {{ request('date_filter') === 'this_year' ? 'selected' : '' }}>This Year</option>
+                    </select>
+                </div>
 
-            <!-- Filter by Status -->
-            <div>
-                <select name="status" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
-                    <option value="">All Statuses</option>
-                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>✅ Completed</option>
-                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>⏳ Pending</option>
-                    <option value="failed" {{ request('status') === 'failed' ? 'selected' : '' }}>❌ Failed</option>
-                    <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>🚫 Cancelled</option>
-                </select>
-            </div>
+                <!-- Custom Date From -->
+                <div>
+                    <input type="date" name="date_from" value="{{ request('date_from') }}" title="Date From"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                </div>
 
-            <!-- Reset & Submit -->
-            <div class="flex items-center gap-2">
-                <select name="method" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
-                    <option value="">All Gateways</option>
-                    <option value="bkash" {{ request('method') === 'bkash' ? 'selected' : '' }}>bKash</option>
-                    <option value="nagad" {{ request('method') === 'nagad' ? 'selected' : '' }}>Nagad</option>
-                    <option value="card" {{ request('method') === 'card' ? 'selected' : '' }}>Visa / Cards</option>
-                    <option value="sslcommerz" {{ request('method') === 'sslcommerz' ? 'selected' : '' }}>SSLCommerz</option>
-                </select>
-                <button type="submit" class="px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition flex-shrink-0">
-                    Filter
-                </button>
-                @if(request('search') || request('course_id') || request('status') || request('method'))
-                <a href="{{ route('admin.transactions.index') }}" class="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition text-xs flex-shrink-0" title="Reset Filters">
-                    <i class="fa-solid fa-rotate-left"></i>
-                </a>
-                @endif
+                <!-- Custom Date To -->
+                <div>
+                    <input type="date" name="date_to" value="{{ request('date_to') }}" title="Date To"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                </div>
+
+                <!-- Apply & Reset Buttons -->
+                <div class="sm:col-span-2 flex items-center gap-2">
+                    <button type="submit" class="flex-1 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition">
+                        <i class="fa-solid fa-filter me-1"></i> Apply Filters
+                    </button>
+                    @if(request('search') || request('course_id') || request('status') || request('method') || request('date_filter') || request('date_from') || request('date_to'))
+                    <a href="{{ route('admin.transactions.index') }}" class="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition text-xs" title="Reset Filters">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </a>
+                    @endif
+                </div>
+
             </div>
 
         </form>
@@ -325,7 +396,7 @@
                                 <i class="fa-solid fa-receipt"></i>
                             </div>
                             <div class="font-medium text-gray-900">No payment records found</div>
-                            <p class="text-xs text-gray-500 mt-1">Try resetting your search or gateway filters.</p>
+                            <p class="text-xs text-gray-500 mt-1">Try resetting your date range or gateway filters.</p>
                         </td>
                     </tr>
                     @endforelse
@@ -341,4 +412,96 @@
     </div>
 
 </div>
+
+<!-- ApexCharts Script Initialization -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Revenue Velocity Area Chart
+    const revenueOptions = {
+        chart: {
+            type: 'area',
+            height: 250,
+            toolbar: { show: false },
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
+        },
+        series: [{
+            name: 'Collected Revenue (BDT)',
+            data: @json($revenueTrendSeries),
+        }],
+        xaxis: {
+            categories: @json($revenueTrendDates),
+            labels: { style: { colors: '#94a3b8', fontSize: '11px' } }
+        },
+        yaxis: {
+            labels: {
+                formatter: function (val) { return '৳' + val.toLocaleString(); },
+                style: { colors: '#94a3b8', fontSize: '11px' }
+            },
+            min: 0,
+            forceNiceScale: true,
+        },
+        colors: ['#10b981'],
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.45,
+                opacityTo: 0.05,
+                stops: [0, 90, 100]
+            }
+        },
+        stroke: { curve: 'smooth', width: 2.5 },
+        dataLabels: { enabled: false },
+        grid: { borderColor: '#f1f5f9' },
+        tooltip: {
+            y: {
+                formatter: function (val) { return '৳' + val.toLocaleString(); }
+            },
+            theme: 'light'
+        }
+    };
+    new ApexCharts(document.querySelector("#revenue-trend-chart"), revenueOptions).render();
+
+    // 2. Gateway Share Donut Chart
+    const gatewayOptions = {
+        chart: {
+            type: 'donut',
+            height: 250,
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
+        },
+        series: @json($gatewayChartData['series']),
+        labels: @json($gatewayChartData['labels']),
+        colors: ['#db2777', '#ea580c', '#2563eb', '#64748b'],
+        legend: { position: 'bottom', fontSize: '11px' },
+        dataLabels: { enabled: false },
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '65%',
+                    labels: {
+                        show: true,
+                        total: {
+                            show: true,
+                            label: 'Total Revenue',
+                            formatter: function (w) {
+                                return '৳' + w.globals.seriesTotals.reduce((a, b) => a + b, 0).toLocaleString();
+                            },
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            color: '#1e293b'
+                        }
+                    }
+                }
+            }
+        },
+        tooltip: {
+            y: {
+                formatter: function (val) { return '৳' + val.toLocaleString(); }
+            },
+            theme: 'light'
+        }
+    };
+    new ApexCharts(document.querySelector("#gateway-donut-chart"), gatewayOptions).render();
+});
+</script>
 @endsection

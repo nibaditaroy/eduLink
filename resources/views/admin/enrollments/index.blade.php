@@ -9,7 +9,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Enrollments & Course Popularity</h1>
-            <p class="text-xs text-gray-500 mt-0.5">Analyze high vs low demand courses, manage student course access, and track syllabus completion progress.</p>
+            <p class="text-xs text-gray-500 mt-0.5">Analyze high vs low demand courses, visual enrollment trends, and manage student course access.</p>
         </div>
         <div class="flex items-center gap-2">
             <a href="{{ route('admin.courses.index') }}" class="inline-flex items-center px-4 py-2 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl shadow-sm transition">
@@ -24,7 +24,7 @@
     <!-- Quick Aggregate KPI Cards -->
     <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
         <a href="{{ route('admin.enrollments.index') }}" 
-           class="bg-white p-4 rounded-2xl border {{ !request('status') && !request('course_id') ? 'border-slate-900 ring-2 ring-slate-900/10' : 'border-gray-200 hover:border-gray-300' }} shadow-sm transition block">
+           class="bg-white p-4 rounded-2xl border {{ !request('status') && !request('course_id') && !request('date_filter') ? 'border-slate-900 ring-2 ring-slate-900/10' : 'border-gray-200 hover:border-gray-300' }} shadow-sm transition block">
             <div class="text-xs text-gray-500 font-medium">Total Enrollments</div>
             <div class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($stats['total']) }}</div>
         </a>
@@ -57,6 +57,40 @@
         </div>
     </div>
 
+    <!-- Visual Graphs & Analytics (ApexCharts Grace) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Graph 1: Enrollment Growth Trend Area Chart (2 Cols) -->
+        <div class="lg:col-span-2 bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
+            <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+                <div>
+                    <h2 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-area text-indigo-600"></i> Enrollment Velocity & Growth
+                    </h2>
+                    <p class="text-[11px] text-gray-400">Daily registrations over the last 7 days</p>
+                </div>
+                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700">Daily Trend</span>
+            </div>
+            <div class="mt-4">
+                <div id="enrollment-trend-chart" class="w-full" style="min-height: 250px;"></div>
+            </div>
+        </div>
+
+        <!-- Graph 2: Enrollment Status Distribution Donut Chart (1 Col) -->
+        <div class="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
+            <div class="pb-3 border-b border-gray-100">
+                <h2 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-indigo-600"></i> Status Distribution
+                </h2>
+                <p class="text-[11px] text-gray-400">Learners breakdown by completion status</p>
+            </div>
+            <div class="mt-4 flex items-center justify-center">
+                <div id="status-donut-chart" class="w-full" style="min-height: 250px;"></div>
+            </div>
+        </div>
+
+    </div>
+
     <!-- Course Popularity Comparison (More Enrolled vs Less Enrolled) -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
@@ -72,7 +106,7 @@
                         <p class="text-[11px] text-gray-400">Top courses with highest student registrations</p>
                     </div>
                 </div>
-                <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">High Demand</span>
+                <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">High Demand</span>
             </div>
 
             <div class="mt-4 space-y-3">
@@ -113,7 +147,7 @@
                         <p class="text-[11px] text-gray-400">Courses with low enrollment numbers (opportunity to promote)</p>
                     </div>
                 </div>
-                <span class="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Low Demand</span>
+                <span class="text-xs font-semibold text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full">Low Demand</span>
             </div>
 
             <div class="mt-4 space-y-3">
@@ -140,57 +174,94 @@
 
     </div>
 
-    <!-- Filters & Search Bar -->
-    <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
-        <form method="GET" action="{{ route('admin.enrollments.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
+    <!-- Filters Bar with Date Range -->
+    <div class="bg-white p-5 rounded-3xl border border-gray-200 shadow-sm space-y-3">
+        <form method="GET" action="{{ route('admin.enrollments.index') }}" class="space-y-3">
             
-            <!-- Search -->
-            <div class="md:col-span-2 relative">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-gray-400">
-                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+            <!-- Row 1: Search, Course, Status, Sort -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <!-- Search -->
+                <div class="relative">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                    </div>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by student or course..." 
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full ps-9 p-2.5">
                 </div>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by student or course (press Enter)..." 
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full ps-9 p-2.5">
+
+                <!-- Course Dropdown -->
+                <div>
+                    <select name="course_id" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
+                        <option value="">All Courses</option>
+                        @foreach($courses as $c)
+                        <option value="{{ $c->id }}" {{ request('course_id') == $c->id ? 'selected' : '' }}>
+                            {{ Str::limit($c->title, 26) }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Status Dropdown -->
+                <div>
+                    <select name="status" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
+                        <option value="">All Statuses</option>
+                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>🟢 Active</option>
+                        <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>🎓 Completed</option>
+                        <option value="suspended" {{ request('status') === 'suspended' ? 'selected' : '' }}>⏸️ Suspended</option>
+                        <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>🚫 Cancelled</option>
+                    </select>
+                </div>
+
+                <!-- Sort -->
+                <div>
+                    <select name="sort" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
+                        <option value="latest" {{ request('sort') === 'latest' ? 'selected' : '' }}>Latest Enrolled</option>
+                        <option value="progress_desc" {{ request('sort') === 'progress_desc' ? 'selected' : '' }}>Progress: High &rarr; Low</option>
+                        <option value="progress_asc" {{ request('sort') === 'progress_asc' ? 'selected' : '' }}>Progress: Low &rarr; High</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- Filter by Course -->
-            <div>
-                <select name="course_id" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
-                    <option value="">All Courses</option>
-                    @foreach($courses as $c)
-                    <option value="{{ $c->id }}" {{ request('course_id') == $c->id ? 'selected' : '' }}>
-                        {{ Str::limit($c->title, 28) }}
-                    </option>
-                    @endforeach
-                </select>
-            </div>
+            <!-- Row 2: Date Filter Presets + Custom Date Range -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-6 gap-3 items-center pt-2 border-t border-gray-100">
+                
+                <!-- Date Presets -->
+                <div class="sm:col-span-2">
+                    <select name="date_filter" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer font-medium">
+                        <option value="all" {{ request('date_filter', 'all') === 'all' ? 'selected' : '' }}>📅 Date Range: All Time</option>
+                        <option value="today" {{ request('date_filter') === 'today' ? 'selected' : '' }}>Today</option>
+                        <option value="yesterday" {{ request('date_filter') === 'yesterday' ? 'selected' : '' }}>Yesterday</option>
+                        <option value="this_week" {{ request('date_filter') === 'this_week' ? 'selected' : '' }}>This Week</option>
+                        <option value="this_month" {{ request('date_filter') === 'this_month' ? 'selected' : '' }}>This Month</option>
+                        <option value="last_30_days" {{ request('date_filter') === 'last_30_days' ? 'selected' : '' }}>Last 30 Days</option>
+                        <option value="this_year" {{ request('date_filter') === 'this_year' ? 'selected' : '' }}>This Year</option>
+                    </select>
+                </div>
 
-            <!-- Filter by Status -->
-            <div>
-                <select name="status" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
-                    <option value="">All Statuses</option>
-                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>🟢 Active</option>
-                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>🎓 Completed</option>
-                    <option value="suspended" {{ request('status') === 'suspended' ? 'selected' : '' }}>⏸️ Suspended</option>
-                    <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>🚫 Cancelled</option>
-                </select>
-            </div>
+                <!-- Custom Date From -->
+                <div>
+                    <input type="date" name="date_from" value="{{ request('date_from') }}" title="Date From"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                </div>
 
-            <!-- Sort & Reset -->
-            <div class="flex items-center gap-2">
-                <select name="sort" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-pointer">
-                    <option value="latest" {{ request('sort') === 'latest' ? 'selected' : '' }}>Latest First</option>
-                    <option value="progress_desc" {{ request('sort') === 'progress_desc' ? 'selected' : '' }}>Progress: High to Low</option>
-                    <option value="progress_asc" {{ request('sort') === 'progress_asc' ? 'selected' : '' }}>Progress: Low to High</option>
-                </select>
-                <button type="submit" class="px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition flex-shrink-0">
-                    Filter
-                </button>
-                @if(request('search') || request('course_id') || request('status') || request('sort'))
-                <a href="{{ route('admin.enrollments.index') }}" class="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition text-xs flex-shrink-0" title="Reset Filters">
-                    <i class="fa-solid fa-rotate-left"></i>
-                </a>
-                @endif
+                <!-- Custom Date To -->
+                <div>
+                    <input type="date" name="date_to" value="{{ request('date_to') }}" title="Date To"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                </div>
+
+                <!-- Submit & Clear Buttons -->
+                <div class="sm:col-span-2 flex items-center gap-2">
+                    <button type="submit" class="flex-1 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition">
+                        <i class="fa-solid fa-filter me-1"></i> Apply Filters
+                    </button>
+                    @if(request('search') || request('course_id') || request('status') || request('sort') || request('date_filter') || request('date_from') || request('date_to'))
+                    <a href="{{ route('admin.enrollments.index') }}" class="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition text-xs" title="Reset Filters">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </a>
+                    @endif
+                </div>
+
             </div>
 
         </form>
@@ -314,7 +385,7 @@
                                 <i class="fa-solid fa-user-graduate"></i>
                             </div>
                             <div class="font-medium text-gray-900">No enrollments match this filter</div>
-                            <p class="text-xs text-gray-500 mt-1">Try resetting your course or status filter.</p>
+                            <p class="text-xs text-gray-500 mt-1">Try resetting your date range or course filter.</p>
                         </td>
                     </tr>
                     @endforelse
@@ -330,4 +401,80 @@
     </div>
 
 </div>
+
+<!-- ApexCharts Script Initialization -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Enrollment Trend Area Chart
+    const trendOptions = {
+        chart: {
+            type: 'area',
+            height: 250,
+            toolbar: { show: false },
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
+        },
+        series: [{
+            name: 'New Enrollments',
+            data: @json($trendCounts),
+        }],
+        xaxis: {
+            categories: @json($trendDates),
+            labels: { style: { colors: '#94a3b8', fontSize: '11px' } }
+        },
+        yaxis: {
+            labels: { style: { colors: '#94a3b8', fontSize: '11px' } },
+            min: 0,
+            forceNiceScale: true,
+        },
+        colors: ['#6366f1'],
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.45,
+                opacityTo: 0.05,
+                stops: [0, 90, 100]
+            }
+        },
+        stroke: { curve: 'smooth', width: 2.5 },
+        dataLabels: { enabled: false },
+        grid: { borderColor: '#f1f5f9' },
+        tooltip: { theme: 'light' }
+    };
+    new ApexCharts(document.querySelector("#enrollment-trend-chart"), trendOptions).render();
+
+    // 2. Status Donut Chart
+    const statusOptions = {
+        chart: {
+            type: 'donut',
+            height: 250,
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
+        },
+        series: @json($statusChartData['series']),
+        labels: @json($statusChartData['labels']),
+        colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+        legend: { position: 'bottom', fontSize: '11px' },
+        dataLabels: { enabled: false },
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '65%',
+                    labels: {
+                        show: true,
+                        total: {
+                            show: true,
+                            label: 'Total',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            color: '#1e293b'
+                        }
+                    }
+                }
+            }
+        },
+        tooltip: { theme: 'light' }
+    };
+    new ApexCharts(document.querySelector("#status-donut-chart"), statusOptions).render();
+});
+</script>
 @endsection

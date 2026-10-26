@@ -7,6 +7,8 @@ use App\Models\Enrollment;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class EnrollmentController extends Controller
 {
@@ -16,6 +18,9 @@ class EnrollmentController extends Controller
         $courseId = $request->input('course_id');
         $status = strtolower(trim((string) $request->input('status')));
         $sortBy = $request->input('sort', 'latest'); // latest, progress_desc, progress_asc
+        $dateFilter = $request->input('date_filter', 'all');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
 
         $query = Enrollment::with(['user', 'course']);
 
@@ -36,6 +41,30 @@ class EnrollmentController extends Controller
 
         if ($status !== '' && in_array($status, ['active', 'completed', 'suspended', 'cancelled'])) {
             $query->where('status', $status);
+        }
+
+        // Date Range Filtering
+        if ($dateFilter === 'today') {
+            $query->whereDate('enrolled_at', Carbon::today());
+        } elseif ($dateFilter === 'yesterday') {
+            $query->whereDate('enrolled_at', Carbon::yesterday());
+        } elseif ($dateFilter === 'this_week') {
+            $query->whereBetween('enrolled_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+        } elseif ($dateFilter === 'this_month') {
+            $query->whereBetween('enrolled_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
+        } elseif ($dateFilter === 'last_30_days') {
+            $query->where('enrolled_at', '>=', Carbon::now()->subDays(30));
+        } elseif ($dateFilter === 'this_year') {
+            $query->whereYear('enrolled_at', Carbon::now()->year);
+        } elseif ($dateFrom && $dateTo) {
+            $query->whereBetween('enrolled_at', [
+                Carbon::parse($dateFrom)->startOfDay(),
+                Carbon::parse($dateTo)->endOfDay(),
+            ]);
+        } elseif ($dateFrom) {
+            $query->where('enrolled_at', '>=', Carbon::parse($dateFrom)->startOfDay());
+        } elseif ($dateTo) {
+            $query->where('enrolled_at', '<=', Carbon::parse($dateTo)->endOfDay());
         }
 
         if ($sortBy === 'progress_desc') {
@@ -65,6 +94,33 @@ class EnrollmentController extends Controller
             'avg_progress' => round(Enrollment::avg('progress_percent') ?? 0, 1),
         ];
 
+        // 3. Visual Charts Data (ApexCharts Grace)
+        // Trend chart: Last 7 days enrollment counts
+        $trendDates = [];
+        $trendCounts = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $d = Carbon::now()->subDays($i);
+            $trendDates[] = $d->format('M d');
+            $trendCounts[] = Enrollment::whereDate('enrolled_at', $d->format('Y-m-d'))->count();
+        }
+
+        // Status Distribution Donut Chart
+        $statusChartData = [
+            'labels' => ['Active', 'Completed', 'Suspended', 'Cancelled'],
+            'series' => [
+                Enrollment::where('status', 'active')->count(),
+                Enrollment::where('status', 'completed')->count(),
+                Enrollment::where('status', 'suspended')->count(),
+                Enrollment::where('status', 'cancelled')->count(),
+            ],
+        ];
+
+        // Course Popularity Comparison Bar Chart
+        $courseBarChart = [
+            'categories' => $courseAnalytics->take(6)->map(fn($c) => Str::limit($c->title, 18))->values()->toArray(),
+            'series' => $courseAnalytics->take(6)->pluck('enrollments_count')->values()->toArray(),
+        ];
+
         $courses = Course::select('id', 'title')->orderBy('title')->get();
 
         return view('admin.enrollments.index', compact(
@@ -77,7 +133,14 @@ class EnrollmentController extends Controller
             'search',
             'courseId',
             'status',
-            'sortBy'
+            'sortBy',
+            'dateFilter',
+            'dateFrom',
+            'dateTo',
+            'trendDates',
+            'trendCounts',
+            'statusChartData',
+            'courseBarChart'
         ));
     }
 
