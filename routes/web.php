@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ChapterController;
 use App\Http\Controllers\Admin\LessonController;
 use App\Http\Controllers\Admin\QuizController;
 use App\Http\Controllers\Admin\AssignmentController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CodeRunnerController;
 
 // Redirect root to Admin Dashboard (or login)
@@ -45,5 +46,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Assignment Management (Under Chapter/Lesson)
         Route::resource('assignments', AssignmentController::class)->except(['index']);
+
+        // User & Student Management (Active, Suspended, Blocked & Progress/Payments)
+        Route::resource('users', UserController::class);
+        Route::patch('/users/{id}/status', [UserController::class, 'toggleStatus'])->name('users.status');
     });
 });

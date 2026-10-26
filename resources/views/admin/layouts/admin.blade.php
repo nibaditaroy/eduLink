@@ -114,6 +114,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('admin.users.index') }}" class="flex items-center p-2.5 text-gray-900 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 group {{ request()->routeIs('admin.users.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : '' }} transition">
+                        <i class="fa-solid fa-users w-6 text-center text-gray-500 group-hover:text-indigo-600 {{ request()->routeIs('admin.users.*') ? 'text-indigo-600' : '' }}"></i>
+                        <span class="ms-3">User Management</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('admin.courses.create') }}" class="flex items-center p-2.5 text-gray-900 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 group transition">
                         <i class="fa-solid fa-folder-plus w-6 text-center text-gray-500 group-hover:text-indigo-600"></i>
                         <span class="ms-3">Create Course</span>

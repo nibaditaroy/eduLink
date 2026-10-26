@@ -279,27 +279,121 @@ CREATE TABLE chapters (
             ]
         );
 
-        Lesson::firstOrCreate(
+        // 3. Demo Students (Active, Suspended, Blocked with LMS Progress & Transactions)
+        $student1 = User::firstOrCreate(
+            ['email' => 'student.nipa@edulink.test'],
             [
-                'chapter_id' => $course2Ch1->id,
-                'sort_order' => 1,
+                'name' => 'Nipa Roy',
+                'phone' => '+8801711223344',
+                'password' => Hash::make('password'),
+                'role' => 'student',
+                'status' => 'active',
+            ]
+        );
+
+        $student2 = User::firstOrCreate(
+            ['email' => 'suspended.user@edulink.test'],
+            [
+                'name' => 'Tanvir Ahmed',
+                'phone' => '+8801822334455',
+                'password' => Hash::make('password'),
+                'role' => 'student',
+                'status' => 'suspended',
+                'status_reason' => 'Multiple failed quiz submissions flagged for review by course instructor.',
+            ]
+        );
+
+        $student3 = User::firstOrCreate(
+            ['email' => 'blocked.user@edulink.test'],
+            [
+                'name' => 'Sohag Hossain',
+                'phone' => '+8801933445566',
+                'password' => Hash::make('password'),
+                'role' => 'student',
+                'status' => 'blocked',
+                'status_reason' => 'Fraudulent payment dispute on bKash transaction #TXN-BK99201.',
+            ]
+        );
+
+        // 4. Enrollments & Transactions for student1
+        \App\Models\Enrollment::firstOrCreate(
+            [
+                'user_id' => $student1->id,
+                'course_id' => $course1->id,
             ],
             [
-                'title' => 'Big-O Notation & Amortized Cost',
-                'text_content' => "Big-O notation describes the upper bound of an algorithm's growth rate in terms of input size (n). Common complexities include O(1), O(log n), O(n), O(n log n), and O(n^2).",
-                'video_url' => 'https://www.youtube.com/watch?v=D6xkbGLQesk',
-                'code_snippet' => "def binary_search(arr, target):
-    left, right = 0, len(arr) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if arr[mid] == target:
-            return mid
-        elif arr[mid] < target:
-            left = mid + 1
-        else:
-            right = mid - 1
-    return -1",
-                'code_language' => 'python',
+                'status' => 'active',
+                'progress_percent' => 50,
+                'enrolled_at' => now()->subDays(5),
+            ]
+        );
+
+        \App\Models\Enrollment::firstOrCreate(
+            [
+                'user_id' => $student1->id,
+                'course_id' => $course2->id,
+            ],
+            [
+                'status' => 'active',
+                'progress_percent' => 20,
+                'enrolled_at' => now()->subDays(2),
+            ]
+        );
+
+        \App\Models\Transaction::firstOrCreate(
+            [
+                'transaction_id' => 'TXN-SSL-981203',
+            ],
+            [
+                'user_id' => $student1->id,
+                'course_id' => $course2->id,
+                'amount' => 4200.00,
+                'currency' => 'BDT',
+                'payment_method' => 'sslcommerz',
+                'card_type' => 'BKASH-BKASH',
+                'status' => 'completed',
+                'gateway_response' => ['card_type' => 'BKASH', 'status' => 'VALID'],
+                'paid_at' => now()->subDays(2),
+            ]
+        );
+
+        // 5. Lesson Progress & Quiz Attempts for student1
+        \App\Models\LessonProgress::firstOrCreate(
+            [
+                'user_id' => $student1->id,
+                'lesson_id' => $lesson1_1->id,
+            ],
+            [
+                'is_completed' => true,
+                'completed_at' => now()->subDays(3),
+            ]
+        );
+
+        \App\Models\QuizAttempt::firstOrCreate(
+            [
+                'user_id' => $student1->id,
+                'quiz_id' => $quiz1->id,
+            ],
+            [
+                'total_questions' => 3,
+                'correct_answers' => 3,
+                'score_percent' => 100.00,
+                'is_passed' => true,
+                'completed_at' => now()->subDays(2),
+            ]
+        );
+
+        \App\Models\AssignmentSubmission::firstOrCreate(
+            [
+                'user_id' => $student1->id,
+                'assignment_id' => 1,
+            ],
+            [
+                'submission_text' => 'Here is my complete student grade calculator solution using modular functions.',
+                'marks_obtained' => 95,
+                'status' => 'graded',
+                'instructor_feedback' => 'Exceptional code structure, excellent comments and error handling!',
+                'graded_at' => now()->subDay(),
             ]
         );
     }
