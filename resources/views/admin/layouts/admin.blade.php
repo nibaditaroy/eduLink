@@ -149,10 +149,6 @@
                             </div>
 
                             <div class="border-t border-gray-100 pt-1">
-                                <a href="{{ route('admin.quick-login') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 transition">
-                                    <i class="fa-solid fa-users-gear text-slate-400 w-4 text-center"></i>
-                                    <span>Switch Demo Account</span>
-                                </a>
                                 @if(Auth::check())
                                 <form action="{{ route('admin.logout') }}" method="POST">
                                     @csrf

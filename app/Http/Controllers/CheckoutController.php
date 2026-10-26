@@ -92,21 +92,10 @@ class CheckoutController extends Controller
         $request->validate([
             'payment_method' => 'required|string|in:bkash,nagad,rocket,card',
             'wallet_number' => 'nullable|string|max:20',
-            'coupon_code' => 'nullable|string',
         ]);
 
         $paymentMethod = $request->payment_method;
-        $amount = (float) $course->price;
-
-        // Simple coupon logic: "EDULINK10" or "STUDENT20"
-        $coupon = strtoupper(trim($request->coupon_code ?? ''));
-        $discount = 0;
-        if ($coupon === 'EDULINK10') {
-            $discount = $amount * 0.10;
-        } elseif ($coupon === 'STUDENT20') {
-            $discount = $amount * 0.20;
-        }
-        $finalAmount = max(0, $amount - $discount);
+        $finalAmount = (float) $course->price;
 
         // Generate distinctive transaction ID
         $trxId = 'TRX-' . strtoupper($paymentMethod) . '-' . strtoupper(Str::random(8));

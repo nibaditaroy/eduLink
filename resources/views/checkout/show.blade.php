@@ -119,17 +119,6 @@
                         </div>
                     </div>
 
-                    <!-- Coupon Voucher Input -->
-                    <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm mb-6 flex items-center justify-between gap-3">
-                        <div class="flex-grow">
-                            <label for="coupon_code" class="block text-[11px] font-bold text-slate-600 mb-1">Have a Promotional Voucher?</label>
-                            <input type="text" id="coupon_code" name="coupon_code" placeholder="e.g. EDULINK10 (10% off)"
-                                class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 uppercase tracking-wider outline-none">
-                        </div>
-                        <span class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2.5 py-1.5 rounded-xl whitespace-nowrap mt-4">
-                            Try: EDULINK10
-                        </span>
-                    </div>
 
                     <!-- Submit Button -->
                     <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-xl shadow-indigo-600/30 transition flex items-center justify-center gap-2">
