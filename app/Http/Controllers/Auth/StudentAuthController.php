@@ -131,11 +131,11 @@ class StudentAuthController extends Controller
         $request->session()->regenerate();
 
         if ($user->isAdmin()) {
-            return redirect()->route('admin.dashboard')
+            return redirect()->intended(route('admin.dashboard'))
                 ->with('success', "Logged in as {$user->name} ({$user->role}) via Quick Access.");
         }
 
-        return redirect()->route('student.dashboard')
+        return redirect()->intended(route('student.dashboard'))
             ->with('success', "Logged in as {$user->name} ({$user->role}) via Quick Access.");
     }
 

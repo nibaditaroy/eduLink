@@ -14,6 +14,16 @@
             <p class="text-xs text-slate-500 mt-1">Start learning software engineering and interactive coding today</p>
         </div>
 
+        @if(session()->has('url.intended') && Str::contains(session('url.intended'), '/learn/'))
+            <div class="mb-5 p-3.5 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs flex items-center gap-2.5">
+                <i class="fa-solid fa-circle-play text-indigo-600 text-base flex-shrink-0"></i>
+                <div>
+                    <span class="font-bold">Create an account to watch your Free Preview lecture!</span>
+                    <span class="block text-[11px] text-indigo-700">You will be redirected straight to the classroom right after registering.</span>
+                </div>
+            </div>
+        @endif
+
         <!-- Registration Form -->
         <form action="{{ route('register.post') }}" method="POST" class="space-y-4">
             @csrf

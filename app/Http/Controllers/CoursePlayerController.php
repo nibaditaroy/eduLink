@@ -36,16 +36,6 @@ class CoursePlayerController extends Controller
         $userId = Auth::id();
         $user = Auth::user();
 
-        // Check enrollment (Admins can preview any course)
-        $enrollment = Enrollment::where('user_id', $userId)
-            ->where('course_id', $course->id)
-            ->first();
-
-        if (!$enrollment && !$user->isAdmin()) {
-            return redirect()->route('courses.show', $course->slug)
-                ->with('warning', 'Please enroll in this course to access the classroom curriculum.');
-        }
-
         // Get all flat lessons in order
         $allLessons = collect();
         foreach ($course->chapters as $chapter) {
@@ -56,6 +46,25 @@ class CoursePlayerController extends Controller
 
         if ($allLessons->isEmpty()) {
             return view('learn.empty', compact('course'));
+        }
+
+        $firstLesson = $allLessons->first();
+        $isFreePreview = false;
+
+        // Check enrollment (Admins can preview any course, any logged in student can view first lesson as Free Preview)
+        $enrollment = Enrollment::where('user_id', $userId)
+            ->where('course_id', $course->id)
+            ->first();
+
+        if (!$enrollment && !$user->isAdmin()) {
+            $targetLessonId = (int) ($lessonId ?? $firstLesson->id);
+            if ($firstLesson && $targetLessonId === $firstLesson->id) {
+                $isFreePreview = true;
+                $lessonId = $firstLesson->id;
+            } else {
+                return redirect()->route('courses.show', $course->slug)
+                    ->with('warning', 'Please enroll in this course to access subsequent lessons.');
+            }
         }
 
         // Determine current lesson
@@ -108,7 +117,8 @@ class CoursePlayerController extends Controller
             'previousLesson',
             'nextLesson',
             'enrollment',
-            'progressPercent'
+            'progressPercent',
+            'isFreePreview'
         ));
     }
 

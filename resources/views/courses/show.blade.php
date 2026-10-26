@@ -104,28 +104,32 @@
                             <div class="divide-y divide-slate-100 bg-white">
                                 <!-- Lessons -->
                                 @foreach($chapter->lessons as $lIndex => $lesson)
-                                    <div class="p-3.5 px-4 flex items-center justify-between text-xs hover:bg-slate-50 transition">
+                                    @php
+                                        $canAccess = $isEnrolled || ($index === 0 && $lIndex === 0);
+                                    @endphp
+                                    <div class="p-3.5 px-4 flex items-center justify-between text-xs transition {{ $canAccess ? 'hover:bg-indigo-50/50 cursor-pointer group' : 'hover:bg-slate-50' }}"
+                                         @if($canAccess) onclick="window.location='{{ route('learn.lesson', [$course->slug, $lesson->id]) }}'" @endif>
                                         <div class="flex items-center gap-3">
-                                            <span class="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-[10px] font-bold">
+                                            <span class="w-6 h-6 rounded-lg {{ $canAccess ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-500' }} flex items-center justify-center text-[10px] font-bold">
                                                 {{ $lIndex + 1 }}
                                             </span>
                                             <div>
-                                                <span class="font-medium text-slate-800">{{ $lesson->title }}</span>
+                                                <span class="font-medium text-slate-800 {{ $canAccess ? 'group-hover:text-indigo-600' : '' }}">{{ $lesson->title }}</span>
                                                 @if($lesson->code_snippet)
                                                     <span class="ml-2 px-1.5 py-0.5 rounded text-[9px] bg-slate-100 text-slate-600 font-mono">Code Lab</span>
                                                 @endif
                                             </div>
                                         </div>
 
-                                        <div class="flex items-center gap-2">
+                                        <div class="flex items-center gap-2" onclick="event.stopPropagation()">
                                             @if($isEnrolled)
                                                 <a href="{{ route('learn.lesson', [$course->slug, $lesson->id]) }}" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold transition text-[11px]">
                                                     Open Lesson
                                                 </a>
                                             @elseif($index === 0 && $lIndex === 0)
-                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                                                    Free Preview
-                                                </span>
+                                                <a href="{{ route('learn.lesson', [$course->slug, $lesson->id]) }}" class="px-3 py-1.5 rounded-full text-[11px] font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition flex items-center gap-1.5 shadow-xs">
+                                                    <i class="fa-solid fa-circle-play text-[10px] text-emerald-600"></i> Free Preview
+                                                </a>
                                             @else
                                                 <i class="fa-solid fa-lock text-slate-300 text-xs"></i>
                                             @endif
@@ -226,6 +230,14 @@
                         <a href="{{ route('checkout.show', $course->slug) }}" class="w-full py-3.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold text-center block shadow-lg shadow-indigo-600/25 transition">
                             <i class="fa-solid fa-credit-card mr-1.5"></i> Enroll Now &bull; ৳{{ number_format($course->price, 0) }} Tk
                         </a>
+                        @php
+                            $firstLesson = $course->chapters->flatMap->lessons->first();
+                        @endphp
+                        @if($firstLesson)
+                            <a href="{{ route('learn.lesson', [$course->slug, $firstLesson->id]) }}" class="mt-2 w-full py-3 px-4 rounded-2xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-bold text-center flex items-center justify-center gap-2 transition shadow-xs">
+                                <i class="fa-solid fa-circle-play text-emerald-600"></i> Free Preview Lecture
+                            </a>
+                        @endif
                     @endif
                 </div>
 

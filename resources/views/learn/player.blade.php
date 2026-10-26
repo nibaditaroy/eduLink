@@ -5,10 +5,17 @@
 @section('content')
 <div class="bg-slate-900 text-white border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between text-xs">
-        <a href="{{ route('student.dashboard') }}" class="text-slate-400 hover:text-white flex items-center gap-2 transition font-medium">
-            <i class="fa-solid fa-arrow-left"></i>
-            <span>Back to Dashboard</span>
-        </a>
+        @if($isFreePreview ?? false)
+            <a href="{{ route('courses.show', $course->slug) }}" class="text-slate-400 hover:text-white flex items-center gap-2 transition font-medium">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Course Overview</span>
+            </a>
+        @else
+            <a href="{{ route('student.dashboard') }}" class="text-slate-400 hover:text-white flex items-center gap-2 transition font-medium">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
+        @endif
         <div class="flex items-center gap-3">
             <span class="text-slate-400 hidden sm:inline">{{ $course->title }}</span>
             <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
@@ -23,6 +30,31 @@
 </div>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    @if($isFreePreview ?? false)
+        <!-- Free Preview Alert Banner -->
+        <div class="mb-6 p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl border border-indigo-500/30">
+            <div class="flex items-center gap-3.5">
+                <span class="w-11 h-11 rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center justify-center text-lg flex-shrink-0">
+                    <i class="fa-solid fa-gift"></i>
+                </span>
+                <div>
+                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mb-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Free Preview Mode
+                    </div>
+                    <div class="text-xs sm:text-sm font-bold text-white">You are previewing this lecture for free!</div>
+                    <div class="text-[11px] text-slate-300">Enroll now to unlock the full curriculum, interactive quizzes, graded lab projects, and certificates.</div>
+                </div>
+            </div>
+            <div class="flex-shrink-0 w-full sm:w-auto">
+                <a href="{{ route('checkout.show', $course->slug) }}" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+                    <span>Enroll Now &bull; ৳{{ number_format($course->price, 0) }} Tk</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </a>
+            </div>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
 
         <!-- Left Column: Curriculum Syllabus Sidebar -->
@@ -49,45 +81,79 @@
                                 @php
                                     $isDone = in_array($lesson->id, $completedLessonIds);
                                     $isActive = $lesson->id === $currentLesson->id;
+                                    $isLocked = ($isFreePreview ?? false) && !$isActive;
                                 @endphp
-                                <a href="{{ route('learn.lesson', [$course->slug, $lesson->id]) }}" 
-                                   class="flex items-center justify-between p-2 rounded-xl text-xs transition {{ $isActive ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-700 hover:bg-slate-100/80' }}">
-                                    <div class="flex items-center gap-2 truncate">
-                                        @if($isDone)
-                                            <i class="fa-solid fa-circle-check {{ $isActive ? 'text-white' : 'text-emerald-500' }} text-xs flex-shrink-0"></i>
-                                        @else
-                                            <i class="fa-regular fa-circle {{ $isActive ? 'text-white/60' : 'text-slate-300' }} text-xs flex-shrink-0"></i>
+                                @if($isLocked)
+                                    <a href="{{ route('checkout.show', $course->slug) }}" title="Enroll to unlock" 
+                                       class="flex items-center justify-between p-2 rounded-xl text-xs text-slate-400 hover:bg-slate-100/70 transition group">
+                                        <div class="flex items-center gap-2 truncate">
+                                            <i class="fa-solid fa-lock text-slate-300 text-xs flex-shrink-0 group-hover:text-indigo-500 transition"></i>
+                                            <span class="truncate">{{ $lesson->title }}</span>
+                                        </div>
+                                        <span class="text-[9px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">Unlock</span>
+                                    </a>
+                                @else
+                                    <a href="{{ route('learn.lesson', [$course->slug, $lesson->id]) }}" 
+                                       class="flex items-center justify-between p-2 rounded-xl text-xs transition {{ $isActive ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-700 hover:bg-slate-100/80' }}">
+                                        <div class="flex items-center gap-2 truncate">
+                                            @if($isDone)
+                                                <i class="fa-solid fa-circle-check {{ $isActive ? 'text-white' : 'text-emerald-500' }} text-xs flex-shrink-0"></i>
+                                            @else
+                                                <i class="fa-regular fa-circle {{ $isActive ? 'text-white/60' : 'text-slate-300' }} text-xs flex-shrink-0"></i>
+                                            @endif
+                                            <span class="truncate">{{ $lesson->title }}</span>
+                                        </div>
+                                        @if($lesson->code_snippet)
+                                            <span class="text-[9px] px-1 py-0.2 rounded font-mono {{ $isActive ? 'bg-indigo-700 text-indigo-100' : 'bg-slate-200 text-slate-600' }}">Code</span>
                                         @endif
-                                        <span class="truncate">{{ $lesson->title }}</span>
-                                    </div>
-                                    @if($lesson->code_snippet)
-                                        <span class="text-[9px] px-1 py-0.2 rounded font-mono {{ $isActive ? 'bg-indigo-700 text-indigo-100' : 'bg-slate-200 text-slate-600' }}">Code</span>
-                                    @endif
-                                </a>
+                                    </a>
+                                @endif
                             @endforeach
 
                             <!-- Quizzes -->
                             @foreach($chapter->quizzes as $quiz)
-                                <a href="{{ route('learn.quiz', [$course->slug, $quiz->id]) }}" 
-                                   class="flex items-center justify-between p-2 rounded-xl text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 font-semibold transition">
-                                    <div class="flex items-center gap-2 truncate">
-                                        <i class="fa-solid fa-circle-question text-amber-600 text-xs"></i>
-                                        <span class="truncate">Quiz: {{ $quiz->title }}</span>
-                                    </div>
-                                    <span class="text-[9px] font-bold bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded">MCQ</span>
-                                </a>
+                                @if($isFreePreview ?? false)
+                                    <a href="{{ route('checkout.show', $course->slug) }}" title="Enroll to take quiz" 
+                                       class="flex items-center justify-between p-2 rounded-xl text-xs text-slate-400 hover:bg-slate-100/60 transition group">
+                                        <div class="flex items-center gap-2 truncate">
+                                            <i class="fa-solid fa-lock text-slate-300 text-xs"></i>
+                                            <span class="truncate">Quiz: {{ $quiz->title }}</span>
+                                        </div>
+                                        <span class="text-[9px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">MCQ</span>
+                                    </a>
+                                @else
+                                    <a href="{{ route('learn.quiz', [$course->slug, $quiz->id]) }}" 
+                                       class="flex items-center justify-between p-2 rounded-xl text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 font-semibold transition">
+                                        <div class="flex items-center gap-2 truncate">
+                                            <i class="fa-solid fa-circle-question text-amber-600 text-xs"></i>
+                                            <span class="truncate">Quiz: {{ $quiz->title }}</span>
+                                        </div>
+                                        <span class="text-[9px] font-bold bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded">MCQ</span>
+                                    </a>
+                                @endif
                             @endforeach
 
                             <!-- Assignments -->
                             @foreach($chapter->assignments as $assignment)
-                                <a href="{{ route('learn.assignment', [$course->slug, $assignment->id]) }}" 
-                                   class="flex items-center justify-between p-2 rounded-xl text-xs bg-cyan-50 hover:bg-cyan-100 text-cyan-900 font-semibold transition">
-                                    <div class="flex items-center gap-2 truncate">
-                                        <i class="fa-solid fa-file-code text-cyan-600 text-xs"></i>
-                                        <span class="truncate">Lab: {{ $assignment->title }}</span>
-                                    </div>
-                                    <span class="text-[9px] font-bold bg-cyan-200 text-cyan-900 px-1.5 py-0.5 rounded">Lab</span>
-                                </a>
+                                @if($isFreePreview ?? false)
+                                    <a href="{{ route('checkout.show', $course->slug) }}" title="Enroll to submit lab" 
+                                       class="flex items-center justify-between p-2 rounded-xl text-xs text-slate-400 hover:bg-slate-100/60 transition group">
+                                        <div class="flex items-center gap-2 truncate">
+                                            <i class="fa-solid fa-lock text-slate-300 text-xs"></i>
+                                            <span class="truncate">Lab: {{ $assignment->title }}</span>
+                                        </div>
+                                        <span class="text-[9px] font-bold text-cyan-600 bg-cyan-50 px-1.5 py-0.5 rounded">Lab</span>
+                                    </a>
+                                @else
+                                    <a href="{{ route('learn.assignment', [$course->slug, $assignment->id]) }}" 
+                                       class="flex items-center justify-between p-2 rounded-xl text-xs bg-cyan-50 hover:bg-cyan-100 text-cyan-900 font-semibold transition">
+                                        <div class="flex items-center gap-2 truncate">
+                                            <i class="fa-solid fa-file-code text-cyan-600 text-xs"></i>
+                                            <span class="truncate">Lab: {{ $assignment->title }}</span>
+                                        </div>
+                                        <span class="text-[9px] font-bold bg-cyan-200 text-cyan-900 px-1.5 py-0.5 rounded">Lab</span>
+                                    </a>
+                                @endif
                             @endforeach
                         </div>
                     </div>
@@ -105,22 +171,29 @@
                     <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-0.5">{{ $currentLesson->title }}</h1>
                 </div>
 
-                <!-- Mark Complete Action -->
+                <!-- Mark Complete Action / Free Preview Prompt -->
                 <div>
-                    <form action="{{ route('learn.lesson.toggle', [$course->slug, $currentLesson->id]) }}" method="POST">
-                        @csrf
-                        @if($isCurrentCompleted)
-                            <button type="submit" class="px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-bold transition flex items-center gap-2">
-                                <i class="fa-solid fa-circle-check text-emerald-600"></i>
-                                <span>Completed (Click to Unmark)</span>
-                            </button>
-                        @else
-                            <button type="submit" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition flex items-center gap-2">
-                                <i class="fa-regular fa-circle-check"></i>
-                                <span>Mark as Complete</span>
-                            </button>
-                        @endif
-                    </form>
+                    @if($isFreePreview ?? false)
+                        <a href="{{ route('checkout.show', $course->slug) }}" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition flex items-center gap-2">
+                            <i class="fa-solid fa-lock text-xs"></i>
+                            <span>Enroll to Track Completion</span>
+                        </a>
+                    @else
+                        <form action="{{ route('learn.lesson.toggle', [$course->slug, $currentLesson->id]) }}" method="POST">
+                            @csrf
+                            @if($isCurrentCompleted)
+                                <button type="submit" class="px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-bold transition flex items-center gap-2">
+                                    <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                                    <span>Completed (Click to Unmark)</span>
+                                </button>
+                            @else
+                                <button type="submit" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition flex items-center gap-2">
+                                    <i class="fa-regular fa-circle-check"></i>
+                                    <span>Mark as Complete</span>
+                                </button>
+                            @endif
+                        </form>
+                    @endif
                 </div>
             </div>
 
@@ -202,7 +275,13 @@
                 </div>
 
                 <div>
-                    @if($nextLesson)
+                    @if($isFreePreview ?? false)
+                        <a href="{{ route('checkout.show', $course->slug) }}" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white text-xs font-bold shadow-md shadow-indigo-600/30 transition flex items-center gap-2">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span>Enroll in Full Course to Continue (৳{{ number_format($course->price, 0) }} Tk)</span>
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </a>
+                    @elseif($nextLesson)
                         <form action="{{ route('learn.lesson.toggle', [$course->slug, $currentLesson->id]) }}" method="POST" class="inline">
                             @csrf
                             <input type="hidden" name="completed" value="1">
