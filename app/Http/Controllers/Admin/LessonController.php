@@ -14,7 +14,7 @@ class LessonController extends Controller
     {
         $chapterId = $request->query('chapter_id');
         $chapter = Chapter::with('course')->findOrFail($chapterId);
-        $nextOrder = Lesson::where('chapter_id', $chapterId)->max('sort_order') + 1;
+        $nextOrder = $chapter->nextItemSortOrder();
 
         return view('admin.lessons.create', compact('chapter', 'nextOrder'));
     }

@@ -39,7 +39,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('lessons', LessonController::class)->except(['index']);
 
         // Quiz Management (Under Chapter/Lesson)
-        Route::resource('quizzes', QuizController::class)->except(['index', 'edit', 'update']);
+        Route::resource('quizzes', QuizController::class)->except(['index']);
         Route::post('/quizzes/{id}/questions', [QuizController::class, 'storeQuestion'])->name('quizzes.questions.store');
         Route::delete('/quiz-questions/{id}', [QuizController::class, 'destroyQuestion'])->name('quizzes.questions.destroy');
 

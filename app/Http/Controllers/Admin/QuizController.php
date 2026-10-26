@@ -18,8 +18,9 @@ class QuizController extends Controller
 
         $chapter = Chapter::with('course')->findOrFail($chapterId);
         $lesson = $lessonId ? Lesson::find($lessonId) : null;
+        $nextOrder = $chapter->nextItemSortOrder();
 
-        return view('admin.quizzes.create', compact('chapter', 'lesson'));
+        return view('admin.quizzes.create', compact('chapter', 'lesson', 'nextOrder'));
     }
 
     public function store(Request $request)
@@ -28,6 +29,7 @@ class QuizController extends Controller
             'chapter_id' => 'required|exists:chapters,id',
             'lesson_id' => 'nullable|exists:lessons,id',
             'title' => 'required|string|max:255',
+            'sort_order' => 'required|integer|min:1',
             'description' => 'nullable|string',
             'time_limit_mins' => 'required|integer|min:1',
             'passing_score' => 'required|integer|min:1|max:100',
@@ -43,6 +45,31 @@ class QuizController extends Controller
     {
         $quiz = Quiz::with(['chapter.course', 'lesson', 'questions'])->findOrFail($id);
         return view('admin.quizzes.show', compact('quiz'));
+    }
+
+    public function edit($id)
+    {
+        $quiz = Quiz::with('chapter.course')->findOrFail($id);
+        return view('admin.quizzes.edit', compact('quiz'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $quiz = Quiz::findOrFail($id);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'sort_order' => 'required|integer|min:1',
+            'description' => 'nullable|string',
+            'time_limit_mins' => 'required|integer|min:1',
+            'passing_score' => 'required|integer|min:1|max:100',
+        ]);
+
+        $quiz->update($validated);
+        $courseId = $quiz->chapter->course_id;
+
+        return redirect()->route('admin.courses.show', $courseId)
+            ->with('success', "Quiz '{$quiz->title}' updated successfully.");
     }
 
     public function storeQuestion(Request $request, $id)

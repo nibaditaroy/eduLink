@@ -27,10 +27,17 @@
             <input type="hidden" name="lesson_id" value="{{ $lesson->id }}">
             @endif
 
-            <!-- Assignment Title -->
-            <div>
-                <label for="title" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Assignment Title *</label>
-                <input type="text" id="title" name="title" value="{{ old('title') }}" required placeholder="e.g. Lab Task: Build a Student Grade Calculator in PHP" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3">
+            <!-- Assignment Title & Sequence Position -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="md:col-span-3">
+                    <label for="title" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Assignment Title *</label>
+                    <input type="text" id="title" name="title" value="{{ old('title') }}" required placeholder="e.g. Lab Task: Build a Student Grade Calculator in PHP" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 font-semibold">
+                </div>
+
+                <div>
+                    <label for="sort_order" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Position # *</label>
+                    <input type="number" id="sort_order" name="sort_order" value="{{ old('sort_order', $nextOrder) }}" required min="1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 font-bold text-center" title="Chronological order in chapter curriculum">
+                </div>
             </div>
 
             <!-- Max Marks & Deadline -->

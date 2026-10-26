@@ -122,10 +122,18 @@
                             </span>
                         </div>
                         <div class="flex items-center gap-2">
-                            @if(!$isSandboxDisabled)
+                            @php
+                                $isTestable = in_array(strtolower($lang), ['php', 'javascript', 'python', 'html', 'sql']);
+                                $isRunnable = !isset($block['runnable']) || filter_var($block['runnable'], FILTER_VALIDATE_BOOLEAN);
+                            @endphp
+                            @if(!$isSandboxDisabled && $isTestable && $isRunnable)
                             <button type="button" onclick="loadIntoSandbox(@js($block['code']), @js($lang))" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-950/60 border border-emerald-800/60 px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition">
                                 <i class="fa-solid fa-play text-[10px]"></i> Test in Sandbox
                             </button>
+                            @elseif(!$isRunnable)
+                            <span class="text-[10px] font-mono font-medium text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 flex items-center gap-1" title="Code snippet / syntax reference (not runnable standalone)">
+                                <i class="fa-solid fa-code text-[9px] text-slate-500"></i> Code Fragment
+                            </span>
                             @endif
                             <button onclick="navigator.clipboard.writeText(document.getElementById('{{ $codeId }}').innerText); alert('Code snippet copied to clipboard!');" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition px-2 py-1">
                                 <i class="fa-solid fa-copy"></i> Copy
@@ -233,14 +241,14 @@
                         @endif
 
                         @if($hasHint)
-                        <button type="button" onclick="document.getElementById('{{ $hintId }}').classList.toggle('hidden')" class="inline-flex items-center px-3.5 py-2 text-xs font-semibold text-amber-300 bg-amber-950/60 hover:bg-amber-900/60 border border-amber-800/60 rounded-xl transition">
-                            <i class="fa-solid fa-lightbulb me-1.5 text-amber-400"></i> View Hint
+                        <button type="button" onclick="toggleChallengeHint('{{ $hintId }}', this)" class="inline-flex items-center px-3.5 py-2 text-xs font-semibold text-amber-300 bg-amber-950/60 hover:bg-amber-900/60 border border-amber-800/60 rounded-xl transition">
+                            <i class="fa-solid fa-lightbulb me-1.5 text-amber-400"></i> <span class="hint-btn-text">View Hint</span>
                         </button>
                         @endif
 
-                        @if($hasSolution)
-                        <button type="button" onclick="document.getElementById('{{ $solutionId }}').classList.toggle('hidden')" class="inline-flex items-center px-3.5 py-2 text-xs font-semibold text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-800/60 rounded-xl transition">
-                            <i class="fa-solid fa-key me-1.5 text-emerald-400"></i> View Answer / Solution
+                        @if($hasSolution || $hasExpectedOutput)
+                        <button type="button" onclick="toggleChallengeAnswer('{{ $solutionId }}', this)" class="inline-flex items-center px-3.5 py-2 text-xs font-semibold text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-800/60 rounded-xl transition shadow-sm active:scale-95">
+                            <i class="fa-solid fa-eye me-1.5 text-emerald-400"></i> <span class="answer-btn-text">See Answer</span>
                         </button>
                         @endif
                     </div>
@@ -255,27 +263,46 @@
                     </div>
                     @endif
 
-                    <!-- Collapsible Model Answer / Solution -->
-                    @if($hasSolution)
+                    <!-- Collapsible Model Answer & Solution -->
+                    @if($hasSolution || $hasExpectedOutput)
                     <div id="{{ $solutionId }}" class="hidden rounded-2xl bg-slate-950 border border-emerald-800/60 overflow-hidden text-xs transition">
                         <div class="px-4 py-2.5 bg-emerald-950/80 border-b border-emerald-800/60 flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="font-bold text-emerald-300 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-circle-check text-emerald-400"></i> Official Instructor Solution & Model Answer:
+                                    <i class="fa-solid fa-circle-check text-emerald-400"></i> Official Answer & Solution:
                                 </span>
                             </div>
                             <div class="flex items-center gap-2">
+                                @if($hasSolution)
                                 @if(!$isSandboxDisabled)
-                                <button type="button" onclick="loadChallengeIntoSandbox(@js($block['solution_code']), @js($challengeLang), @js($block['expected_output'] ?? ''))" class="text-[11px] font-bold text-emerald-400 hover:text-emerald-200 underline">
-                                    Load Solution into Sandbox
+                                <button type="button" onclick="loadIntoSandbox(@js($block['solution_code']), @js($challengeLang))" class="text-[11px] text-emerald-300 hover:text-emerald-200 bg-emerald-900/50 hover:bg-emerald-900 px-2.5 py-0.5 rounded-lg transition flex items-center gap-1 font-semibold" title="Load solution code into sandbox editor">
+                                    <i class="fa-solid fa-code"></i> Load into Lab
                                 </button>
                                 @endif
                                 <button type="button" onclick="navigator.clipboard.writeText(@js($block['solution_code'])); alert('Solution copied to clipboard!');" class="text-[11px] text-slate-400 hover:text-white px-2 py-0.5">
-                                    Copy
+                                    <i class="fa-solid fa-copy me-1"></i> Copy Code
+                                </button>
+                                @endif
+                                <button type="button" onclick="toggleChallengeAnswer('{{ $solutionId }}')" class="text-slate-400 hover:text-white text-xs px-1" title="Close">
+                                    ✕
                                 </button>
                             </div>
                         </div>
-                        <pre class="p-4 overflow-x-auto text-xs font-mono text-emerald-300 bg-slate-950"><code>{{ $block['solution_code'] }}</code></pre>
+                        <div class="p-4 space-y-3">
+                            @if($hasSolution)
+                            <div>
+                                <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-1">Solution Code:</span>
+                                <pre class="p-3.5 overflow-x-auto text-xs font-mono text-emerald-300 bg-black/80 rounded-xl border border-slate-800"><code>{{ $block['solution_code'] }}</code></pre>
+                            </div>
+                            @endif
+
+                            @if($hasExpectedOutput)
+                            <div>
+                                <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-1">Expected Output Result:</span>
+                                <pre class="p-3 rounded-xl bg-black/80 text-xs font-mono text-amber-300 border border-slate-800 whitespace-pre-wrap">{{ $block['expected_output'] }}</pre>
+                            </div>
+                            @endif
+                        </div>
                     </div>
                     @endif
                 </div>
@@ -514,32 +541,69 @@
 </div>
 @endsection
 
+@php
+$codeTemplates = [
+    'php' => implode("\n", [
+        '<' . '?php',
+        '// Practice: Loops & Accumulate in PHP',
+        '$numbers = [10, 25, 45, 80, 100];',
+        '$sum = 0;',
+        '',
+        'echo "=== Processing Numbers ===\n";',
+        'foreach ($numbers as $num) {',
+        '    $sum += $num;',
+        '    echo "Added: $num | Running Total: $sum\n";',
+        '}',
+        '',
+        'echo "Final Total: " . $sum . "\n";',
+    ]),
+    'python' => implode("\n", [
+        '# Practice in Python 3',
+        'def calculate_grades(scores):',
+        '    return {name: ("Grade A" if score >= 80 else "Grade Pass") for name, score in scores.items()}',
+        '',
+        'students = {"Alice": 88, "Bob": 62, "Charlie": 95}',
+        'print("Evaluated Grades:", calculate_grades(students))',
+    ]),
+    'javascript' => implode("\n", [
+        '// Practice in JavaScript (Node.js)',
+        'const students = [',
+        '    { name: "Alice", score: 88 },',
+        '    { name: "Bob", score: 62 },',
+        '    { name: "Charlie", score: 95 }',
+        '];',
+        '',
+        'students.forEach(s => {',
+        '    const status = s.score >= 80 ? "Grade A" : "Grade Pass";',
+        '    console.log(s.name + ": " + s.score + "pts (" + status + ")");',
+        '});',
+    ]),
+    'html' => implode("\n", [
+        '<!DOCTYPE html>',
+        '<html>',
+        '<head>',
+        '    <style>',
+        '        body { font-family: sans-serif; padding: 20px; background: #f8fafc; }',
+        '        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }',
+        '        h2 { color: #4f46e5; margin-top: 0; }',
+        '        .badge { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-weight: bold; }',
+        '    </style>',
+        '</head>',
+        '<body>',
+        '    <div class="card">',
+        '        <h2>EDULINK Live Interactive Preview</h2>',
+        '        <p>This markup renders in real-time inside the lesson sandbox.</p>',
+        '        <span class="badge">Status: Live Preview</span>',
+        '    </div>',
+        '</body>',
+        '</html>',
+    ]),
+];
+@endphp
+
 @push('scripts')
 <script>
-    const codeTemplates = {
-        // Concatenated to prevent the Blade/PHP parser from treating it as an opening PHP tag
-        php: "<" + "?php\n// Practice: Loops & Accumulate in PHP\n$numbers = [10, 25, 45, 80, 100];\n$sum = 0;\n\necho \"=== Processing Numbers ===\\n\";\nforeach ($numbers as $num) {\n    $sum += $num;\n    echo \"Added: $num | Running Total: $sum\\n\";\n}\n\necho \"Final Total: \" . $sum . \"\\n\";",
-        python: "# Practice in Python 3\ndef calculate_grades(scores):\n    return {name: (\"Grade A\" if score >= 80 else \"Grade Pass\") for name, score in scores.items()}\n\nstudents = {\"Alice\": 88, \"Bob\": 62, \"Charlie\": 95}\nprint(\"Evaluated Grades:\", calculate_grades(students))",
-        javascript: "// Practice in JavaScript (Node.js)\nconst students = [\n    { name: \"Alice\", score: 88 },\n    { name: \"Bob\", score: 62 },\n    { name: \"Charlie\", score: 95 }\n];\n\nstudents.forEach(s => {\n    const status = s.score >= 80 ? \"Grade A\" : \"Grade Pass\";\n    console.log(s.name + \": \" + s.score + \"pts (\" + status + \")\");\n});",
-        html: `<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body { font-family: sans-serif; padding: 20px; background: #f8fafc; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        h2 { color: #4f46e5; margin-top: 0; }
-        .badge { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h2>EDULINK Live Interactive Preview</h2>
-        <p>This markup renders in real-time inside the lesson sandbox.</p>
-        <span class="badge">Status: Live Preview</span>
-    </div>
-</body>
-</html>`
-    };
+    const codeTemplates = {{ \Illuminate\Support\Js::from($codeTemplates) }};
     const isLocked = {{ \Illuminate\Support\Js::from($isLanguageLocked) }};
     const lockedLang = {{ \Illuminate\Support\Js::from($lockedLang) }};
     const customStarter = {{ \Illuminate\Support\Js::from($lesson->code_snippet ?? '') }};
@@ -558,10 +622,6 @@
         }
 
         clearTerminalOutput();
-
-        if (lang === 'html') {
-            runSandboxCode();
-        }
     }
 
     function resetSandboxCode() {
@@ -579,10 +639,6 @@
         }
 
         clearTerminalOutput();
-
-        if (lang === 'html') {
-            runSandboxCode();
-        }
     }
 
     function setTerminalViewMode(hasOutput, isHtml = false) {
@@ -642,6 +698,35 @@
         document.getElementById('sandbox-execution-badge')?.classList.add('hidden');
     }
 
+    function toggleChallengeAnswer(id, btn) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const isHidden = el.classList.contains('hidden');
+        el.classList.toggle('hidden');
+        if (btn) {
+            const icon = btn.querySelector('i');
+            const text = btn.querySelector('.answer-btn-text') || btn.querySelector('span');
+            if (isHidden) {
+                if (icon) icon.className = 'fa-solid fa-eye-slash me-1.5 text-emerald-400';
+                if (text) text.textContent = 'Hide Answer';
+            } else {
+                if (icon) icon.className = 'fa-solid fa-eye me-1.5 text-emerald-400';
+                if (text) text.textContent = 'See Answer';
+            }
+        }
+    }
+
+    function toggleChallengeHint(id, btn) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const isHidden = el.classList.contains('hidden');
+        el.classList.toggle('hidden');
+        if (btn) {
+            const text = btn.querySelector('.hint-btn-text') || btn.querySelector('span');
+            if (text) text.textContent = isHidden ? 'Hide Hint' : 'View Hint';
+        }
+    }
+
     function loadChallengeIntoSandbox(code, language, expectedOutput) {
         activeChallengeExpectedOutput = (expectedOutput && expectedOutput.trim()) ? expectedOutput.trim() : null;
         loadIntoSandbox(code, language, true);
@@ -682,7 +767,9 @@
             }, 1200);
         }
 
-        runSandboxCode();
+        if (editor) {
+            editor.focus();
+        }
     }
 
     async function runSandboxCode() {
@@ -891,11 +978,7 @@
             }
         }
 
-        if (targetLang === 'html') {
-            runSandboxCode();
-        } else {
-            setTerminalViewMode(false);
-        }
+        setTerminalViewMode(false);
     });
 </script>
 @endpush

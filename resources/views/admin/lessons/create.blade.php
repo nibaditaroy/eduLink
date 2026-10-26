@@ -237,7 +237,11 @@
                     </div>
                 `;
             } else if (block.type === 'code') {
-                headerBadge = `<span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-slate-900 text-emerald-400 border border-slate-700"><i class="fa-solid fa-code me-1"></i> Code Snippet (${(block.language || 'php').toUpperCase()})</span>`;
+                const currentLang = (block.language || 'php').toLowerCase();
+                const isTestable = ['php', 'javascript', 'python', 'html', 'sql'].includes(currentLang);
+                const hasCode = !!(block.code && block.code.trim());
+
+                headerBadge = `<span id="block-badge-${index}" class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-slate-900 text-emerald-400 border border-slate-700"><i class="fa-solid fa-code me-1"></i> Code Snippet (${currentLang.toUpperCase()})</span>`;
                 contentHtml = `
                     <div class="space-y-2">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -247,22 +251,60 @@
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Language</label>
-                                <select onchange="updateBlock(${index}, 'language', this.value)" class="bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full font-semibold">
+                                <select onchange="updateBlock(${index}, 'language', this.value); onSnippetLanguageChange(${index}, this.value);" class="bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full font-semibold">
                                     ${['php', 'javascript', 'python', 'html', 'sql', 'css', 'cpp', 'java'].map(lang => 
-                                        `<option value="${lang}" ${block.language === lang ? 'selected' : ''}>${lang.toUpperCase()}</option>`
+                                        `<option value="${lang}" ${currentLang === lang ? 'selected' : ''}>${lang.toUpperCase()}</option>`
                                     ).join('')}
                                 </select>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Code Snippet</label>
-                            <textarea rows="6" oninput="updateBlock(${index}, 'code', this.value)" placeholder="// Enter code snippet..." class="bg-slate-900 border border-slate-800 text-emerald-400 text-xs font-mono rounded-xl p-3 w-full">${escapeHtml(block.code || '')}</textarea>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-[11px] font-bold text-gray-600 uppercase">Code Snippet</label>
+                                <div id="test-sandbox-container-${index}" class="${isTestable ? 'flex items-center gap-2' : 'hidden'}">
+                                    <button type="button" 
+                                            id="btn-test-sandbox-${index}" 
+                                            onclick="testSnippetInSandbox(${index})" 
+                                            ${hasCode ? '' : 'disabled'}
+                                            class="text-xs font-semibold px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition shadow-sm ${hasCode ? 'text-emerald-400 hover:text-emerald-300 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700 cursor-pointer active:scale-95' : 'text-slate-500 bg-slate-900 border border-slate-800 cursor-not-allowed opacity-50'}"
+                                            title="${hasCode ? 'Test code snippet in sandbox' : 'Enter code to test in sandbox'}">
+                                        <i class="fa-solid fa-play text-[10px]"></i> Test in Sandbox
+                                    </button>
+                                </div>
+                            </div>
+                            <textarea id="code-snippet-textarea-${index}" rows="6" oninput="updateBlock(${index}, 'code', this.value); syncTestButtonState(${index});" placeholder="// Enter code snippet..." class="bg-slate-900 border border-slate-800 text-emerald-400 text-xs font-mono rounded-xl p-3 w-full focus:ring-1 focus:ring-emerald-500">${escapeHtml(block.code || '')}</textarea>
+                            
+                            <!-- Inline Sandbox Test Execution Result -->
+                            <div id="test-sandbox-result-${index}" class="hidden mt-2 p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono"></div>
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1 flex items-center gap-1.5">
                                 <i class="fa-solid fa-terminal text-emerald-600"></i> Expected Output / Console Result (Optional)
                             </label>
-                            <textarea rows="3" oninput="updateBlock(${index}, 'output', this.value)" placeholder="e.g. Program output shown to students below the snippet (stdout)..." class="bg-slate-950 border border-slate-800 text-emerald-300 text-xs font-mono rounded-xl p-3 w-full">${escapeHtml(block.output || '')}</textarea>
+                            <textarea id="code-snippet-output-${index}" rows="3" oninput="updateBlock(${index}, 'output', this.value)" placeholder="e.g. Program output shown to students below the snippet (stdout)..." class="bg-slate-950 border border-slate-800 text-emerald-300 text-xs font-mono rounded-xl p-3 w-full">${escapeHtml(block.output || '')}</textarea>
+                        </div>
+
+                        <!-- Student Sandbox Visibility Toggle -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-gray-50 border border-gray-200 rounded-xl">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-6 h-6 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center text-xs shrink-0">
+                                    <i class="fa-solid fa-play text-[10px]"></i>
+                                </span>
+                                <div>
+                                    <span class="text-xs font-bold text-gray-800 block">Student "Test in Sandbox" Button</span>
+                                    <span class="text-[11px] text-gray-500">Show test button to students (turn off if this is a partial code fragment or syntax example)</span>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                <input type="checkbox" 
+                                       ${block.runnable !== false ? 'checked' : ''} 
+                                       onchange="updateBlock(${index}, 'runnable', this.checked); onRunnableToggle(${index}, this.checked);" 
+                                       class="sr-only peer">
+                                <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                                <span id="runnable-status-text-${index}" class="ms-2 text-xs font-bold ${block.runnable !== false ? 'text-emerald-700' : 'text-gray-500'}">
+                                    ${block.runnable !== false ? 'Active for Students' : 'Hidden from Students (Partial Code)'}
+                                </span>
+                            </label>
                         </div>
                     </div>
                 `;
@@ -406,8 +448,16 @@
     }
 
     function addCodeBlock() {
-        blocks.push({ type: 'code', title: '', language: 'php', code: '', output: '' });
+        blocks.push({ type: 'code', title: '', language: 'php', code: '', output: '', runnable: true });
         renderBlocks();
+    }
+
+    function onRunnableToggle(index, checked) {
+        const text = document.getElementById(`runnable-status-text-${index}`);
+        if (text) {
+            text.textContent = checked ? 'Active for Students' : 'Hidden from Students (Partial Code)';
+            text.className = `ms-2 text-xs font-bold ${checked ? 'text-emerald-700' : 'text-gray-500'}`;
+        }
     }
 
     function toggleSandbox(enabled) {
@@ -483,10 +533,172 @@
         blocks = [
             { type: 'text', title: '1. Theoretical Foundations', content: 'In this topic, we examine the fundamental mechanisms and principles...' },
             { type: 'video', title: 'Lecture Part 1: Concept Walkthrough', url: 'https://www.youtube.com/watch?v=OK_JCtrrv-c' },
-            { type: 'code', title: 'Implementation Example', language: 'php', code: '<?php\n// Practical code implementation\n$data = ["status" => "active", "timestamp" => time()];\necho json_encode($data);\n?>' },
+            { type: 'code', title: 'Implementation Example', language: 'php', code: '<' + '?php\n// Practical code implementation\n$data = ["status" => "active", "timestamp" => time()];\necho json_encode($data);\n?>' },
             { type: 'callout', title: 'Key Takeaway', style: 'tip', content: 'Notice how data structures are passed by value unless explicitly referenced.' }
         ];
         renderBlocks();
+    }
+
+    function syncTestButtonState(index) {
+        const btn = document.getElementById(`btn-test-sandbox-${index}`);
+        const textarea = document.getElementById(`code-snippet-textarea-${index}`);
+        if (!btn || !textarea) return;
+        const hasCode = textarea.value.trim().length > 0;
+        btn.disabled = !hasCode;
+        if (hasCode) {
+            btn.className = "text-xs font-semibold px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition shadow-sm text-emerald-400 hover:text-emerald-300 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700 cursor-pointer active:scale-95";
+            btn.title = "Test code snippet in sandbox";
+        } else {
+            btn.className = "text-xs font-semibold px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition shadow-sm text-slate-500 bg-slate-900 border border-slate-800 cursor-not-allowed opacity-50";
+            btn.title = "Enter code to test in sandbox";
+        }
+    }
+
+    function onSnippetLanguageChange(index, language) {
+        const isTestable = ['php', 'javascript', 'python', 'html', 'sql'].includes((language || 'php').toLowerCase());
+        const container = document.getElementById(`test-sandbox-container-${index}`);
+        const badge = document.getElementById(`block-badge-${index}`);
+        if (badge) {
+            badge.innerHTML = `<i class="fa-solid fa-code me-1"></i> Code Snippet (${(language || 'php').toUpperCase()})`;
+        }
+        if (container) {
+            if (isTestable) {
+                container.classList.remove('hidden');
+                container.classList.add('flex', 'items-center', 'gap-2');
+                syncTestButtonState(index);
+            } else {
+                container.classList.add('hidden');
+                container.classList.remove('flex', 'items-center', 'gap-2');
+            }
+        }
+        const resultBox = document.getElementById(`test-sandbox-result-${index}`);
+        if (resultBox) {
+            resultBox.classList.add('hidden');
+            resultBox.innerHTML = '';
+        }
+    }
+
+    function applyOutputToBlock(index, output) {
+        if (blocks[index]) {
+            blocks[index].output = output;
+            document.getElementById('blocks_json').value = JSON.stringify(blocks);
+            const outputTextarea = document.getElementById(`code-snippet-output-${index}`);
+            if (outputTextarea) {
+                outputTextarea.value = output;
+                outputTextarea.classList.add('ring-2', 'ring-emerald-500/70');
+                setTimeout(() => {
+                    outputTextarea.classList.remove('ring-2', 'ring-emerald-500/70');
+                }, 1200);
+            }
+        }
+    }
+
+    async function testSnippetInSandbox(index) {
+        const block = blocks[index];
+        if (!block) return;
+        const textarea = document.getElementById(`code-snippet-textarea-${index}`);
+        const code = textarea ? textarea.value : (block.code || '');
+        const language = (block.language || 'php').toLowerCase();
+
+        if (!code.trim()) {
+            return;
+        }
+
+        const btn = document.getElementById(`btn-test-sandbox-${index}`);
+        const resultBox = document.getElementById(`test-sandbox-result-${index}`);
+        const originalBtnHtml = `<i class="fa-solid fa-play text-[10px]"></i> Test in Sandbox`;
+
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-[10px]"></i> Testing...`;
+        }
+
+        if (resultBox) {
+            resultBox.classList.remove('hidden');
+            resultBox.innerHTML = `
+                <div class="flex items-center gap-2 text-indigo-400">
+                    <i class="fa-solid fa-spinner fa-spin text-xs"></i>
+                    <span>Testing snippet in sandbox (${language.toUpperCase()})...</span>
+                </div>
+            `;
+        }
+
+        try {
+            const response = await fetch("{{ route('code.execute') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ language, code })
+            });
+
+            const data = await response.json();
+
+            if (language === 'html') {
+                if (resultBox) {
+                    resultBox.innerHTML = `
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between text-emerald-400 font-bold text-[11px]">
+                                <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> HTML Live Render Preview</span>
+                                <button type="button" onclick="document.getElementById('test-sandbox-result-${index}').classList.add('hidden')" class="text-slate-400 hover:text-white text-xs">✕ Close</button>
+                            </div>
+                            <iframe class="w-full h-44 bg-white rounded-lg border border-slate-700" srcdoc="${escapeHtml(code)}"></iframe>
+                        </div>
+                    `;
+                }
+            } else {
+                const hasError = data.exit_code !== 0 || (data.stderr && data.stderr.trim().length > 0);
+                const outputText = data.stdout || data.stderr || '(No output returned)';
+
+                if (resultBox) {
+                    const safeOutput = escapeHtml(outputText);
+                    resultBox.innerHTML = `
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="flex items-center gap-1.5 font-bold text-[11px] ${hasError ? 'text-amber-400' : 'text-emerald-400'}">
+                                    <i class="fa-solid ${hasError ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i>
+                                    ${hasError ? 'Execution Failed / Error' : 'Sandbox Executed Successfully'} (${data.execution_time || '0.01s'})
+                                </span>
+                                <div class="flex items-center gap-2">
+                                    ${!hasError && data.stdout ? `
+                                        <button type="button" onclick="applyOutputToBlock(${index}, this.getAttribute('data-output'))" data-output="${escapeHtml(data.stdout)}" class="text-[10px] font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-950 border border-emerald-700 px-2 py-0.5 rounded transition">
+                                            <i class="fa-solid fa-arrow-down me-1"></i> Copy to Expected Output
+                                        </button>
+                                    ` : ''}
+                                    <button type="button" onclick="document.getElementById('test-sandbox-result-${index}').classList.add('hidden')" class="text-slate-400 hover:text-white text-xs">✕</button>
+                                </div>
+                            </div>
+                            <pre class="p-2.5 rounded-lg bg-black text-xs font-mono whitespace-pre-wrap ${hasError ? 'text-rose-400' : 'text-emerald-300'} max-h-48 overflow-y-auto">${safeOutput}</pre>
+                        </div>
+                    `;
+                }
+
+                // Auto-fill Expected Output if currently empty and test succeeded with stdout
+                if (!hasError && data.stdout && (!block.output || !block.output.trim())) {
+                    applyOutputToBlock(index, data.stdout);
+                }
+            }
+        } catch (err) {
+            if (resultBox) {
+                resultBox.innerHTML = `
+                    <div class="text-rose-400 space-y-1">
+                        <div class="flex items-center justify-between font-bold text-[11px]">
+                            <span><i class="fa-solid fa-circle-xmark me-1"></i> Sandbox execution error</span>
+                            <button type="button" onclick="document.getElementById('test-sandbox-result-${index}').classList.add('hidden')" class="text-slate-400 hover:text-white text-xs">✕ Close</button>
+                        </div>
+                        <p class="text-[11px] opacity-80">${escapeHtml(err.message || 'Network / server error')}</p>
+                    </div>
+                `;
+            }
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHtml;
+                syncTestButtonState(index);
+            }
+        }
     }
 
     function escapeHtml(string) {

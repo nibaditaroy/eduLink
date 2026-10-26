@@ -13,6 +13,7 @@ class Assignment extends Model
         'chapter_id',
         'lesson_id',
         'title',
+        'sort_order',
         'instructions',
         'max_marks',
         'deadline',

@@ -18,8 +18,9 @@ class AssignmentController extends Controller
 
         $chapter = Chapter::with('course')->findOrFail($chapterId);
         $lesson = $lessonId ? Lesson::find($lessonId) : null;
+        $nextOrder = $chapter->nextItemSortOrder();
 
-        return view('admin.assignments.create', compact('chapter', 'lesson'));
+        return view('admin.assignments.create', compact('chapter', 'lesson', 'nextOrder'));
     }
 
     public function store(Request $request)
@@ -28,6 +29,7 @@ class AssignmentController extends Controller
             'chapter_id' => 'required|exists:chapters,id',
             'lesson_id' => 'nullable|exists:lessons,id',
             'title' => 'required|string|max:255',
+            'sort_order' => 'required|integer|min:1',
             'instructions' => 'required|string',
             'max_marks' => 'required|integer|min:1',
             'deadline' => 'nullable|date',
@@ -64,6 +66,7 @@ class AssignmentController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'sort_order' => 'required|integer|min:1',
             'instructions' => 'required|string',
             'max_marks' => 'required|integer|min:1',
             'deadline' => 'nullable|date',
