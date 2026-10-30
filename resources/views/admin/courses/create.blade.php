@@ -141,8 +141,15 @@
             <!-- Thumbnail Upload -->
             <div>
                 <label for="thumbnail" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Course Thumbnail</label>
-                <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-xl cursor-pointer bg-gray-50 focus:outline-none p-2.5" id="thumbnail" name="thumbnail" type="file" accept="image/*">
-                <p class="mt-1 text-[11px] text-gray-500">Supported formats: JPG, PNG, WEBP (Max 2MB).</p>
+                <div class="flex items-center gap-4">
+                    <div id="thumbnail-preview-box" class="hidden w-28 h-20 rounded-xl overflow-hidden border border-gray-200 shadow-xs shrink-0">
+                        <img id="thumbnail-preview" src="#" alt="Thumbnail Preview" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-grow">
+                        <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-xl cursor-pointer bg-gray-50 focus:outline-none p-2.5" id="thumbnail" name="thumbnail" type="file" accept="image/*" onchange="previewThumbnail(event)">
+                        <p class="mt-1 text-[11px] text-gray-500">Supported formats: JPG, PNG, WEBP (Max 2MB).</p>
+                    </div>
+                </div>
             </div>
 
             <!-- Submit Button -->
@@ -160,6 +167,22 @@
 </div>
 
 <script>
+function previewThumbnail(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewBox = document.getElementById('thumbnail-preview-box');
+            const preview = document.getElementById('thumbnail-preview');
+            if (preview && previewBox) {
+                preview.src = e.target.result;
+                previewBox.classList.remove('hidden');
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
 function addLearningPoint(val = '') {
     const container = document.getElementById('learning-points-container');
     const div = document.createElement('div');

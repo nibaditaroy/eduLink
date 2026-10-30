@@ -62,4 +62,16 @@ class Course extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        if ($this->thumbnail) {
+            if (str_starts_with($this->thumbnail, 'http://') || str_starts_with($this->thumbnail, 'https://')) {
+                return $this->thumbnail;
+            }
+            return asset('storage/' . $this->thumbnail);
+        }
+
+        return null;
+    }
 }

@@ -121,13 +121,24 @@
 
             <!-- Thumbnail Upload -->
             <div>
-                <label for="thumbnail" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Change Thumbnail</label>
-                @if($course->thumbnail)
-                <div class="mb-2 w-32 h-20 rounded-xl overflow-hidden border border-gray-200">
-                    <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="Thumbnail" class="w-full h-full object-cover">
+                <label for="thumbnail" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Course Thumbnail</label>
+                <div class="flex items-center gap-4">
+                    <div id="edit-thumbnail-preview-box" class="w-32 h-20 rounded-xl overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center shrink-0">
+                        @if($course->thumbnail_url)
+                            <img id="edit-thumbnail-preview" src="{{ $course->thumbnail_url }}" alt="Thumbnail" class="w-full h-full object-cover">
+                        @else
+                            <div id="edit-thumbnail-placeholder" class="text-gray-400 text-center p-2">
+                                <i class="fa-solid fa-image text-xl mb-1 block"></i>
+                                <span class="text-[10px]">No thumbnail</span>
+                            </div>
+                            <img id="edit-thumbnail-preview" src="#" alt="Thumbnail" class="w-full h-full object-cover hidden">
+                        @endif
+                    </div>
+                    <div class="flex-grow">
+                        <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-xl cursor-pointer bg-gray-50 focus:outline-none p-2.5" id="thumbnail" name="thumbnail" type="file" accept="image/*" onchange="previewEditThumbnail(event)">
+                        <p class="mt-1 text-[11px] text-gray-500">Supported formats: JPG, PNG, WEBP (Max 2MB).</p>
+                    </div>
                 </div>
-                @endif
-                <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-xl cursor-pointer bg-gray-50 focus:outline-none p-2.5" id="thumbnail" name="thumbnail" type="file" accept="image/*">
             </div>
 
             <!-- Submit Button -->
@@ -145,6 +156,25 @@
 </div>
 
 <script>
+function previewEditThumbnail(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('edit-thumbnail-preview');
+            const placeholder = document.getElementById('edit-thumbnail-placeholder');
+            if (preview) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+            }
+            if (placeholder) {
+                placeholder.classList.add('hidden');
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
 function addLearningPoint(val = '') {
     const container = document.getElementById('learning-points-container');
     const div = document.createElement('div');

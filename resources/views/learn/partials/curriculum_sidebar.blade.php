@@ -47,6 +47,11 @@
                                 @php
                                     $hasCode = !empty($lesson->code_snippet) || (is_array($lesson->content_blocks) && collect($lesson->content_blocks)->contains(fn($b) => in_array($b['type'] ?? '', ['code', 'practice'])));
                                 @endphp
+                                @if(!empty($lesson->pdf_file))
+                                    <span class="text-[9px] px-1 py-0.5 rounded font-mono {{ $isActive ? 'bg-indigo-800 text-amber-300' : 'bg-amber-50 text-amber-700 border border-amber-200/60' }} flex items-center gap-0.5" title="Downloadable PDF slides attached">
+                                        <i class="fa-solid fa-file-pdf text-[8px]"></i> PDF
+                                    </span>
+                                @endif
                                 @if($hasCode)
                                     @if($isActive)
                                         <button type="button" onclick="event.preventDefault(); event.stopPropagation(); if (typeof scrollToPracticeLab === 'function') { scrollToPracticeLab(); } else { window.location.hash = 'practice-sandbox-section'; }" title="Jump to Practice Code Lab" class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-indigo-700 hover:bg-indigo-800 text-indigo-100 flex items-center gap-1 transition shadow-2xs">

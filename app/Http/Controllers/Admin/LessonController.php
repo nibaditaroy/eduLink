@@ -159,4 +159,30 @@ class LessonController extends Controller
 
         return $blocks;
     }
+
+    /**
+     * Handle asynchronous image uploads for modular lesson blocks
+     */
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp,svg|max:10240',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('lesson_images', 'public');
+            $url = asset('storage/' . $path);
+
+            return response()->json([
+                'success' => true,
+                'url' => $url,
+                'path' => $path,
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No image file uploaded.',
+        ], 422);
+    }
 }

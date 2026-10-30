@@ -349,18 +349,59 @@
                 `;
             } else if (block.type === 'image') {
                 headerBadge = `<span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-image me-1"></i> Image / Architecture Diagram</span>`;
+                const hasImage = !!(block.url && block.url.trim().length > 0);
                 contentHtml = `
-                    <div class="space-y-2">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Image URL</label>
-                                <input type="url" value="${escapeHtml(block.url || '')}" oninput="updateBlock(${index}, 'url', this.value)" placeholder="https://images.unsplash.com/... or /storage/..." class="bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full">
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Left: Device Upload or URL -->
+                            <div class="space-y-2">
+                                <label class="block text-[11px] font-bold text-gray-700 uppercase">Image Source</label>
+                                
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <label class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95">
+                                        <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+                                        <span>Upload Device Image</span>
+                                        <input type="file" accept="image/*" class="hidden" onchange="uploadBlockImage(${index}, this)">
+                                    </label>
+                                    <span id="upload-status-${index}" class="text-xs text-gray-500"></span>
+                                </div>
+
+                                <div class="relative flex py-1 items-center">
+                                    <div class="flex-grow border-t border-gray-200"></div>
+                                    <span class="flex-shrink mx-2 text-[10px] uppercase font-bold text-gray-400">or enter image url</span>
+                                    <div class="flex-grow border-t border-gray-200"></div>
+                                </div>
+
+                                <div>
+                                    <input type="url" value="${escapeHtml(block.url || '')}" oninput="updateBlock(${index}, 'url', this.value); renderBlocks();" placeholder="https://images.unsplash.com/... or /storage/..." class="bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full focus:ring-indigo-500 focus:border-indigo-500">
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Caption / Alt Text</label>
-                                <input type="text" value="${escapeHtml(block.caption || '')}" oninput="updateBlock(${index}, 'caption', this.value)" placeholder="e.g. Model-View-Controller Request Cycle" class="bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full">
+
+                            <!-- Right: Caption / Alt Text -->
+                            <div class="space-y-2">
+                                <label class="block text-[11px] font-bold text-gray-700 uppercase">Caption / Alt Text</label>
+                                <input type="text" value="${escapeHtml(block.caption || '')}" oninput="updateBlock(${index}, 'caption', this.value)" placeholder="e.g. Model-View-Controller Request Cycle" class="bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-xl p-2.5 w-full focus:ring-indigo-500 focus:border-indigo-500">
+                                <p class="text-[11px] text-gray-400">Displayed below the image for students as figure caption and accessibility label.</p>
                             </div>
                         </div>
+
+                        ${hasImage ? `
+                            <!-- Live Image Preview Box -->
+                            <div class="mt-2 p-3 bg-gray-50 rounded-2xl border border-gray-200 flex flex-col sm:flex-row items-center gap-4">
+                                <div class="w-full sm:w-48 h-32 rounded-xl bg-slate-900 overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-200 shadow-xs relative group">
+                                    <img src="${escapeHtml(block.url)}" alt="${escapeHtml(block.caption || 'Preview')}" class="w-full h-full object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'text-xs text-rose-500 font-bold p-2 text-center\\'>Invalid image URL</span>';">
+                                </div>
+                                <div class="flex-grow space-y-1 text-center sm:text-left">
+                                    <div class="text-xs font-bold text-gray-800 break-all">${escapeHtml(block.caption || 'Diagram Preview')}</div>
+                                    <div class="text-[11px] text-gray-500 break-all font-mono">${escapeHtml(block.url)}</div>
+                                    <div class="pt-2">
+                                        <button type="button" onclick="updateBlock(${index}, 'url', ''); renderBlocks();" class="text-xs text-rose-600 hover:text-rose-700 font-bold inline-flex items-center gap-1">
+                                            <i class="fa-solid fa-trash-can"></i> Remove Image
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             } else if (block.type === 'callout') {
@@ -556,6 +597,56 @@
     function removeBlock(index) {
         blocks.splice(index, 1);
         renderBlocks();
+    }
+
+    function uploadBlockImage(index, input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        
+        if (file.size > 10 * 1024 * 1024) {
+            alert('File is too large. Maximum image size is 10MB.');
+            input.value = '';
+            return;
+        }
+
+        const statusEl = document.getElementById(`upload-status-${index}`);
+        if (statusEl) {
+            statusEl.innerHTML = `<span class="inline-flex items-center gap-1.5 text-xs text-indigo-600 font-bold animate-pulse"><i class="fa-solid fa-spinner fa-spin"></i> Uploading ${escapeHtml(file.name)}...</span>`;
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+
+        fetch('{{ route("admin.lessons.upload_image") }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(json => { throw new Error(json.message || 'Server upload error'); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.url) {
+                updateBlock(index, 'url', data.url);
+                renderBlocks();
+            } else {
+                alert(data.message || 'Image upload failed.');
+                if (statusEl) statusEl.innerHTML = '';
+            }
+        })
+        .catch(err => {
+            console.error('Upload Error:', err);
+            alert('Upload failed: ' + (err.message || 'Unknown error occurred.'));
+            if (statusEl) statusEl.innerHTML = '';
+        });
     }
 
     function moveBlock(index, direction) {

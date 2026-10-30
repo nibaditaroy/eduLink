@@ -15,7 +15,7 @@
                     </div>
                 @endif
                 <div>
-                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Student Hub</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">BAUST Student Hub</span>
                     <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-0.5">
                         Welcome, {{ Auth::user()->name }}! 👋
                     </h1>
@@ -93,25 +93,71 @@
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden group">
                 <div>
                     <!-- Header Banner -->
-                    <div class="h-32 bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-800 p-4 flex flex-col justify-between relative overflow-hidden">
+                    <div class="h-52 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-5 flex flex-col justify-between relative overflow-hidden">
+                        @if($course->thumbnail_url)
+                            <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-900/40"></div>
+                        @else
+                            <!-- Geometric Dot Matrix Texture -->
+                            <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 16px 16px;"></div>
+                            
+                            <!-- Ambient Glow -->
+                            <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full {{ Str::contains(strtolower($course->title), 'python') ? 'bg-cyan-500/25' : 'bg-indigo-500/25' }} blur-2xl group-hover:scale-125 transition duration-500"></div>
+                            <div class="absolute -left-12 -bottom-12 w-48 h-48 rounded-full {{ Str::contains(strtolower($course->title), 'python') ? 'bg-amber-500/20' : 'bg-rose-500/20' }} blur-2xl"></div>
+                        @endif
+
+                        <!-- Top Badges Bar -->
                         <div class="flex items-center justify-between relative z-10">
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white border border-white/20">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/10 text-white backdrop-blur-md border border-white/20 shadow-xs">
                                 {{ $course->category }}
                             </span>
                             @if($enrollment->status === 'completed' || $enrollment->progress_percent >= 100)
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 shadow-xs">
                                     <i class="fa-solid fa-check"></i> Completed
                                 </span>
                             @else
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 backdrop-blur-sm shadow-xs">
                                     In Progress
                                 </span>
                             @endif
                         </div>
 
-                        <h3 class="font-bold text-white text-sm line-clamp-2 relative z-10 leading-snug group-hover:text-cyan-200 transition">
-                            {{ $course->title }}
-                        </h3>
+                        <!-- Centerpiece Tech Stack Indicator -->
+                        <div class="my-auto py-2 flex items-center justify-between relative z-10">
+                            @if(!$course->thumbnail_url)
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr {{ Str::contains(strtolower($course->title), 'python') ? 'from-amber-500 to-cyan-400' : 'from-indigo-600 to-rose-500' }} p-0.5 shadow-lg group-hover:scale-110 transition duration-300">
+                                <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-lg">
+                                    @if(Str::contains(strtolower($course->title), 'python'))
+                                        <i class="fa-brands fa-python text-amber-400 text-xl"></i>
+                                    @elseif(Str::contains(strtolower($course->title), ['laravel', 'php']))
+                                        <i class="fa-brands fa-laravel text-rose-500 text-xl"></i>
+                                    @else
+                                        <i class="fa-solid fa-code text-cyan-400 text-xl"></i>
+                                    @endif
+                                </div>
+                            </div>
+                            @endif
+
+                            <div class="text-right ms-auto">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-700/80 text-[10px] font-mono text-cyan-300 shadow-xs backdrop-blur-sm">
+                                    <i class="fa-solid fa-microchip text-[9px]"></i>
+                                    @if(Str::contains(strtolower($course->title), 'python'))
+                                        Python 3 &bull; DSA
+                                    @elseif(Str::contains(strtolower($course->title), ['laravel', 'php']))
+                                        PHP 8.2 &bull; Laravel
+                                    @else
+                                        Interactive Lab
+                                    @endif
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Title on Banner -->
+                        <div class="relative z-10">
+                            <h3 class="font-extrabold text-white text-base line-clamp-2 leading-snug group-hover:text-cyan-200 transition drop-shadow-xs">
+                                {{ $course->title }}
+                            </h3>
+                        </div>
                     </div>
 
                     <!-- Progress Details -->

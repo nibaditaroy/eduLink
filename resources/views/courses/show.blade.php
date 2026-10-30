@@ -189,6 +189,50 @@
         <!-- Right: Sticky Purchase / Enrollment Card -->
         <div class="lg:sticky lg:top-24">
             <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden p-6 sm:p-7">
+                @if($course->thumbnail_url)
+                    <div class="mb-6 -mx-6 -mt-6 sm:-mx-7 sm:-mt-7 h-48 sm:h-52 overflow-hidden relative group">
+                        <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent"></div>
+                        <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white text-xs font-bold">
+                            <span class="px-2.5 py-1 rounded-lg bg-black/50 backdrop-blur-md border border-white/20 text-[10px] uppercase">
+                                {{ $course->category }}
+                            </span>
+                            <span class="px-2.5 py-1 rounded-lg bg-indigo-600/80 backdrop-blur-md text-[10px] uppercase">
+                                {{ ucfirst($course->level) }}
+                            </span>
+                        </div>
+                    </div>
+                @else
+                    <div class="mb-6 -mx-6 -mt-6 sm:-mx-7 sm:-mt-7 h-48 sm:h-52 overflow-hidden relative bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-5 flex flex-col justify-between">
+                        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 16px 16px;"></div>
+                        <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full {{ Str::contains(strtolower($course->title), 'python') ? 'bg-cyan-500/25' : 'bg-indigo-500/25' }} blur-2xl"></div>
+                        <div class="relative z-10 flex items-center justify-between">
+                            <span class="px-2.5 py-1 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase">
+                                {{ $course->category }}
+                            </span>
+                            <span class="px-2.5 py-1 rounded-lg bg-indigo-500/30 border border-indigo-400/30 text-indigo-200 text-[10px] font-bold uppercase">
+                                {{ ucfirst($course->level) }}
+                            </span>
+                        </div>
+                        <div class="relative z-10 my-auto flex justify-center">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr {{ Str::contains(strtolower($course->title), 'python') ? 'from-amber-500 to-cyan-400' : 'from-indigo-600 to-rose-500' }} p-0.5 shadow-lg">
+                                <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-xl">
+                                    @if(Str::contains(strtolower($course->title), 'python'))
+                                        <i class="fa-brands fa-python text-amber-400 text-2xl"></i>
+                                    @elseif(Str::contains(strtolower($course->title), ['laravel', 'php']))
+                                        <i class="fa-brands fa-laravel text-rose-500 text-2xl"></i>
+                                    @else
+                                        <i class="fa-solid fa-code text-cyan-400 text-2xl"></i>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative z-10">
+                            <h3 class="text-sm font-bold text-white line-clamp-1">{{ $course->title }}</h3>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Price Header -->
                 <div class="mb-6 pb-6 border-b border-slate-100">
                     <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Tuition & Enrollment</span>

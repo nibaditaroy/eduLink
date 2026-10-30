@@ -10,14 +10,18 @@
         <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-indigo-200 backdrop-blur-md mb-2">
-                    <i class="fa-solid fa-graduation-cap"></i> Academic Management System
+                    <i class="fa-solid fa-graduation-cap"></i> BAUST Academic Management System
                 </span>
                 <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Admin & Curriculum Control</h1>
                 <p class="text-indigo-200 text-sm mt-1 max-w-xl">
-                    Manage university courses, chapters, interactive lessons, quizzes, and practical assignments.
+                    Manage BAUST engineering courses, chapters, interactive lessons, quizzes, and practical assignments.
                 </p>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 flex-wrap">
+                <a href="{{ route('home') }}" target="_blank" class="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl backdrop-blur-md shadow-md transition group">
+                    <i class="fa-solid fa-globe me-2 text-cyan-300 group-hover:rotate-12 transition"></i> Live View Website
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ms-2 opacity-70"></i>
+                </a>
                 <a href="{{ route('admin.courses.create') }}" class="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-indigo-900 bg-white hover:bg-indigo-50 rounded-xl shadow-md transition">
                     <i class="fa-solid fa-plus me-2 text-indigo-600"></i> Create New Course
                 </a>
@@ -148,8 +152,8 @@
                 <div>
                     <!-- Thumbnail or Banner -->
                     <div class="h-36 bg-gradient-to-r from-slate-800 to-indigo-900 relative overflow-hidden flex items-center justify-center">
-                        @if($course->thumbnail)
-                        <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
+                        @if($course->thumbnail_url)
+                        <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
                         @else
                         <div class="text-center text-white/80 p-4">
                             <i class="fa-solid fa-laptop-code text-3xl mb-2 text-indigo-400"></i>

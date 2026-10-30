@@ -7,36 +7,43 @@
 
     <!-- Breadcrumb & Header -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-            <nav class="flex mb-2 text-xs text-gray-500" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-2">
-                    <li><a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600">Dashboard</a></li>
-                    <li><i class="fa-solid fa-chevron-right text-[10px]"></i></li>
-                    <li><a href="{{ route('admin.courses.index') }}" class="hover:text-indigo-600">Courses</a></li>
-                    <li><i class="fa-solid fa-chevron-right text-[10px]"></i></li>
-                    <li class="font-medium text-gray-900">Curriculum Hierarchy</li>
-                </ol>
-            </nav>
-            <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">{{ $course->title }}</h1>
-            <div class="flex flex-wrap items-center gap-2 mt-2">
-                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
-                    {{ $course->category }}
-                </span>
-                <span class="px-2.5 py-1 rounded-md text-xs font-semibold uppercase bg-slate-100 text-slate-700">
-                    {{ $course->level }}
-                </span>
-                @if($course->isFree())
-                <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    Free Course
-                </span>
-                @else
-                <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-600 text-white shadow-sm">
-                    ৳{{ number_format($course->price, 2) }} Tk
-                </span>
-                @endif
-                <span class="text-xs text-gray-400">
-                    • {{ $course->chapters->count() }} Chapters • {{ $course->chapters->sum(fn($ch) => $ch->lessons->count()) }} Lessons
-                </span>
+        <div class="flex items-start gap-4">
+            @if($course->thumbnail_url)
+                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border border-gray-200 shadow-sm shrink-0 mt-1">
+                    <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
+                </div>
+            @endif
+            <div>
+                <nav class="flex mb-2 text-xs text-gray-500" aria-label="Breadcrumb">
+                    <ol class="inline-flex items-center space-x-1 md:space-x-2">
+                        <li><a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600">Dashboard</a></li>
+                        <li><i class="fa-solid fa-chevron-right text-[10px]"></i></li>
+                        <li><a href="{{ route('admin.courses.index') }}" class="hover:text-indigo-600">Courses</a></li>
+                        <li><i class="fa-solid fa-chevron-right text-[10px]"></i></li>
+                        <li class="font-medium text-gray-900">Curriculum Hierarchy</li>
+                    </ol>
+                </nav>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">{{ $course->title }}</h1>
+                <div class="flex flex-wrap items-center gap-2 mt-2">
+                    <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                        {{ $course->category }}
+                    </span>
+                    <span class="px-2.5 py-1 rounded-md text-xs font-semibold uppercase bg-slate-100 text-slate-700">
+                        {{ $course->level }}
+                    </span>
+                    @if($course->isFree())
+                    <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        Free Course
+                    </span>
+                    @else
+                    <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-600 text-white shadow-sm">
+                        ৳{{ number_format($course->price, 2) }} Tk
+                    </span>
+                    @endif
+                    <span class="text-xs text-gray-400">
+                        • {{ $course->chapters->count() }} Chapters • {{ $course->chapters->sum(fn($ch) => $ch->lessons->count()) }} Lessons
+                    </span>
+                </div>
             </div>
         </div>
 

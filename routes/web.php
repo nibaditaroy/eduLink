@@ -112,6 +112,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('chapters', ChapterController::class)->except(['index', 'show']);
 
         // Lesson Management (Under Chapter)
+        Route::post('/lessons/upload-image', [LessonController::class, 'uploadImage'])->name('lessons.upload_image');
         Route::resource('lessons', LessonController::class)->except(['index']);
 
         // Quiz Management (Under Chapter/Lesson)
@@ -140,3 +141,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('/transactions/{id}/status', [TransactionController::class, 'updateStatus'])->name('transactions.status');
     });
 });
+
+/*
+|--------------------------------------------------------------------------
+| Storage Asset Fallback Route
+|--------------------------------------------------------------------------
+| Ensures uploaded public images (avatars, thumbnails) are served reliably
+| even if web server symlink resolution is bypassed or restricted.
+*/
+Route::get('/storage/{path}', function ($path) {
+    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+        return \Illuminate\Support\Facades\Storage::disk('public')->response($path);
+    }
+    abort(404);
+})->where('path', '.*')->name('storage.fallback');

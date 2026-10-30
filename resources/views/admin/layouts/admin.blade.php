@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin Portal') - EDULINK LMS</title>
 
     <!-- Flowbite & Tailwind via CDN for seamless immediate rendering -->
@@ -94,9 +95,8 @@
                         </div>
                         <div>
                             <span
-                                class="self-center text-xl font-bold whitespace-nowrap text-gray-900 tracking-tight">EDULINK</span>
-                            <span class="block text-xs font-semibold uppercase tracking-wider text-indigo-600">Admin
-                                CMS</span>
+                                class="self-center text-xl font-bold whitespace-nowrap text-gray-900 tracking-tight">BAUST <span class="text-indigo-600">LMS</span></span>
+                            <span class="block text-xs font-semibold uppercase tracking-wider text-indigo-600">eduLink Admin</span>
                         </div>
                     </a>
                 </div>
@@ -105,8 +105,18 @@
                     <span
                         class="hidden md:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
                         <span class="w-2 h-2 me-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                        University Demo Mode
+                        BAUST Campus Mode
                     </span>
+
+                    <!-- Live View Website Link -->
+                    <a href="{{ route('home') }}" target="_blank"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:text-indigo-600 bg-gray-100 hover:bg-indigo-50 border border-gray-200 hover:border-indigo-200 rounded-xl shadow-xs transition group"
+                        title="Open Live Public Website">
+                        <i class="fa-solid fa-globe text-indigo-600 group-hover:scale-110 transition"></i>
+                        <span class="hidden sm:inline">Live View Website</span>
+                        <span class="sm:hidden">View Site</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-gray-400 group-hover:text-indigo-600"></i>
+                    </a>
 
                     <!-- Quick Create Dropdown -->
                     <div class="relative">
@@ -309,8 +319,14 @@
                     </span>
                     <span class="text-xs font-bold text-gray-900">Admin Quick Access</span>
                 </div>
-                <p class="text-[11px] text-gray-600 mb-2">Logged in as Administrator with full CRUD permissions.</p>
-                <div class="text-[10px] text-gray-400">EDULINK • University LMS</div>
+                <p class="text-[11px] text-gray-600 mb-2.5">Logged in as Administrator with full CRUD permissions.</p>
+                <a href="{{ route('home') }}" target="_blank"
+                    class="w-full py-2 px-3 rounded-xl bg-white hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 text-xs font-bold shadow-xs transition flex items-center justify-center gap-2 group mb-2">
+                    <i class="fa-solid fa-globe group-hover:rotate-12 transition"></i>
+                    <span>Live View Website</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-70"></i>
+                </a>
+                <div class="text-[10px] text-gray-400 text-center">BAUST &bull; eduLink University LMS</div>
             </div>
         </div>
     </aside>

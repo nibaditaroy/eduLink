@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Empower Your Tech Career') - eduLink Platform</title>
+    <title>@yield('title', 'Empower Your Tech Career') - BAUST eduLink</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,7 +74,7 @@
             class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
             <i class="fa-solid fa-bangladeshi-taka-sign mr-1"></i> BDT (৳ Tk)
         </span>
-        <span>Bangladesh's Premier Hands-on Tech Academy &bull; Instant bKash, Nagad & Rocket Enrollment!</span>
+        <span>BAUST &bull; Bangladesh Army University of Science & Technology Hands-on Tech Academy</span>
     </div>
 
     <!-- Navigation Header -->
@@ -90,11 +90,10 @@
                         </div>
                         <div>
                             <span
-                                class="text-xl font-extrabold tracking-tight text-slate-900 group-hover:text-indigo-600 transition">edu<span
-                                    class="text-indigo-600">Link</span></span>
+                                class="text-xl font-extrabold tracking-tight text-slate-900 group-hover:text-indigo-600 transition">BAUST <span
+                                    class="text-indigo-600">eduLink</span></span>
                             <span
-                                class="block text-[10px] uppercase font-bold tracking-widest text-slate-400 -mt-1">Learning
-                                Lab</span>
+                                class="block text-[10px] uppercase font-bold tracking-widest text-indigo-600 -mt-1">Learning Lab</span>
                         </div>
                     </a>
 
@@ -300,12 +299,11 @@
                         <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
                             <i class="fa-solid fa-graduation-cap"></i>
                         </div>
-                        <span class="text-lg font-bold text-white tracking-tight">edu<span
-                                class="text-indigo-400">Link</span> LMS</span>
+                        <span class="text-lg font-bold text-white tracking-tight">BAUST <span
+                                class="text-indigo-400">eduLink</span> LMS</span>
                     </div>
                     <p class="text-slate-400 text-xs leading-relaxed max-w-sm">
-                        High-engagement tech learning platform with interactive code execution sandboxes, real-world
-                        project assignments, instant assessments, and verifiable graduation certificates.
+                        Bangladesh Army University of Science and Technology (BAUST) hands-on tech learning platform with interactive code execution sandboxes, real-world project assignments, instant assessments, and verifiable graduation certificates.
                     </p>
                     <div class="mt-4 flex items-center gap-2 text-[11px] text-slate-300">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -365,10 +363,8 @@
 
             <div
                 class="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
-                <p>&copy; {{ date('Y') }} eduLink Platform. Developed for Next-Generation Engineers.</p>
+                <p>&copy; {{ date('Y') }} BAUST eduLink Platform &bull; Bangladesh Army University of Science & Technology.</p>
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('home') }}" class="hover:text-slate-400 transition">Privacy Policy</a>
-                    <a href="{{ route('home') }}" class="hover:text-slate-400 transition">Terms of Service</a>
                     <a href="{{ route('admin.dashboard') }}"
                         class="text-indigo-400 hover:text-indigo-300 font-semibold transition">
                         <i class="fa-solid fa-lock text-[10px] mr-1"></i> Admin Login

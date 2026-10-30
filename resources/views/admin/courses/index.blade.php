@@ -11,9 +11,15 @@
             <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Courses Management</h1>
             <p class="text-xs text-gray-500 mt-0.5">Manage your curriculum directory, pricing, and nested content.</p>
         </div>
-        <a href="{{ route('admin.courses.create') }}" class="inline-flex items-center px-4 py-2.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition">
-            <i class="fa-solid fa-plus me-2"></i> Add New Course
-        </a>
+        <div class="flex items-center gap-2.5 flex-wrap">
+            <a href="{{ route('courses.index') }}" target="_blank" class="inline-flex items-center px-3.5 py-2.5 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded-xl shadow-xs transition group">
+                <i class="fa-solid fa-globe text-indigo-600 me-2 group-hover:rotate-12 transition"></i> View Live Catalog
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ms-1.5 text-gray-400"></i>
+            </a>
+            <a href="{{ route('admin.courses.create') }}" class="inline-flex items-center px-4 py-2.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition">
+                <i class="fa-solid fa-plus me-2"></i> Add New Course
+            </a>
+        </div>
     </div>
 
     <!-- Courses Table -->
@@ -36,8 +42,8 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200 flex items-center justify-center">
-                                    @if($course->thumbnail)
-                                    <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
+                                    @if($course->thumbnail_url)
+                                    <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
                                     @else
                                     <i class="fa-solid fa-book-open text-indigo-600"></i>
                                     @endif
@@ -90,6 +96,9 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                             <div class="inline-flex items-center gap-1">
+                                <a href="{{ route('courses.show', $course->slug) }}" target="_blank" title="View Course on Live Website" class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </a>
                                 <a href="{{ route('admin.courses.show', $course->id) }}" title="Manage Curriculum (Chapters & Lessons)" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition">
                                     <i class="fa-solid fa-sitemap"></i>
                                 </a>

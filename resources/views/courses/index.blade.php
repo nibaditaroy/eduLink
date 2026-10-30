@@ -95,12 +95,17 @@
             <div class="bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group">
                 <!-- Clickable Tech Banner linked to Syllabus -->
                 <a href="{{ route('courses.show', $course->slug) }}" class="relative block h-52 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-5 overflow-hidden group/thumb cursor-pointer">
-                    <!-- Geometric Dot Matrix Texture -->
-                    <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 16px 16px;"></div>
-                    
-                    <!-- Ambient Glow -->
-                    <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full {{ Str::contains(strtolower($course->title), 'python') ? 'bg-cyan-500/25' : 'bg-indigo-500/25' }} blur-2xl group-hover/thumb:scale-125 transition duration-500"></div>
-                    <div class="absolute -left-12 -bottom-12 w-48 h-48 rounded-full {{ Str::contains(strtolower($course->title), 'python') ? 'bg-amber-500/20' : 'bg-rose-500/20' }} blur-2xl"></div>
+                    @if($course->thumbnail_url)
+                        <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}" class="absolute inset-0 w-full h-full object-cover group-hover/thumb:scale-105 transition-all duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-900/40"></div>
+                    @else
+                        <!-- Geometric Dot Matrix Texture -->
+                        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 16px 16px;"></div>
+                        
+                        <!-- Ambient Glow -->
+                        <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full {{ Str::contains(strtolower($course->title), 'python') ? 'bg-cyan-500/25' : 'bg-indigo-500/25' }} blur-2xl group-hover/thumb:scale-125 transition duration-500"></div>
+                        <div class="absolute -left-12 -bottom-12 w-48 h-48 rounded-full {{ Str::contains(strtolower($course->title), 'python') ? 'bg-amber-500/20' : 'bg-rose-500/20' }} blur-2xl"></div>
+                    @endif
 
                     <div class="relative z-10 flex flex-col justify-between h-full">
                         <!-- Badges Bar -->
@@ -115,6 +120,7 @@
 
                         <!-- Tech Centerpiece Icon & Stack Indicator -->
                         <div class="my-auto py-2 flex items-center justify-between">
+                            @if(!$course->thumbnail_url)
                             <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr {{ Str::contains(strtolower($course->title), 'python') ? 'from-amber-500 to-cyan-400' : 'from-indigo-600 to-rose-500' }} p-0.5 shadow-lg group-hover/thumb:scale-110 transition duration-300">
                                 <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-xl">
                                     @if(Str::contains(strtolower($course->title), 'python'))
@@ -126,10 +132,11 @@
                                     @endif
                                 </div>
                             </div>
+                            @endif
 
                             <!-- Tech Tag Pills -->
-                            <div class="text-right">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-700/80 text-[10px] font-mono text-cyan-300 shadow-xs">
+                            <div class="text-right ms-auto">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-700/80 text-[10px] font-mono text-cyan-300 shadow-xs backdrop-blur-sm">
                                     <i class="fa-solid fa-microchip text-[9px]"></i>
                                     @if(Str::contains(strtolower($course->title), 'python'))
                                         Python 3 &bull; DSA
@@ -139,7 +146,7 @@
                                         Full Stack Lab
                                     @endif
                                 </span>
-                                <span class="block text-[10px] text-slate-400 font-semibold mt-1">Interactive Sandbox &bull; Verified</span>
+                                <span class="block text-[10px] text-slate-300 font-semibold mt-1 drop-shadow-xs">Interactive Sandbox &bull; Verified</span>
                             </div>
                         </div>
 

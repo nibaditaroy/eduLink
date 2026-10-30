@@ -77,6 +77,7 @@
 
                 <!-- Mark Complete Action / Free Preview Prompt / Practice Code -->
                 <div class="flex items-center gap-2.5 flex-wrap">
+
                     <button type="button" onclick="scrollToPracticeLab()" class="px-3.5 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs">
                         <i class="fa-solid fa-terminal text-emerald-600"></i>
                         <span>Practice Code</span>
@@ -105,6 +106,24 @@
                     @endif
                 </div>
             </div>
+
+            <!-- Downloadable PDF Lecture Slides / Study Material (Quick Access at Top) -->
+            @if($currentLesson->pdf_file)
+                <div class="p-4 sm:p-5 bg-amber-50/80 rounded-3xl border border-amber-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-lg shadow-sm flex-shrink-0">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm">Downloadable Material & Lecture Slides</h4>
+                            <p class="text-xs text-amber-900/80">Supplementary study notes and slides attached to this lesson.</p>
+                        </div>
+                    </div>
+                    <a href="{{ asset('storage/' . $currentLesson->pdf_file) }}" target="_blank" class="inline-flex items-center justify-center px-4 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-xl transition shadow-sm flex-shrink-0">
+                        <i class="fa-solid fa-arrow-down me-1.5"></i> Open / Download PDF
+                    </a>
+                </div>
+            @endif
 
             <!-- Modular Block Rendering Engine or Classic Fallback -->
             @if(is_array($currentLesson->content_blocks) && count($currentLesson->content_blocks) > 0)
