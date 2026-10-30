@@ -90,10 +90,11 @@
                         </div>
                         <div>
                             <span
-                                class="text-xl font-extrabold tracking-tight text-slate-900 group-hover:text-indigo-600 transition">BAUST <span
-                                    class="text-indigo-600">eduLink</span></span>
+                                class="text-xl font-extrabold tracking-tight text-slate-900 group-hover:text-indigo-600 transition">BAUST
+                                <span class="text-indigo-600">eduLink</span></span>
                             <span
-                                class="block text-[10px] uppercase font-bold tracking-widest text-indigo-600 -mt-1">Learning Lab</span>
+                                class="block text-[10px] uppercase font-bold tracking-widest text-indigo-600 -mt-1">Learning
+                                Lab</span>
                         </div>
                     </a>
 
@@ -303,7 +304,9 @@
                                 class="text-indigo-400">eduLink</span> LMS</span>
                     </div>
                     <p class="text-slate-400 text-xs leading-relaxed max-w-sm">
-                        Bangladesh Army University of Science and Technology (BAUST) hands-on tech learning platform with interactive code execution sandboxes, real-world project assignments, instant assessments, and verifiable graduation certificates.
+                        Bangladesh Army University of Science and Technology (BAUST) hands-on tech learning platform
+                        with interactive code execution sandboxes, real-world project assignments, instant assessments,
+                        and verifiable graduation certificates.
                     </p>
                     <div class="mt-4 flex items-center gap-2 text-[11px] text-slate-300">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -363,7 +366,8 @@
 
             <div
                 class="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
-                <p>&copy; {{ date('Y') }} BAUST eduLink Platform &bull; Bangladesh Army University of Science & Technology.</p>
+                <p>&copy; {{ date('Y') }} BAUST eduLink Platform &bull; Bangladesh Army University of Science &
+                    Technology.</p>
                 <div class="flex items-center gap-4">
                     <a href="{{ route('admin.dashboard') }}"
                         class="text-indigo-400 hover:text-indigo-300 font-semibold transition">

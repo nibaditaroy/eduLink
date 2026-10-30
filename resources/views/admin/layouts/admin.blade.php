@@ -95,18 +95,15 @@
                         </div>
                         <div>
                             <span
-                                class="self-center text-xl font-bold whitespace-nowrap text-gray-900 tracking-tight">BAUST <span class="text-indigo-600">LMS</span></span>
-                            <span class="block text-xs font-semibold uppercase tracking-wider text-indigo-600">eduLink Admin</span>
+                                class="self-center text-xl font-bold whitespace-nowrap text-gray-900 tracking-tight">BAUST
+                                <span class="text-indigo-600">LMS</span></span>
+                            <span class="block text-xs font-semibold uppercase tracking-wider text-indigo-600">eduLink
+                                Admin</span>
                         </div>
                     </a>
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <span
-                        class="hidden md:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        <span class="w-2 h-2 me-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                        BAUST Campus Mode
-                    </span>
 
                     <!-- Live View Website Link -->
                     <a href="{{ route('home') }}" target="_blank"
@@ -115,7 +112,8 @@
                         <i class="fa-solid fa-globe text-indigo-600 group-hover:scale-110 transition"></i>
                         <span class="hidden sm:inline">Live View Website</span>
                         <span class="sm:hidden">View Site</span>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-gray-400 group-hover:text-indigo-600"></i>
+                        <i
+                            class="fa-solid fa-arrow-up-right-from-square text-[9px] text-gray-400 group-hover:text-indigo-600"></i>
                     </a>
 
                     <!-- Quick Create Dropdown -->
@@ -164,7 +162,8 @@
                             @endif
                             <div class="hidden md:block text-left">
                                 <div class="text-xs font-bold text-gray-900 leading-tight">
-                                    {{ Auth::user()->name ?? 'Administrator' }}</div>
+                                    {{ Auth::user()->name ?? 'Administrator' }}
+                                </div>
                                 <div class="text-[10px] text-gray-400 capitalize">{{ Auth::user()->role ?? 'Admin' }}
                                 </div>
                             </div>
